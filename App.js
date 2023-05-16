@@ -20,21 +20,20 @@ import { Provider } from "react-redux";
 
 
 import * as Font from 'expo-font';
-import AppLoading from 'expo-app-loading';
+import * as SplashScreen from 'expo-splash-screen';
 
 import Login from "./src/Auth/Login";
 import Signup from "./src/Auth/Signup";
 import ForgotPassword from "./src/Auth/ForgotPassword";
 
 // upload post
-import PostUpload from "./src/screens/PostUpload";
+import PostUpload from "./src/components/PostUpload";
 
 import { Provider as  PaperProvider } from "react-native-paper";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 
-LogBox.ignoreLogs(["expo-app-loading"]);
 
 
 
@@ -76,16 +75,20 @@ export default function App() {
         });
     };
 
+    useEffect(() => {
+        (async () => {
+            await SplashScreen.preventAutoHideAsync();
+            await loadFonts();
+            await SplashScreen.hideAsync();
+            setFontLoaded(true);
+        })();
+    }, []);
 
     if (!fontLoaded) {
-        return (
-          <AppLoading
-            startAsync={loadFonts}
-            onFinish={() => setFontLoaded(true)}
-            onError={console.warn}
-          />
-        );
-      }
+        return null;
+    }
+
+    
 
     return (
         <NavigationContainer theme={theme}>

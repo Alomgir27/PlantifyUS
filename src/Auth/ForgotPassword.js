@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, StatusBar, Image, Alert, KeyboardAvoidingView } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
-import { auth } from "../../firebase";
+import { auth } from "../config/firebase";
 import styles from "./styles";
 import LottieView from "lottie-react-native";
 

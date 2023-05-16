@@ -1,10 +1,10 @@
 import React from "react";
 import { KeyboardAvoidingView, View, Alert } from "react-native";
 import { Button, Text, TextInput, Banner, Colors } from "react-native-paper";
-import { auth } from "../../firebase";
+import { auth } from "../config/firebase";
 import styles from "./styles";
 
-import { baseURL } from "../config/baseURL";
+import { API_URL as baseURL } from "../constants";
 import axios from "axios";
 
 import LottieView from "lottie-react-native";

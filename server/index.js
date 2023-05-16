@@ -24,11 +24,14 @@ mongoose
 const db = mongoose.connection.useDb('PlantifyUs');
 
 // // Routes
-// app.use('/api/users', require('./routes/api/users'));
-// app.use('/api/auth', require('./routes/api/auth'));
-// app.use('/api/events', require('./routes/api/events'));
-// app.use('/api/plants', require('./routes/api/plants'));
-// app.use('/api/requests', require('./routes/api/requests'));
+// app.use('/api/users', require('./routes/users.js'));
+// app.use('/api/auth', require('./routes/auth.js'));
+app.use('/api/events', require('./routes/events'));
+// app.use('/api/organizations', require("./routes/organizations"));
+// app.use('/api/posts', require('./routes/posts'));
+// app.use('/api/plants', require('./routes/plants'));
+
+
 
 
 app.get('/', (req, res) => {

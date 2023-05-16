@@ -14,10 +14,10 @@ import {
   Banner,
   Colors,
 } from "react-native-paper";
-import { auth, db } from "../../firebase";
+import { auth, db } from "../config/firebase";
 import styles from "./styles";
 
-import { baseURL } from "../config/baseURL";
+import { API_URL as baseURL } from "../constants";
 import axios from "axios";
 
 import LottieView from "lottie-react-native";

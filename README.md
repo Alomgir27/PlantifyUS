@@ -1,6 +1,6 @@
 # PlantifyUs
 
-PlantifyUs is a web application that helps plant enthusiasts discover and share information about various plants. Whether you're a seasoned botanist or just starting out with your plant collection, PlantifyUs provides a platform to connect with fellow plant lovers, explore different plant species, and learn more about plant care.
+PlantifyUs is an Android application that allows plant enthusiasts to discover and share information about various plants. Whether you're a seasoned botanist or just starting out with your plant collection, PlantifyUs provides a platform to connect with fellow plant lovers, explore different plant species, and learn more about plant care.
 
 ## Features
 
@@ -12,28 +12,30 @@ PlantifyUs is a web application that helps plant enthusiasts discover and share 
 - Connect with other plant enthusiasts through comments and discussions
 - Get personalized plant care recommendations based on your collection and preferences
 
-## Technologies Used
-
-- Front-end: HTML, CSS, JavaScript, React
-- Back-end: Node.js, Express.js
-- Database: MongoDB, Firebase storage
-- Authentication: JSON Web Tokens (JWT) 
-- Image Upload: Multer, Firebase Storage
-- External API: [PlantifyAPI](https://plantifyapi.com) for plant data
-
 ## Installation
 
 1. Clone the repository: `git clone https://github.com/your-username/PlantifyUs.git`
 2. Navigate to the project directory: `cd PlantifyUs`
-3. Install dependencies: `npm install`
-4. Create a `.env` file in the root directory and provide the necessary environment variables (see `.env.example`)
-5. Start the development server: `npm start`
-6. Open `http://localhost:3000` in your browser
+3. Install dependencies: `npm install` or `yarn install`
+4. Start the Metro bundler: `npm start` or `yarn start`
+5. Connect your Android device or emulator
+6. Run the application on Android:
+   - For physical devices: `npm run android` or `yarn android`
+   - For emulators: `npm run android` or `yarn android`
 
-Note: Make sure you have Node.js and MongoDB installed on your system. You can download them from the following links:
+Note: Make sure you have Node.js and the Android development environment set up on your system.
 
-- [Node.js](https://nodejs.org/en/download/)
+## Technologies Used
 
+- React Native: A framework for building native mobile applications using JavaScript and React
+- Expo: A set of tools and services for developing, building, and deploying React Native applications
+- Firebase: A platform for building and managing backend services, used for user authentication and data storage
+- Redux: A state management library for managing the application state
+- React Navigation: A routing and navigation library for handling navigation between screens
+- Axios: A library for making HTTP requests to retrieve plant data and interact with APIs
+- Stripe: A payment processing platform used for handling transactions within the application
+- Firebase Cloud Storage: Used for storing plant photos contributed by users
+- Lottie: A library for displaying and animating JSON-based animations in the application
 
 ## Contributing
 

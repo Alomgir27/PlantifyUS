@@ -1,11 +1,13 @@
 import React from "react";
-import { KeyboardAvoidingView, View, Alert } from "react-native";
+import { KeyboardAvoidingView, View, Alert, ScrollView } from "react-native";
 import { Button, Text, TextInput, Banner, Colors } from "react-native-paper";
 import { auth } from "../config/firebase";
 import styles from "./styles";
 
 import { API_URL as baseURL } from "../constants";
 import axios from "axios";
+
+import { COLORS } from "../constants";
 
 import LottieView from "lottie-react-native";
 
@@ -42,7 +44,7 @@ export default function Login({ navigation }) {
     }
   };
   return (
-    <View style={{ backgroundColor: "#fff", flex: 1 }}>
+    <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <LottieView
           source={require("../../assets/lottie/login-and-sign-up.json")}
@@ -51,6 +53,40 @@ export default function Login({ navigation }) {
           style={{ width: 300, height: 300 }}
         />
       </View>
+
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: 30, fontWeight: "bold", marginBottom: 20 }}>
+          Login
+        </Text>
+      </View>
+
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ textAlign: "center", color: COLORS.gray, marginBottom: 20 }}>
+          Welcome back! Login to your existing account
+        </Text>
+      </View>
+      <Banner
+          visible={visible}
+          actions={[
+            {
+              label: "Ok",
+              onPress: () => setVisible(false),
+            },
+          ]}
+          contentStyle={{
+            backgroundColor: '#f8d7da',
+            borderRadius: 9,
+          }}
+          style={{
+            margin: 10,
+            borderRadius: 9,
+            marginBottom: 20,
+          }}
+        >
+          <Text style={{ fontSize: 15, color: "#000" }}>{label}</Text>
+        </Banner>
+
+
       <KeyboardAvoidingView
         style={{ flex: 1, justifyContent: "center", padding: 20, bottom: 50 }}
       >
@@ -85,7 +121,11 @@ export default function Login({ navigation }) {
           }
         />
 
-        <Button style={styles.button} mode="contained" onPress={onSignin}>
+        <Text style={{ textAlign: "center", color: COLORS.gray, marginBottom: 5 }}>
+          By continuing, you agree to our Terms of Use and Privacy Policy
+        </Text>
+
+        <Button style={styles.button} mode="contained" onPress={onSignin} color="#000">
           Sign in
         </Button>
         <Button
@@ -95,34 +135,17 @@ export default function Login({ navigation }) {
         >
           Forgot password?
         </Button>
+        <Text style={{ textAlign: "center", color: COLORS.gray, marginTop: 10}}>
+          Don't have an account?
+        </Text>
         <Button
-          uppercase={false}
-          style={styles.button}
+          style={{ textAlign: "center", marginBottom: 30, fontWeight: "bold" }}
           onPress={() => navigation.navigate("Signup")}
         >
-          Don't have account? Signup here
+          Sign up
         </Button>
-        <Banner
-          visible={visible}
-          actions={[
-            {
-              label: "Ok",
-              onPress: () => setVisible(false),
-            },
-          ]}
-          contentStyle={{
-            backgroundColor: '#f8d7da',
-            borderRadius: 9,
-          }}
-          style={{
-            margin: 10,
-            borderRadius: 9,
-            marginBottom: 20,
-          }}
-        >
-          <Text style={{ fontSize: 15, color: "#000" }}>{label}</Text>
-        </Banner>
+        
       </KeyboardAvoidingView>
-    </View>
+    </ScrollView>
   );
 }

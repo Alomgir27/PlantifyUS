@@ -205,7 +205,7 @@ const Home = ({ navigation }) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ marginLeft: SIZES.base }}
-                                    onPress={() => navigation.navigate("Login")}
+                                    onPress={() => navigation.navigate("AuthLanding")}
                                 >
                                     <Text style={{ color: COLORS.white, ...FONTS.body4 }}>Sign In </Text>
                                 </TouchableOpacity>

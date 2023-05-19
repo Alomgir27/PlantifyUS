@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, StatusBar, Image, Alert, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, View, StatusBar, Image, Alert, KeyboardAvoidingView, ScrollView } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { auth } from "../config/firebase";
 import styles from "./styles";
@@ -7,6 +7,8 @@ import LottieView from "lottie-react-native";
 
 import * as Icon from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
+
+import { COLORS } from "../constants";
 
 export default function ForgotPassword({ navigation }) {
   const [Email, setEmail] = React.useState("");
@@ -34,7 +36,7 @@ export default function ForgotPassword({ navigation }) {
       });
   };
   return (
-    <View style={{ backgroundColor: "#fff", flex: 1 }}>
+    <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
       <TouchableOpacity style={{ position: 'absolute', top: 1, left: 1, zIndex: 100}}
       onPress={() => navigation.goBack()}>
         <Icon.MaterialCommunityIcons name="arrow-left" size={27} color={'black'} />
@@ -60,6 +62,10 @@ export default function ForgotPassword({ navigation }) {
           keyboardType="email-address"
           mode="outlined"
         />
+         <Text style={{ textAlign: "center", color: COLORS.gray, marginBottom: 5 }}>
+          By continuing, you agree to our Terms of Use and Privacy Policy
+        </Text>
+        
 
         <Button
           style={styles.button}
@@ -69,8 +75,15 @@ export default function ForgotPassword({ navigation }) {
           Verify
         </Button>
       </KeyboardAvoidingView>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <Text style={{ textAlign: "center", color: COLORS.gray, marginBottom: 5 }}>
+            Back to Login Page
+          </Text>
+        </TouchableOpacity>
+      </View>
      
       
-    </View>
+    </ScrollView>
   );
 }

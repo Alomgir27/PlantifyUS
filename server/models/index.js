@@ -67,7 +67,8 @@ const userSchema = new Schema({
     badges: [Schema.Types.ObjectId],
     notifications: [Schema.Types.ObjectId],
     favourites: [Schema.Types.ObjectId],
-    type: String
+    type: String,
+    uuid: String
 }, { timestamps: true });
 
 const organizationSchema = new Schema({

@@ -1,18 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 
-import { LogBox } from "react-native";
-import { Platform, StatusBar, StyleSheet, View } from "react-native";
+import { Platform, StatusBar} from "react-native";
 
-
-// screens
-import { PlantDetail } from "./src/screens/";
-// extra screens
-import Tabs from "./src/navigation/tabs";
-
-import Campings from "./src/screens/Campings";
-import Settings from "./src/screens/Settings";
+// Main
+import Main from "./src/Main";
 
 import store from "./src/modules";
 
@@ -22,12 +14,7 @@ import { Provider } from "react-redux";
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-import Login from "./src/Auth/Login";
-import Signup from "./src/Auth/Signup";
-import ForgotPassword from "./src/Auth/ForgotPassword";
 
-// upload post
-import PostUpload from "./src/components/PostUpload";
 
 import { Provider as  PaperProvider } from "react-native-paper";
 
@@ -46,7 +33,6 @@ const theme = {
     },
 };
 
-const Stack = createStackNavigator();
 
 export default function App() {
    const [fontLoaded, setFontLoaded] = useState(false);
@@ -89,34 +75,13 @@ export default function App() {
     }
 
     
-
     return (
         <NavigationContainer theme={theme}>
            <GestureHandlerRootView style={{ flex: 1 }}>
                 <PaperProvider>
                     <Provider store={store}>
                         <StatusBar barStyle="default" />
-                            <Stack.Navigator
-                                screenOptions={{
-                                    headerShown: false
-                                }}
-                                initialRouteName={'Home'}
-                            >
-                                {/* Tabs */}
-                                <Stack.Screen name="Home" component={Tabs} />
-
-                                {/* Screens */}
-                                <Stack.Screen name="PlantDetail" component={PlantDetail} options={{ headerShown: false }} />
-                                <Stack.Screen name="Box" component={Campings} options={{ headerShown: false}} />
-                                <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false}} />
-                                
-                                {/* Extra Screens */}
-                                <Stack.Screen name="Login" component={Login} />
-                                <Stack.Screen name="Signup" component={Signup} />
-                                <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-                                <Stack.Screen name="PostUpload" component={PostUpload} />
-
-                            </Stack.Navigator>
+                         <Main />
                     </Provider>
                 </PaperProvider>
             </GestureHandlerRootView>

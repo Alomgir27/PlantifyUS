@@ -24,7 +24,7 @@ mongoose
 const db = mongoose.connection.useDb('PlantifyUs');
 
 // // Routes
-// app.use('/api/users', require('./routes/users.js'));
+app.use('/api/users', require('./routes/users.js'));
 // app.use('/api/auth', require('./routes/auth.js'));
 app.use('/api/events', require('./routes/events'));
 // app.use('/api/organizations', require("./routes/organizations"));

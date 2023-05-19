@@ -490,7 +490,6 @@ export default function PostUpload({ navigation, route }) {
     };
 
     const renderForm = () => {
-        console.log(type);
         switch (type) {
             case "newEvent":
                 return eventForm();

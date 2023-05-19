@@ -16,9 +16,9 @@ PlantifyUs is a web application that helps plant enthusiasts discover and share 
 
 - Front-end: HTML, CSS, JavaScript, React
 - Back-end: Node.js, Express.js
-- Database: MongoDB, firebase storage
+- Database: MongoDB, Firebase storage
 - Authentication: JSON Web Tokens (JWT) 
-- Image Upload: Cloudinary
+- Image Upload: Multer, Firebase Storage
 - External API: [PlantifyAPI](https://plantifyapi.com) for plant data
 
 ## Installation

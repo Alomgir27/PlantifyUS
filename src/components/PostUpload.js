@@ -146,7 +146,7 @@ export default function PostUpload({ navigation, route }) {
 
             if(index === images.length - 1){
                 if(type === "newEvent"){
-                    await axios.post(`${API_URL}/events`, {
+                    await axios.post(`${API_URL}/events/new`, {
                         ...newEventForm,
                         images: imagesURL
                     })
@@ -161,7 +161,7 @@ export default function PostUpload({ navigation, route }) {
                     });
 
                 } else if(type === "newPost"){
-                    await axios.post(`${API_URL}/posts`, {
+                    await axios.post(`${API_URL}/posts/new`, {
                         ...newPostForm,
                         images: imagesURL
                     })
@@ -175,7 +175,7 @@ export default function PostUpload({ navigation, route }) {
                         setLoading(false);
                     });
                 } else if(type === "newOrganization"){
-                    await axios.post(`${API_URL}/organizations`,  {
+                    await axios.post(`${API_URL}/organizations/new`,  {
                         ...newOrganizationForm,
                         images: imagesURL
                     })
@@ -189,7 +189,7 @@ export default function PostUpload({ navigation, route }) {
                         setLoading(false);
                     })
                 } else if(type === "newTree"){
-                    await axios.post(`${API_URL}/plants`, {
+                    await axios.post(`${API_URL}/plants/new`, {
                         ...newTreeForm,
                         images: imagesURL
                     })

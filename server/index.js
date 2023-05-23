@@ -21,11 +21,10 @@ mongoose
     .catch(err => console.log(err));
 
 // Connect to MongoDB and create/use database as configured db name should be PlantifyUs (same as Atlas cluster name)
-const db = mongoose.connection.useDb('PlantifyUs');
+//const db = mongoose.connection.useDb('PlantifyUs');
 
 // // Routes
 app.use('/api/users', require('./routes/users.js'));
-// app.use('/api/auth', require('./routes/auth.js'));
 app.use('/api/events', require('./routes/events'));
 // app.use('/api/organizations', require("./routes/organizations"));
 // app.use('/api/posts', require('./routes/posts'));

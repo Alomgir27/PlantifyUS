@@ -14,14 +14,22 @@ import { COLORS } from "../constants";
 
 import * as ImagePicker from "expo-image-picker";
 
-
-
+import { useSelector } from 'react-redux';
 
 
 const BottomSheet = ({ navigation }) => {
   const [visible, setVisible] = React.useState(true);
   const sheetRef = React.useRef(null);
   const snapPoints = React.useMemo(() => ['25%', '50%'], []);
+
+  const user = useSelector(state => state?.data?.currentUser);
+
+  useEffect(() => {
+    if(!user){
+      setVisible(false);
+      navigation.navigate("AuthLanding");
+    }
+  }, [user, navigation, visible]);
 
   useEffect(() => {
     sheetRef.current?.present();
@@ -85,6 +93,7 @@ const BottomSheet = ({ navigation }) => {
     </View>
   }
 
+  
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal

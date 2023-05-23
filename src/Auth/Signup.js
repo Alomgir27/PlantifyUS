@@ -29,9 +29,9 @@ import LottieView from "lottie-react-native";
 
 import { COLORS } from "../constants";
 
+import { fetchUser } from "../modules/data";
 
-
-
+import { useDispatch } from "react-redux";
 
 export default function Signup({ navigation }) {
 
@@ -46,6 +46,8 @@ export default function Signup({ navigation }) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
+  
+  const dispatch = useDispatch();
 
 
   //SnackBar manage
@@ -125,7 +127,7 @@ export default function Signup({ navigation }) {
             const childPath = `images/${auth.currentUser.uid}/${Math.random().toString(36)}`;
             await storage.ref().child(childPath).put(blob)
             const url = await storage.ref().child(childPath).getDownloadURL();
-            await axios.post(`${baseURL}/users`, {
+            await axios.post(`${baseURL}/users/register`, {
               name: Name,
               email: Email,
               image: url,
@@ -139,8 +141,9 @@ export default function Signup({ navigation }) {
             })
             .then((response) => {
               console.log(response);
+              dispatch(fetchUser(response?.data?.user?._id));
               setLoading(false)
-              navigation.navigate("Home");
+              navigation.navigate("Login");
             })
             .catch((error) => {
               console.log(error);
@@ -149,7 +152,7 @@ export default function Signup({ navigation }) {
               setLoading(false)
             });
           }else{
-            await axios.post(`${baseURL}/users`, {
+            await axios.post(`${baseURL}/users/register`, {
               name: Name,
               email: Email,
               image: "https://firebasestorage.googleapis.com/v0/b/plantifyus.appspot.com/o/images%2Flogo.png?alt=media&token=73a05297-aa73-4e6b-b208-86842afe4973",
@@ -163,8 +166,9 @@ export default function Signup({ navigation }) {
             })
             .then((response) => {
               console.log(response);
+              dispatch(fetchUser(response?.data?.user?._id));
               setLoading(false)
-              navigation.navigate("Home");
+              navigation.navigate("Login");
             })
             .catch((error) => {
               console.log(error);

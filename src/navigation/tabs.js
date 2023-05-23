@@ -9,8 +9,6 @@ import { Home } from "../screens";
 import BottomSheet from "../components/BottomSheet";
 
 import { COLORS } from "../constants";
-import { Pressable } from "react-native";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 const Tab = createBottomTabNavigator();
 
@@ -37,7 +35,6 @@ const Tabs = ({ navigation }) => {
                     borderRadius: 25,
                     backgroundColor: COLORS.primary,
                 }}
-                onPress={() => handleTabPress(2)}
             >
                 <Image
                     source={require('../../assets/icons/camera.png')}

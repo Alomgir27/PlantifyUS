@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     View,
@@ -10,7 +10,19 @@ import {
 
 import { images, icons, COLORS, FONTS, SIZES } from '../constants';
 
+import * as ICONS from "@expo/vector-icons";
+
+import { useSelector } from 'react-redux';
+
+
 const Home = ({ navigation }) => {
+
+    const [loading, setLoading] = useState(false);
+    const [notification, setNotification] = useState([]);
+
+    const user = useSelector(state => state?.data?.currentUser);
+    console.log(user)
+
 
     // Dummy Data
     const [newPlants, setNewPlants] = React.useState([
@@ -176,18 +188,40 @@ const Home = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
-           
+    
 
             {/* New Plants */}
-            <View style={{ height: "30%", backgroundColor: COLORS.white }}>
+            <View style={{ height: "30%", backgroundColor: COLORS.white }}> 
+                {/* notification & signup */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', height: '20%', backgroundColor: COLORS.primary, paddingTop: 10 }}>
+                   {!user && (
+                     <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} onPress={() => navigation.navigate("AuthLanding")} />
+                   )}
+
+                    <ICONS.Ionicons name="notifications" size={24} color={COLORS.white} onPress={() => navigation.navigate("Notifications")}style={{
+                        paddingHorizontal: SIZES.padding
+                    }} />
+                    {notification.length > 0 && (
+                        <View style={{
+                            position: 'absolute',
+                            top: 15,
+                            right: 27,
+                            height: 10,
+                            width: 10,
+                            borderRadius: 5,
+                            backgroundColor: COLORS.red,
+                        }}></View>
+                    )}
+                </View>
                 <View style={{
                     flex: 1,
                     borderBottomLeftRadius: 50,
                     borderBottomRightRadius: 50,
-                    backgroundColor: COLORS.primary
+                    backgroundColor: COLORS.primary,
+                    height: '80%'
                 }}>
-                    <View style={{ marginTop: SIZES.padding * 2, marginHorizontal: SIZES.padding }}>
+                
+                    <View style={{ marginHorizontal: SIZES.padding, marginTop: 10  }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.white, ...FONTS.h2, }}>New Plants</Text>
                             <View style={{ flexDirection: 'row' }}>
@@ -202,12 +236,6 @@ const Home = ({ navigation }) => {
                                             height: 20
                                         }}
                                     />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={{ marginLeft: SIZES.base }}
-                                    onPress={() => navigation.navigate("AuthLanding")}
-                                >
-                                    <Text style={{ color: COLORS.white, ...FONTS.body4 }}>Sign In </Text>
                                 </TouchableOpacity>
                             </View>
 

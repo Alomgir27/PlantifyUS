@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {  View, Text } from "react-native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -26,9 +26,27 @@ import PostUpload from "./components/PostUpload";
 // constants
 import { COLORS } from "./constants";
 
+import { fetchUser } from "./modules/data";
+
+import { useDispatch } from "react-redux";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Drawer = createDrawerNavigator();
 export default function Main() {  
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      (async () => {
+        const user = await AsyncStorage.getItem('user');
+        if(user){
+            dispatch(fetchUser(JSON.parse(user)?._id));
+        }
+      })()
+    }, [])
+
+
     return (
        <View style={{ flex: 1 }}>
             <Drawer.Navigator

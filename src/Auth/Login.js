@@ -11,6 +11,12 @@ import { COLORS } from "../constants";
 
 import LottieView from "lottie-react-native";
 
+import { fetchUser } from "../modules/data";
+
+import { useDispatch } from "react-redux";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function Login({ navigation }) {
 
   const [label, setLabel] = React.useState("");
@@ -20,20 +26,50 @@ export default function Login({ navigation }) {
   const [Email, setEmail] = React.useState("");
   const [Password, setPassword] = React.useState("");
   const [color, setColor] = React.useState("#9d9d9d");
+  const [loading, setLoading] = React.useState(false);
+
+  const dispatch = useDispatch();
+
+
 
   const onSignin = () => {
+    setLoading(true)
     auth.signInWithEmailAndPassword(Email, Password)
-      .then((result) => {
+      .then(async (result) => {
         console.log(result);
-        setEmail("");
-        setPassword("");
-        navigation.navigate("Main");
+        await axios.post(`${baseURL}/users/login`, {
+          email: Email,
+          password: Password,
+        })
+        .then(async (res) => {
+          dispatch(fetchUser(res?.data?.user?._id));
+          console.log(res?.data?.user);
+          await AsyncStorage.setItem("user", JSON.stringify(res?.data?.user));
+          setLoading(false);
+          console.log(res);
+          setEmail("");
+          setPassword("");
+          Alert.alert("Success", "Logged in successfully", [
+            {
+              text: "Ok",
+              onPress: () => navigation.navigate("Home"),
+            },
+          ]);
+
+        })
+        .catch((err) => {
+          setLoading(false);
+          console.log(err);
+          Alert.alert("Error", err.message);
+        })
 
       })
       .catch((error) => {
+        setLoading(false);
         console.log(error);
         setLabel(error.message);
         setVisible(true);
+
       });
   };
   const eyeColor = () => {
@@ -125,7 +161,7 @@ export default function Login({ navigation }) {
           By continuing, you agree to our Terms of Use and Privacy Policy
         </Text>
 
-        <Button style={styles.button} mode="contained" onPress={onSignin} color="#000">
+        <Button style={styles.button} mode="contained" onPress={onSignin} color="#000" loading={loading}>
           Sign in
         </Button>
         <Button

@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 
 const { User } = require('../models');
@@ -90,6 +89,39 @@ router.get('/:id', async (req, res) => {
     User.findById(id)
         .then(user => res.status(200).json({ success: true, user, message: 'User retrieved successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'User could not be retrieved', error: err }));
+});
+
+
+// @route   GET api/users
+// @desc    Get all users
+// @access  Public
+router.get('/', async (req, res) => {
+    const { page, user } = req.query;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    //fetch all users if _id is present in friends array
+    if (user) {
+        User.findOne({ _id: user })
+            .then(user => {
+                if (!user) {
+                    return res.status(400).json({ success: false, message: 'User does not exist' });
+                }
+
+                User.find({ _id: { $in: user.friends } })
+                    .skip(skip)
+                    .limit(limit)
+                    .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+                    .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+            })
+            .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+    } else {
+        User.find()
+            .skip(skip)
+            .limit(limit)
+            .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+            .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+    }
 });
 
 

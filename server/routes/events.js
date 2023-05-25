@@ -58,6 +58,27 @@ router.post('/new', async (req, res) => {
 })
 
 
+//@route GET api/events
+//@desc Get all events if number of events is below 20 or fetch maximum 20
+//@access Public
+router.get('/', async (req, res) => {
+    const { page } = req.query;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    Event.find()
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
+})
+
+
+
+    
+
+    
 
 
 module.exports = router;

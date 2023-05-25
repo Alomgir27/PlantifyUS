@@ -95,7 +95,8 @@ const postSchema = new Schema({
     images: [String],
     likes: [Schema.Types.ObjectId],
     comments: [{author: Schema.Types.ObjectId, text: String, date: Date }],
-    event: Schema.Types.ObjectId
+    event: Schema.Types.ObjectId,
+    isVerified: Boolean
 }, { timestamps: true });
 
 const favouriteSchema = new Schema({

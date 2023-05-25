@@ -26,9 +26,9 @@ mongoose
 // // Routes
 app.use('/api/users', require('./routes/users.js'));
 app.use('/api/events', require('./routes/events'));
-// app.use('/api/organizations', require("./routes/organizations"));
-// app.use('/api/posts', require('./routes/posts'));
-// app.use('/api/plants', require('./routes/plants'));
+app.use('/api/organizations', require("./routes/organizations"));
+app.use('/api/posts', require('./routes/posts'));
+app.use('/api/plants', require('./routes/plants'));
 
 
 

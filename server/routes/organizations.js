@@ -54,9 +54,20 @@ router.post('/new', async (req, res) => {
 });
 
 
+//@route GET api/organizations
+//@desc Get all organizations but maximum 20
+//@access Public
+router.get('/', async (req, res) => {
+    const { page } = req.query;
+    const limit = 20
+    const skip = (page - 1) * limit
 
-
-
+    Organizations.find()
+        .skip(skip)
+        .limit(limit)
+        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+});
 
 
 

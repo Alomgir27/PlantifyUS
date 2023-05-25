@@ -68,31 +68,31 @@ export default  data = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 usersLoaded: state.usersLoaded + 1,
-                users: [...state.users, action.user]
+                users: [...state.users, ...action.users]
             }
         case POSTS_DATA_STATE_CHANGE:
             return {
                 ...state,
                 postsLoaded: state.postsLoaded + 1,
-                posts: [...state.posts, action.post]
+                posts: [...state.posts, ...action.posts]
             }
         case EVENTS_DATA_STATE_CHANGE:
             return {
                 ...state,
                 eventsLoaded: state.eventsLoaded + 1,
-                events: [...state.events, action.event]
+                events: [...state.events, ...action.events]
             }
         case ORGANIZATIONS_DATA_STATE_CHANGE:
             return {
                 ...state,
                 organizationsLoaded: state.organizationsLoaded + 1,
-                organizations: [...state.organizations, action.organization]
+                organizations: [...state.organizations, ...action.organizations]
             }
         case TREES_DATA_STATE_CHANGE:
             return {
                 ...state,
                 treesLoaded: state.treesLoaded + 1,
-                trees: [...state.trees, action.tree]
+                trees: [...state.trees, ...action.trees]
             }
         case CLEAR_DATA:
             return {
@@ -125,13 +125,15 @@ export const fetchUser = ( _id) => {
     return (async (dispatch) => {
         await axios.get(`${API_URL}/users/${_id}`)
         .then((res) => {
-            console.log(res)
+            console.log(res?.data?.message)
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: res.data.user
             })
+            dispatch(fetchPosts(res?.data?.user?._id))
+            dispatch(fetchUsers(res?.data?.user?._id))
         })
         .catch((err) => {
-            console.log(err);
+            console.log(err?.data?.message);
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: null
             })
@@ -140,94 +142,120 @@ export const fetchUser = ( _id) => {
 }
 
 export const fetchPosts = ( _id) => {
-    return (async (dispatch) => {
-        await axios.get(`${API_URL}/posts/${_id}`)
+    return (async (dispatch, getState) => {
+        if(getState().data.postsLoaded * 20 !== getState().data.posts.length) return
+        await axios.get(`${API_URL}/posts`, {
+            params: {
+                page: getState().data.postsLoaded + 1,
+                user: _id
+            }
+        })
         .then((res) => {
-            console.log(res)
+            console.log(res?.data?.message)
             dispatch({
-                type: POSTS_DATA_STATE_CHANGE, post: res.data.post
+                type: POSTS_DATA_STATE_CHANGE, posts: res.data.posts
             })
         })
         .catch((err) => {
-            console.log(err);
-            dispatch({
-                type: POSTS_DATA_STATE_CHANGE, post: null
-            })
+            console.log(err?.data?.message)
         })
     })
 }
+        
 
 export const fetchEvents =  () => {
-    return (async (dispatch) => {
-        await axios.get(`${API_URL}/events`)
+    return (async (dispatch, getState) => {
+       if(getState().data.eventsLoaded * 20 !== getState().data.events.length) return
+        await axios.get(`${API_URL}/events`, {
+            params: {
+                page: getState().data.eventsLoaded + 1
+            }
+        })
         .then((res) => {
-            console.log(res)
+            console.log(res?.data?.message)
             dispatch({
-                type: EVENTS_DATA_STATE_CHANGE, event: res.data.event
+                type: EVENTS_DATA_STATE_CHANGE, events: res.data.events
             })
         })
         .catch((err) => {
-            console.log(err);
-            dispatch({
-                type: EVENTS_DATA_STATE_CHANGE, event: null
-            })
+            console.log(err?.data?.message);
         })
-    })
+     })
 }
+
+
+
+        
 
 export const fetchOrganizations =  () => {
-    return (async (dispatch) => {
-        await axios.get(`${API_URL}/organizations`)
+    return (async (dispatch, getState) => {
+        if(getState().data.organizationsLoaded * 20 !== getState().data.organizations.length)return
+        await axios.get(`${API_URL}/organizations`, {
+            params: {
+                page: getState().data.organizationsLoaded + 1
+            }
+        })
         .then((res) => {
-            console.log(res)
+            console.log(res?.data?.message)
             dispatch({
-                type: ORGANIZATIONS_DATA_STATE_CHANGE, organization: res.data.organization
+                type: ORGANIZATIONS_DATA_STATE_CHANGE, organizations: res.data.organizations
             })
         })
         .catch((err) => {
-            console.log(err);
-            dispatch({
-                type: ORGANIZATIONS_DATA_STATE_CHANGE, organization: null
-            })
+            console.log(err?.data?.message)
         })
     })
 }
+
 
 export const fetchTrees =  () => {
-    return (async (dispatch) => {
-        await axios.get(`${API_URL}/trees`)
+    return (async (dispatch, getState) => {
+        if(getState().data.treesLoaded * 20 !== getState().data.trees.length) return
+        await axios.get(`${API_URL}/plants`, {
+            params: {
+                page: getState().data.treesLoaded + 1
+            }
+        })
         .then((res) => {
-            console.log(res)
+            console.log(res?.data?.message)
             dispatch({
-                type: TREES_DATA_STATE_CHANGE, tree: res.data.tree
+                type: TREES_DATA_STATE_CHANGE, trees: res.data.trees
             })
         })
         .catch((err) => {
-            console.log(err);
-            dispatch({
-                type: TREES_DATA_STATE_CHANGE, tree: null
-            })
+            console.log(err?.data?.message);
         })
     })
 }
 
-export const fetchUsersData = ( _id) => {
+
+export const fetchUsers = ( _id) => {
     return (async (dispatch, getState) => {
-        const found = getState().data.users.some(el => el._id === _id);
-        if (!found) {
-            await axios.get(`${API_URL}/users/${_id}`)
-            .then((res) => {
-                console.log(res)
-                dispatch({
-                    type: USER_DATA_STATE_CHANGE, user: res.data.user
-                })
+        if(getState().data.usersLoaded * 20 !== getState().data.users.length) return
+        await axios.get(`${API_URL}/users`, {
+            params: {
+                page: getState().data.usersLoaded + 1,
+                user: _id
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: USER_DATA_STATE_CHANGE, users: res.data.users
             })
-            .catch((err) => {
-                console.log(err);
-                dispatch({
-                    type: USER_DATA_STATE_CHANGE, user: null
-                })
-            })
-        }
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+
+
+export const fetchAllDefaultData = () => {
+    return (async (dispatch) => {
+        await dispatch(fetchEvents())
+        await dispatch(fetchOrganizations())
+        await dispatch(fetchTrees())
     })
 }

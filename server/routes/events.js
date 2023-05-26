@@ -36,7 +36,7 @@ const { Event } = require('../models');
 //@desc Create an event
 //@access Private
 router.post('/new', async (req, res) => {
-    const { title, description, location, organizer, attendees, images, requirements, landsDescription } = req.body;
+    const { title, description, location, organizer, attendees, images, requirements, landsDescription, author } = req.body;
     console.log(req.body);
 
     const newEvent = new Event({
@@ -47,6 +47,7 @@ router.post('/new', async (req, res) => {
         attendees,
         images,
         requirements,
+        author,
         landsDescription,
         status: 'pending'
     });

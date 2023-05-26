@@ -30,7 +30,7 @@ router.post('/new', async (req, res) => {
     const { name, scientificName, description, images, benefits, requirements } = req.body;
     console.log(req.body)
 
-    const newTree = new Tree.create({
+    const newTree = new Tree({
         name,
         scientificName,
         description,

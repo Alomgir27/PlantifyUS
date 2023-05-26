@@ -23,6 +23,10 @@ const eventSchema = new Schema({
         enum: ['pending', 'approved', 'rejected', 'completed'],
         default: 'pending'
     },
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }
 
 }, { timestamps: true });
 
@@ -46,7 +50,10 @@ const donationSchema = new Schema({
     name: String,
     email: String,
     amount: Number,
-    event: Schema.Types.ObjectId,
+    event: {
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
+    },
     type: String,
     trees: Number
 }, { timestamps: true });
@@ -55,47 +62,96 @@ const userSchema = new Schema({
     name: String,
     email: String,
     password: String,
-    eventsAttending: [Schema.Types.ObjectId],
-    friends: [Schema.Types.ObjectId],
-    posts: [Schema.Types.ObjectId],
+    eventsAttending: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
+    }],
+    friends: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    posts: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Post'
+    }],
     image: String,
     bio: String,
     location: {
         type: { type: String, default: 'Point'},
         coordinates: { type: [Number], default: [0, 0] }
     },
-    badges: [Schema.Types.ObjectId],
-    notifications: [Schema.Types.ObjectId],
-    favourites: [Schema.Types.ObjectId],
+    badges: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Badge'
+    }],
+    notifications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Notification'
+    }],
+    favourites: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Favourite'
+    }],
     type: String,
     uuid: String
 }, { timestamps: true });
 
 const organizationSchema = new Schema({
     name: String,
-    volunteers: [Schema.Types.ObjectId],
-    events: [Schema.Types.ObjectId],
-    admin: Schema.Types.ObjectId,
-    moderators: [Schema.Types.ObjectId],
+    volunteers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    events: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
+    }],
+    admin: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    moderators: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     images: [String],
     bio: String,
     location: {
         type: { type: String, default: 'Point'},
         coordinates: { type: [Number], default: [0, 0] }
     },
-    badges: [Schema.Types.ObjectId],
-    notifications: [Schema.Types.ObjectId],
+    badges: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Badge'
+    }],
+    notifications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Notification'
+    }],
     isVerified: Boolean,
     type: String
 }, { timestamps: true });
 
 const postSchema = new Schema({
-    author: Schema.Types.ObjectId,
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     text: String,
     images: [String],
-    likes: [Schema.Types.ObjectId],
-    comments: [{author: Schema.Types.ObjectId, text: String, date: Date }],
-    event: Schema.Types.ObjectId,
+    tags: [String],
+    likes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    comments: [{author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }, text: String, date: Date }],
+    event: {
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
+    },
     isVerified: Boolean
 }, { timestamps: true });
 
@@ -109,7 +165,10 @@ const notificationSchema = new Schema({
     text: String,
     read: Boolean,
     type: String,
-    user: Schema.Types.ObjectId
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }
 }, { timestamps: true });
 
 const badgeSchema = new Schema({
@@ -122,7 +181,10 @@ const badgeSchema = new Schema({
 
 
 const progressSchema = new Schema({
-    event: Schema.Types.ObjectId,
+    event: {
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
+    },
     type : String,
     treesPlanted: Number,
     moneyCollected: Number,

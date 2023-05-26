@@ -24,8 +24,10 @@ export default function PostUpload({ navigation, route }) {
     const [images, setImages] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [type, setType] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [newEventForm, setEventForm] = useState({
         title: '',
+        author: '',
         description: '',
         location: {
           type: 'Point',
@@ -49,6 +51,7 @@ export default function PostUpload({ navigation, route }) {
         likes: [],
         comments: [],
         event: '',
+        tags: []
     });
     const [newOrganizationForm, setNewOrganizationForm] = useState({
         name: '',
@@ -84,8 +87,11 @@ export default function PostUpload({ navigation, route }) {
 
     const [errorMsg, setErrorMsg] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [events, setEvents] = useState(useSelector(state => state?.data?.events) || [])
+    const events = useSelector(state => state?.data?.events)
+    const user = useSelector(state => state?.data?.currentUser)
     const [eventTitle, setEventTitle] = useState("");
+    const [inputValue, setInputValue] = useState('');
+
 
 
     useEffect(() => {
@@ -165,7 +171,8 @@ export default function PostUpload({ navigation, route }) {
                 if(type === "newEvent"){
                     await axios.post(`${API_URL}/events/new`, {
                         ...newEventForm,
-                        images: imagesURL
+                        images: imagesURL,
+                        author: user?._id
                     })
                     .then((response) => {
                         console.log(JSON.stringify(response));
@@ -173,6 +180,25 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
+                        setEventForm({
+                            title: '',
+                            description: '',
+                            author: '',
+                            location: {
+                              type: 'Point',
+                              coordinates: [0, 0],
+                            },
+                            organizer: '',
+                            attendees: [],
+                            images: [],
+                            requirements: {
+                              trees: "",
+                              volunteers: "",
+                              funds: "",
+                            },
+                            landsDescription: '',
+                            status: '',
+                        });
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
@@ -188,7 +214,8 @@ export default function PostUpload({ navigation, route }) {
                 } else if(type === "newPost"){
                     await axios.post(`${API_URL}/posts/new`, {
                         ...newPostForm,
-                        images: imagesURL
+                        images: imagesURL,
+                        author: user?._id
                     })
                     .then((response) => {
                         console.log(JSON.stringify(response));
@@ -196,6 +223,15 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
+                        setNewPostForm({
+                            author: '',
+                            text: '',
+                            images: [],
+                            likes: [],
+                            comments: [],
+                            event: '',
+                            tags: []
+                        });
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
@@ -210,7 +246,8 @@ export default function PostUpload({ navigation, route }) {
                 } else if(type === "newOrganization"){
                     await axios.post(`${API_URL}/organizations/new`,  {
                         ...newOrganizationForm,
-                        images: imagesURL
+                        images: imagesURL,
+                        admin: user?._id
                     })
                     .then((response) => {
                         console.log(JSON.stringify(response));
@@ -218,6 +255,23 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
+                        setNewOrganizationForm({
+                            name: '',
+                            volunteers: [],
+                            events: [],
+                            admin: '',
+                            moderators: [],
+                            images: [],
+                            bio: '',
+                            location: {
+                                type: 'Point',
+                                coordinates: [0, 0],
+                            },
+                            badges: [],
+                            notifications: [],
+                            isVerified: false,
+                            type: '',
+                        });
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
@@ -240,6 +294,20 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
+                        setNewTreeForm({
+                            name: '',
+                            scientificName: '',
+                            description: '',
+                            images: [],
+                            benefits: '',
+                            requirements: {
+                                sun: '',
+                                soil: '',
+                                water: '',
+                                temperature: '',
+                                fertilizer: '',
+                            },
+                        });
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
@@ -260,6 +328,16 @@ export default function PostUpload({ navigation, route }) {
     }
 
 
+    const handleAddTag = () => {
+        if (inputValue.trim() !== '') {
+          setNewPostForm({ ...newPostForm, tags: [...newPostForm.tags, inputValue.trim()] });
+          setInputValue('');
+        }
+      };
+    
+      const handleRemoveTag = (tag) => {
+        setNewPostForm({ ...newPostForm, tags: newPostForm.tags.filter((t) => t !== tag) });
+      };
             
 
 
@@ -410,16 +488,45 @@ export default function PostUpload({ navigation, route }) {
                     />
                 </View>
                 <View style={styles.formItem}>
+                    <Text style={styles.formLabel}>Tags</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {newPostForm.tags.map((tag, index) => (
+                        <TouchableOpacity
+                            key={tag}
+                            onPress={() => handleRemoveTag(tag)}
+                            style={styles.tag}
+                        >
+                            <Text>{tag}</Text>
+                        </TouchableOpacity>
+                        ))}
+                    </View>
+                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                        <TextInput
+                            value={inputValue}
+                            onChangeText={setInputValue}
+                            placeholder="Enter a tag"
+                            style={[styles.formInput, { flex: 1, marginRight: 10} ]}
+                           
+                        />
+                        <TouchableOpacity onPress={handleAddTag} style={{ backgroundColor: '#212121', padding: 10, borderRadius: 5, justifyContent: 'center' }}>
+                             <Text style={{ color: 'white' }}>Add</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+
+                <View style={styles.formItem}>
                     <Text style={styles.formLabel}>Event</Text>
                     <TextInput
                         style={styles.formInput}
                         value={eventTitle}
                         textColor="#fff"
                         onChangeText={(text) => setEventTitle(text)}
+                        onFocus={() => setShowSuggestions(true)}
                         required
                     />
-                    {eventTitle.length > 0 && (
-                        events?.filter((event) => event?.title.toLowerCase()?.includes(eventTitle.toLowerCase()))?.map((event, index) => (
+                    {eventTitle.length > 0 && showSuggestions && (
+                        events?.filter((event) => event?.title.toLowerCase()?.includes(eventTitle.toLowerCase()))?.slice(0, 5).map((event, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={{
@@ -430,6 +537,7 @@ export default function PostUpload({ navigation, route }) {
                                 }}
                                 onPress={() => {
                                     setNewPostForm({ ...newPostForm, event: event._id });
+                                    setShowSuggestions(false);
                                     setEventTitle(event.title);
                                 }}
                             >
@@ -720,11 +828,11 @@ export default function PostUpload({ navigation, route }) {
              <View style={styles.container}>
                 <ScrollView keyboardShouldPersistTaps="always">
                     {renderForm()}
+                    <Button style={[styles.submitButton, { backgroundColor : loading ? COLORS.secondary : COLORS.darkGreen, color: loading ? COLORS.darkgray : COLORS.white }]}
+                    onPress={handleSubmit} disabled={loading} loading={loading}>
+                        <Text style={styles.submitButtonText}>Submit</Text>
+                    </Button>
                 </ScrollView>
-                <Button style={[styles.submitButton, { backgroundColor : loading ? COLORS.secondary : COLORS.darkGreen, color: loading ? COLORS.darkgray : COLORS.white }]}
-                onPress={handleSubmit} disabled={loading} loading={loading}>
-                    <Text style={styles.submitButtonText}>Submit</Text>
-                </Button>
             </View>
            ) : null}
           
@@ -871,6 +979,13 @@ const styles = StyleSheet.create({
     },
     activeTypeButton: {
         backgroundColor: COLORS.secondary,
+    },
+    tag: {
+        backgroundColor: COLORS.secondary,
+        borderRadius: 5,
+        padding: 5,
+        marginRight: 5,
+        marginBottom: 5,
     },
 });
 

@@ -32,7 +32,7 @@ const { Organizations } = require('../models');
 router.post('/new', async (req, res) => {
     const { name, admin, bio, type, location, images } = req.body;
 
-    const newOrganization = new Organizations.create({
+    const newOrganization = new Organizations({
         name,
         admin,
         bio,

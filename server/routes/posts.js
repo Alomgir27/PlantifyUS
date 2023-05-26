@@ -1,5 +1,7 @@
 const express = require('express');
 const axios = require('axios');
+const geolib = require('geolib');
+
 const router = express.Router();
 
 
@@ -41,18 +43,19 @@ const { Post, User } = require('../models');
 //@desc Create a new post
 //@access Public
 router.post('/new', async (req, res) => {
-    const { author, text, images, event } = req.body;
+    const { author, text, images, event, tags } = req.body;
     console.log(req.body);
 
-    const newPost = new Post.create({
+    const newPost = new Post({
         author,
         text,
         images,
         event,
+        tags,
         likes: [],
         comments: [],
         isVerified: false
-    })
+    });
 
     newPost.save()
      .then(post => res.status(200).json({ success: true, post, message: 'Post added successfully.'}))
@@ -69,7 +72,7 @@ router.get('/', async (req, res) => {
     const skip = (page - 1) * limit;
 
     //fetch all users posts if author _id is present in friends array
-    if (user) {
+    if (!user) {
         User.findOne({ _id: user })
             .then(user => {
                 if (!user) {
@@ -79,6 +82,14 @@ router.get('/', async (req, res) => {
                 Post.find({ author: { $in: user.friends } })
                     .skip(skip)
                     .limit(limit)
+                    .populate({
+                        path: 'author',
+                        select: 'name image type'
+                    })
+                    .populate({
+                        path: 'event',
+                        select: 'title images status location'
+                    })
                     .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
                     .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
             })
@@ -87,6 +98,14 @@ router.get('/', async (req, res) => {
         Post.find()
             .skip(skip)
             .limit(limit)
+            .populate({
+                path: 'author',
+                select: 'name image type'
+            })
+            .populate({
+                path: 'event',
+                select: 'title images status location'
+            })
             .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
             .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
     }

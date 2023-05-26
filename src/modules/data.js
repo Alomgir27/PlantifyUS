@@ -152,6 +152,7 @@ export const fetchPosts = ( _id) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
+            console.log(res.data)
             dispatch({
                 type: POSTS_DATA_STATE_CHANGE, posts: res.data.posts
             })
@@ -253,9 +254,16 @@ export const fetchUsers = ( _id) => {
 
 
 export const fetchAllDefaultData = () => {
-    return (async (dispatch) => {
+    return (async (dispatch, getState) => {
         await dispatch(fetchEvents())
         await dispatch(fetchOrganizations())
         await dispatch(fetchTrees())
+        if(getState().data.currentUser) {
+            await dispatch(fetchPosts(getState().data.currentUser._id))
+            await dispatch(fetchUsers(getState().data.currentUser._id))
+        }
+        else {
+            await dispatch(fetchPosts(null))
+        }
     })
 }

@@ -19,7 +19,7 @@ const ImagesViewer = ({ images, resize }) => {
                 {images.map((image, index) => (
                 <View style={styles.slide} key={index}>
                     <Image
-                    source={{ uri: image.uri ? image.uri : image }}
+                    source={{ uri: image?.uri ? image?.uri : image }}
                     resizeMode={resize ? resize : 'cover'}
                     style={styles.image}
                     />

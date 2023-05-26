@@ -60,7 +60,7 @@ router.post('/new', async (req, res) => {
 router.get('/', async (req, res) => {
     const { page } = req.query;
     const limit = 20
-    const skip = (page - 1) * limit
+    const skip = (parseInt(page) - 1) * limit;
 
     Organizations.find()
         .skip(skip)
@@ -68,6 +68,23 @@ router.get('/', async (req, res) => {
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
 });
+
+
+
+//@route GET api/organizations/search
+//@desc Search for organizations by name or bio and do regex search
+//@access Public
+router.get('/search', async (req, res) => {
+    const { search, limit } = req.query;
+
+
+    Organizations.find({ $or: [{ name: { $regex: search, $options: 'i' } }, { bio: { $regex: search, $options: 'i' } }] })
+        .limit(parseInt(limit) || 20)
+        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+});
+
+
 
 
 

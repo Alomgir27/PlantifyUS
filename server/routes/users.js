@@ -98,7 +98,7 @@ router.get('/:id', async (req, res) => {
 router.get('/', async (req, res) => {
     const { page, user } = req.query;
     const limit = 20;
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * limit;
 
     //fetch all users if _id is present in friends array
     if (user) {
@@ -124,6 +124,18 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+// @route   GET api/users/search
+// @desc    Search for users
+// @access  Public
+router.get('/search', async (req, res) => {
+    const { search, limit } = req.query;
+
+    User.find({ name: { $regex: search, $options: 'i' } })
+        .limit(parseInt(limit) || 10)
+        .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+});
 
 
 

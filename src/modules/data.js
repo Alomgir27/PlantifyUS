@@ -15,6 +15,14 @@ const EVENTS_DATA_STATE_CHANGE = 'EVENTS_DATA_STATE_CHANGE'
 const ORGANIZATIONS_DATA_STATE_CHANGE = 'ORGANIZATIONS_DATA_STATE_CHANGE'
 const TREES_DATA_STATE_CHANGE = 'TREES_DATA_STATE_CHANGE'
 
+const EVENTS_SEARCH_STATE_CHANGE = 'EVENTS_SEARCH_STATE_CHANGE'
+const POSTS_SEARCH_STATE_CHANGE = 'POSTS_SEARCH_STATE_CHANGE'
+const ORGANIZATIONS_SEARCH_STATE_CHANGE = 'ORGANIZATIONS_SEARCH_STATE_CHANGE'
+const TREES_SEARCH_STATE_CHANGE = 'TREES_SEARCH_STATE_CHANGE'
+const USERS_SEARCH_STATE_CHANGE = 'USER_SEARCH_STATE_CHANGE'
+
+
+
 const CLEAR_DATA = 'CLEAR_DATA'
 
 
@@ -31,7 +39,12 @@ const INITIAL_STATE = {
     postsLoaded: 0,
     eventsLoaded: 0,
     organizationsLoaded: 0,
-    treesLoaded: 0
+    treesLoaded: 0,
+    eventsSearch: [],
+    postsSearch: [],
+    organizationsSearch: [],
+    treesSearch: [],
+    usersSearch: []
 }
 
 
@@ -94,6 +107,31 @@ export default  data = (state = INITIAL_STATE, action) => {
                 treesLoaded: state.treesLoaded + 1,
                 trees: [...state.trees, ...action.trees]
             }
+        case EVENTS_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                eventsSearch: action.eventsSearch
+            }
+        case POSTS_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                postsSearch: action.postsSearch
+            }
+        case ORGANIZATIONS_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                organizationsSearch: action.organizationsSearch
+            }
+        case TREES_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                treesSearch: action.treesSearch
+            }
+        case USERS_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                usersSearch: action.usersSearch
+            }
         case CLEAR_DATA:
             return {
                 ...state,
@@ -106,7 +144,12 @@ export default  data = (state = INITIAL_STATE, action) => {
                 postsLoaded: 0,
                 eventsLoaded: 0,
                 organizationsLoaded: 0,
-                treesLoaded: 0
+                treesLoaded: 0,
+                eventsSearch: [],
+                postsSearch: [],
+                organizationsSearch: [],
+                treesSearch: [],
+                usersSearch: []
             }
         default:
             return state;
@@ -265,5 +308,115 @@ export const fetchAllDefaultData = () => {
         else {
             await dispatch(fetchPosts(null))
         }
+    })
+}
+
+export const fetchEventsSearch = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await axios.get(`${API_URL}/events/search`, {
+            params: {
+                search: search,
+                limit: limit
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: EVENTS_SEARCH_STATE_CHANGE, eventsSearch: res.data.events
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const fetchUsersSearch = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await axios.get(`${API_URL}/users/search`, {
+            params: {
+                search: search,
+                limit: limit
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: USERS_SEARCH_STATE_CHANGE, usersSearch: res.data.users
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const fetchOrganizationsSearch = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await axios.get(`${API_URL}/organizations/search`, {
+            params: {
+                search: search,
+                limit: limit
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: ORGANIZATIONS_SEARCH_STATE_CHANGE, organizationsSearch: res.data.organizations
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const fetchTreesSearch = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await axios.get(`${API_URL}/plants/search`, {
+            params: {
+                search: search,
+                limit: limit
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: TREES_SEARCH_STATE_CHANGE, treesSearch: res.data.trees
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const fetchPostsSearch = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await axios.get(`${API_URL}/posts/search`, {
+            params: {
+                search: search,
+                limit: limit
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: POSTS_SEARCH_STATE_CHANGE, postsSearch: res.data.posts
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const fetchAllSearchData = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await dispatch(fetchEventsSearch(search, limit))
+        await dispatch(fetchOrganizationsSearch(search, limit))
+        await dispatch(fetchTreesSearch(search, limit))
+        await dispatch(fetchUsersSearch(search, limit))
+        await dispatch(fetchPostsSearch(search, limit))
     })
 }

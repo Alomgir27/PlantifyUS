@@ -69,7 +69,7 @@ router.post('/new', async (req, res) => {
 router.get('/', async (req, res) => {
     const { page, user } = req.query;
     const limit = 20;
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * limit;
 
     //fetch all users posts if author _id is present in friends array
     if (!user) {
@@ -111,6 +111,26 @@ router.get('/', async (req, res) => {
     }
 })
 
+
+//@route GET api/posts/search
+//@desc Search posts by query and do regex match on text
+//@access Public
+router.get('/search', async (req, res) => {
+    const { search , limit } = req.query;
+
+    Post.find({ text: { $regex: search, $options: 'i' } })
+        .limit(parseInt(limit) || 20)
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
+        .populate({
+            path: 'event',
+            select: 'title images status location'
+        })
+        .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
+})
 
 
 

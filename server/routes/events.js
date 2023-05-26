@@ -65,12 +65,26 @@ router.post('/new', async (req, res) => {
 router.get('/', async (req, res) => {
     const { page } = req.query;
     const limit = 20;
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * limit;
 
     Event.find()
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
+        .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
+})
+
+
+//@route GET api/events/search
+//@desc Search events by title or description and do string regex match
+//@access Public
+router.get('/search', async (req, res) => {
+    const { search, limit } = req.query;
+
+
+    Event.find({ $or: [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }] })
+        .limit(parseInt(limit) || 20)
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })

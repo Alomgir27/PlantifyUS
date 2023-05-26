@@ -51,7 +51,7 @@ router.post('/new', async (req, res) => {
 router.get('/', async (req, res) => {
     const { page } = req.query;
     const limit = 20
-    const skip = (page - 1) * limit
+    const skip = (parseInt(page) - 1) * limit;
 
     Tree.find()
         .skip(skip)
@@ -61,5 +61,16 @@ router.get('/', async (req, res) => {
 })
 
 
+//@route api/plants/search
+//@desc Search for a plant
+//@access Public
+router.get('/search', async (req, res) => {
+    const { search, limit } = req.query;
+
+    Tree.find({ $or: [{ name: { $regex: search, $options: 'i' } }, { scientificName: { $regex: search, $options: 'i' } }] })
+        .limit(parseInt(limit) || 20)
+        .then(trees => res.status(200).json({ success: true, trees, message: 'Trees fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch trees', error: err }));
+})
 
 module.exports = router;

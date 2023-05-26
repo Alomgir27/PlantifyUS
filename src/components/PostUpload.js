@@ -13,15 +13,20 @@ import { API_URL } from "../constants";
 
 import { db, auth, storage } from "../config/firebase";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import axios from "axios";
 
+import { fetchEventsSearch } from "../modules/data";
 
 
 export default function PostUpload({ navigation, route }) { 
 
     const [images, setImages] = useState([]);
+    const [location, setLocation] = useState({
+        type: 'Point',
+        coordinates: [0, 0],
+      })
     const [currentStep, setCurrentStep] = useState(0);
     const [type, setType] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -87,10 +92,14 @@ export default function PostUpload({ navigation, route }) {
 
     const [errorMsg, setErrorMsg] = useState(null);
     const [loading, setLoading] = useState(false);
+
     const events = useSelector(state => state?.data?.events)
     const user = useSelector(state => state?.data?.currentUser)
+    const eventsSearch = useSelector(state => state?.data?.eventsSearch);
     const [eventTitle, setEventTitle] = useState("");
     const [inputValue, setInputValue] = useState('');
+
+    const dispatch = useDispatch();
 
 
 
@@ -102,10 +111,10 @@ export default function PostUpload({ navigation, route }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
-            setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
+             setLocation({ type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] });
         })();
     }, []);
+
 
 
     useEffect(() => {
@@ -113,6 +122,13 @@ export default function PostUpload({ navigation, route }) {
             setImages(route.params.images);
         }
     }, [route.params?.images]);
+
+
+    useEffect(() => {
+        if(eventTitle !== ""){
+            dispatch(fetchEventsSearch(eventTitle, 5));
+        }
+    }, [eventTitle])
 
     useEffect(() => {
         if (type === "newEvent") {
@@ -135,14 +151,21 @@ export default function PostUpload({ navigation, route }) {
     const handleSubmit = async () => {
         setLoading(true);
 
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            setErrorMsg('Permission to access location was denied');
-        }
+        if(location.coordinates[0] === 0 && location.coordinates[1] === 0){
 
-        let location = await Location.getCurrentPositionAsync({});
-        setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
-        setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
+            setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
+        }
+        else {
+            setEventForm({ ...newEventForm, location: location });
+            setNewOrganizationForm({...newOrganizationForm, location: location});
+        }
 
 
         let imagesURL = [];
@@ -526,7 +549,7 @@ export default function PostUpload({ navigation, route }) {
                         required
                     />
                     {eventTitle.length > 0 && showSuggestions && (
-                        events?.filter((event) => event?.title.toLowerCase()?.includes(eventTitle.toLowerCase()))?.slice(0, 5).map((event, index) => (
+                        eventsSearch?.map((event, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={{

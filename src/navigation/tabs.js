@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import Campings from "../screens/Campings";
 
-import { Home } from "../screens";
+import { Home, SearchScreen } from "../screens";
 
 import BottomSheet from "../components/BottomSheet";
 
@@ -40,6 +40,7 @@ const Tabs = ({ navigation }) => {
                     source={require('../../assets/icons/camera.png')}
                     resizeMode="contain"
                     style={{
+                        flex: 1,
                         width: 23,
                         height: 23
                     }}
@@ -65,6 +66,7 @@ const Tabs = ({ navigation }) => {
                                     source={require('../../assets/icons/flash_icon.png')}
                                     resizeMode="contain"
                                     style={{
+                                        flex: 1,
                                         tintColor: tintColor,
                                         width: 25,
                                         height: 25
@@ -77,6 +79,7 @@ const Tabs = ({ navigation }) => {
                                     source={require('../../assets/icons/cube_icon.png')}
                                     resizeMode="contain"
                                     style={{
+                                        flex: 1,
                                         tintColor: tintColor,
                                         width: 25,
                                         height: 25
@@ -93,6 +96,7 @@ const Tabs = ({ navigation }) => {
                                     source={require('../../assets/icons/search_icon.png')}
                                     resizeMode="contain"
                                     style={{
+                                        flex: 1,
                                         tintColor: tintColor,
                                         width: 25,
                                         height: 25
@@ -105,6 +109,7 @@ const Tabs = ({ navigation }) => {
                                     source={require('../../assets/icons/heart_icon.png')}
                                     resizeMode="contain"
                                     style={{
+                                        flex: 1,
                                         tintColor: tintColor,
                                         width: 25,
                                         height: 25
@@ -129,7 +134,7 @@ const Tabs = ({ navigation }) => {
             />
             <Tab.Screen
                 name="Search"
-                component={Home}
+                component={SearchScreen}
             />
             <Tab.Screen
                 name="Favourite"

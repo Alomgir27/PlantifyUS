@@ -35,11 +35,6 @@ const Home = ({ navigation }) => {
     const posts = useSelector(state => state?.data?.posts);
     const user = useSelector(state => state?.data?.currentUser);
 
-    console.log(posts)
-
-    const [search, setSearch] = useState("");
-
-
     const dispatch = useDispatch();
     
 
@@ -483,7 +478,7 @@ const Home = ({ navigation }) => {
                                 left: 30,
                                 fontSize: 25
                               }}
-                              >{item?.images?.length - 3}+ photos</Text>
+                              >{item?.images?.length - 3}+</Text>
 
                          </View>
                         </View>
@@ -836,6 +831,7 @@ const Home = ({ navigation }) => {
                     }}
                     placeholderTextColor={COLORS.gray}
                     placeholder="what are you looking for?"
+                    onFocus={() => navigation.navigate("Search")}
                 />
             </View>
         )

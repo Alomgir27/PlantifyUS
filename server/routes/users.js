@@ -79,12 +79,11 @@ router.post('/register', async (req, res) => {
 });
 
 
-// @route   GET api/users/:id
+// @route   GET api/users/get/:id
 // @desc    Get a user
 // @access  Public
-router.get('/:id', async (req, res) => {
+router.get('/get/:id', async (req, res) => {
     const { id } = req.params;
-    console.log(req.params);
 
     User.findById(id)
         .then(user => res.status(200).json({ success: true, user, message: 'User retrieved successfully' }))

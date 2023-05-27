@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef} from "react";
 import { TextInput, ScrollView , FlatList, RefreshControl } from "react-native-gesture-handler";
 import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
+import { Keyboard } from 'react-native';
 import * as ICONS from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, Button, Alert } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
@@ -36,15 +37,58 @@ const SearchScreen = ({ navigation }) => {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            inputRef?.current?.focus();
+            dispatch(fetchAllSearchData('', 5));
+            setSearch('');
+            setSearchResults([]);
+            setSearchType('All');
+            setSearchTypeText('All');
+            setLoading(false);
         }
         );
         return unsubscribe;
     }, [navigation]);
 
+
     useEffect(() => {
-        dispatch(fetchAllSearchData('', 5));
-    }, [])
+      const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+              setSearch('');
+                setSearchResults([]);
+                setSearchType('All');
+                setSearchTypeText('All');
+                setLoading(false);
+        });
+        return () => {
+            keyboardDidHideListener.remove();
+        }
+    }, []);
+
+    useEffect(() => {
+        // open keyboard if search is empty
+        if(search.length === 0) {
+            inputRef?.current.focus();
+        }
+    }, [search]);
+
+      
+    useEffect(() => {
+        //open keyboard if search type is changed
+        inputRef?.current.focus();
+    }, [searchType]);
+
+    useEffect(() => {
+       // open keyboard during initial render
+         inputRef?.current.focus(); 
+    }, []);
+
+    useEffect(() => {
+        // initially Keyboard is open
+        Keyboard.addListener('keyboardDidShow', () => {
+            inputRef?.current.focus();
+        });
+    }, []);
+
+   
+        
 
 
 
@@ -334,12 +378,12 @@ const SearchScreen = ({ navigation }) => {
                 <View style={styles.searchBar}>
                     <ICONS.Ionicons name="search" size={20} color={COLORS.gray} />
                     <TextInput
+                        ref={inputRef}
                         style={styles.searchInput}
                         placeholder="Search"
                         placeholderTextColor={COLORS.gray}
                         onChangeText={handleSearch}
                         value={search}
-                        ref={inputRef}
                     />
                 </View>
                 <View style={styles.searchType}>

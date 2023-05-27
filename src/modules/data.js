@@ -166,9 +166,9 @@ export const clearData = () => {
 
 export const fetchUser = ( _id) => {
     return (async (dispatch) => {
-        await axios.get(`${API_URL}/users/${_id}`)
+        await axios.get(`${API_URL}/users/get/${_id}`)
         .then((res) => {
-            console.log(res?.data?.message)
+            console.log(res?.data?.message, 'USER STATE CHANGE')
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: res.data.user
             })
@@ -195,7 +195,6 @@ export const fetchPosts = ( _id) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
-            console.log(res.data)
             dispatch({
                 type: POSTS_DATA_STATE_CHANGE, posts: res.data.posts
             })
@@ -283,7 +282,7 @@ export const fetchUsers = ( _id) => {
             }
         })
         .then((res) => {
-            console.log(res?.data?.message)
+            console.log(res?.data?.message, 'USERS')
             dispatch({
                 type: USER_DATA_STATE_CHANGE, users: res.data.users
             })

@@ -53,7 +53,6 @@ const BottomSheet = ({ navigation }) => {
         allowsMultipleSelection: true,
       });
 
-      console.log(result);
 
       if (!result.canceled) {
         navigation.navigate("PostUpload", { images: result.assets });
@@ -68,7 +67,6 @@ const BottomSheet = ({ navigation }) => {
         allowsMultipleSelection: true,
       });
 
-      console.log(result);
 
       if (!result.canceled) {
         navigation.navigate("PostUpload", { images: result.assets });

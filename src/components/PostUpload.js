@@ -120,7 +120,7 @@ export default function PostUpload({ navigation, route }) {
     useEffect(() => {
         if (route.params?.images) {
             setImages(route.params.images);
-        }
+        } 
     }, [route.params?.images]);
 
 
@@ -176,7 +176,6 @@ export default function PostUpload({ navigation, route }) {
             const path = `images/${index} + ${name} + ${new Date().getTime()}`;
             await storage.ref().child(path).put(blob)
             .then(async (snapshot) => {
-                // console.log(snapshot);
                 await snapshot.ref.getDownloadURL()
                 .then(async (downloadURL) => {
                     console.log('File available at', downloadURL);

@@ -51,7 +51,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Drawer = createDrawerNavigator();
 export default function Main() {  
 
-    const user = useSelector(state => state.data.currentUser)
+    const user = useSelector(state => state?.data?.currentUser)
+    const organizations = useSelector(state => state?.data?.events)
 
     const dispatch = useDispatch();
 
@@ -88,6 +89,18 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="home" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
+                            label="Profile"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Profile')}
+                            icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Search"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Search')}
+                            icon={() => <ICONS.Ionicons name="search" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
                             label="Plant Detail"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('PlantDetail')}
@@ -99,89 +112,12 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Campings')}
                             icon={() => <ICONS.Ionicons name="map" size={24} color={COLORS.white} />}
                         />
-                        <DrawerItem
-                            label="Settings"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Settings')}
-                            icon={() => <ICONS.Ionicons name="settings" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Donation"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Donation')}
-                            icon={() => <ICONS.Ionicons name="cash" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Post Upload"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Camera')}
-                            icon={() => <ICONS.Ionicons name="cloud-upload" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Search"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Search')}
-                            icon={() => <ICONS.Ionicons name="search" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Profile"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Profile')}
-                            icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Edit Profile"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('EditProfile')}
-                            icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
-                        />
+                        
                         <DrawerItem
                             label="Post"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('Post')}
                             icon={() => <ICONS.Ionicons name="add-circle" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Saved"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Saved')}
-                            icon={() => <ICONS.Ionicons name="bookmark" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Notifications"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Notifications')}
-                            icon={() => <ICONS.Ionicons name="notifications" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Chat"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Chat')}
-                            icon={() => <ICONS.Ionicons name="chatbubbles" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Logout"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('AuthLanding')}
-                            icon={() => <ICONS.Ionicons name="log-out" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Login"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Login')}
-                            icon={() => <ICONS.Ionicons name="log-in" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Signup"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Signup')}
-                            icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Forgot Password"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('ForgotPassword')}
-                            icon={() => <ICONS.Ionicons name="key" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
                             label="Events"
@@ -190,10 +126,10 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
-                            label="Event Detail"
+                            label="Chat"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('EventDetail')}
-                            icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
+                            onPress={() => props.navigation.navigate('Chat')}
+                            icon={() => <ICONS.Ionicons name="chatbubbles" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
                             label="Organizations"
@@ -202,12 +138,129 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="people" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
-                            label="Organization Detail"
+                            label="Notifications"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('OrganizationDetail')}
-                            icon={() => <ICONS.Ionicons name="people" size={24} color={COLORS.white} />}
+                            onPress={() => props.navigation.navigate('Notifications')}
+                            icon={() => <ICONS.Ionicons name="notifications" size={24} color={COLORS.white} />}
                         />
+                        <DrawerItem
+                            label="Saved"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Saved')}
+                            icon={() => <ICONS.Ionicons name="bookmark" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Post Upload"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Camera')}
+                            icon={() => <ICONS.Ionicons name="cloud-upload" size={24} color={COLORS.white} />}
+                        />
+                        {/* auth screens */}
+                        {!user && (
+                            <>
+                             <DrawerItem
+                             label="Login"
+                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                             onPress={() => props.navigation.navigate('Login')}
+                             icon={() => <ICONS.Ionicons name="log-in" size={24} color={COLORS.white} />}
+                            />
+                            <DrawerItem
+                                label="Signup"
+                                labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                                onPress={() => props.navigation.navigate('Signup')}
+                                icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
+                            />
+                         </>
+                         )}
+                         {/* auth screens */}
+                         {user && (
+                            <DrawerItem
+                                label="Logout"
+                                labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                                onPress={() => props.navigation.navigate('AuthLanding')}
+                                icon={() => <ICONS.Ionicons name="log-out" size={24} color={COLORS.white} />}
+                            />
+                          )}
+                         <DrawerItem
+                            label="Donation"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Donation')}
+                            icon={() => <ICONS.Ionicons name="cash" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Settings"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Settings')}
+                            icon={() => <ICONS.Ionicons name="settings" size={24} color={COLORS.white} />}
+                        />
+                        {/* organizations */}
+                        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+                            <Text style={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}>Organizations</Text>
+                        </View>
+                        {organizations?.map((item, index) => (
+                            <DrawerItem
+                                key={index}
+                                label={item?.title}
+                                labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                                onPress={() => props.navigation.navigate('OrganizationDetail', { organization: item })}
+                                icon={() => <Image source={{ uri: item?.images[0] }} style={{ width: 40, height: 40, borderRadius: 20 }} />}
+                            />
+                        ))}
+
+
+                        <View style={{ height: 50 }}></View>
+
+                        
+                       {!user ? (<>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+                            <View style={{ flex: 1, height: 1, backgroundColor: COLORS.white }}></View>
+                            <View>
+                                <Text style={{ width: 50, textAlign: 'center', color: COLORS.white }}>OR</Text>
+                                <Text style={{ width: 50, textAlign: 'center', color: COLORS.white }}>Login with</Text>
+                            </View>
+                            <View style={{ flex: 1, height: 1, backgroundColor: COLORS.white }}></View>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                            <View style={{ flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => props.navigation.navigate('Login')}>
+                                    <ICONS.Ionicons name="mail" size={24} color={COLORS.primary} />
+                                    <Text style={{ marginLeft: 10 }}>Email</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => props.navigation.navigate('Login')}>
+                                    <ICONS.Ionicons name="logo-google" size={24} color={COLORS.primary} />
+                                    <Text style={{ marginLeft: 10 }}>Google</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        </>
+                          ) : (<>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+                            <View style={{ flex: 1, height: 1, backgroundColor: COLORS.white }}></View>
+                            <View>
+                                <Text style={{ width: 50, textAlign: 'center', color: COLORS.white }}>OR</Text>
+                                <Text style={{ width: 50, textAlign: 'center', color: COLORS.white }}>Logout</Text>
+                            </View>
+                            <View style={{ flex: 1, height: 1, backgroundColor: COLORS.white }}></View>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                            <View style={{ flex: 1, alignItems: 'center' }}>
+                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => props.navigation.navigate('AuthLanding')}>
+                                    <ICONS.Ionicons name="log-out" size={24} color={COLORS.primary} />
+                                    <Text style={{ marginLeft: 10 }}>Logout</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                         </>
+                         )}
+
+                        <View style={{ height: 50 }}></View>
                     </View>
+
+                   
+
+
                 </View>
             </DrawerContentScrollView>
         )

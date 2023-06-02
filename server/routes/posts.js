@@ -7,37 +7,28 @@ const router = express.Router();
 
 const { Post, User } = require('../models');
 
-
 // const postSchema = new Schema({
-//     author: Schema.Types.ObjectId,
+//     author: {
+//         type: Schema.Types.ObjectId,
+//         ref: 'User'
+//     },
 //     text: String,
 //     images: [String],
-//     likes: [Schema.Types.ObjectId],
-//     comments: [{author: Schema.Types.ObjectId, text: String, date: Date }],
-//     event: Schema.Types.ObjectId,
-// }, { timestamps: true });
-
-// const userSchema = new Schema({
-//     name: String,
-//     email: String,
-//     password: String,
-//     eventsAttending: [Schema.Types.ObjectId],
-//     friends: [Schema.Types.ObjectId],
-//     posts: [Schema.Types.ObjectId],
-//     image: String,
-//     bio: String,
-//     location: {
-//         type: { type: String, default: 'Point'},
-//         coordinates: { type: [Number], default: [0, 0] }
+//     tags: [String],
+//     likes: [{
+//         type: Schema.Types.ObjectId,
+//         ref: 'User'
+//     }],
+//     comments: [{author: {
+//         type: Schema.Types.ObjectId,
+//         ref: 'User'
+//     }, text: String, date: Date }],
+//     event: {
+//         type: Schema.Types.ObjectId,
+//         ref: 'Event'
 //     },
-//     badges: [Schema.Types.ObjectId],
-//     notifications: [Schema.Types.ObjectId],
-//     favourites: [Schema.Types.ObjectId],
-//     type: String,
-//     uuid: String
+//     isVerified: Boolean
 // }, { timestamps: true });
-
-
 
 //@route POST api/posts/new
 //@desc Create a new post
@@ -71,15 +62,15 @@ router.get('/', async (req, res) => {
     const limit = 20;
     const skip = (parseInt(page) - 1) * limit;
 
-    //fetch all users posts if author _id is present in friends array
-    if (!user) {
+    //fetch all users posts if author _id is present in friends array and user is logged in
+    if (user) {
         User.findOne({ _id: user })
             .then(user => {
                 if (!user) {
                     return res.status(400).json({ success: false, message: 'User does not exist' });
                 }
 
-                Post.find({ author: { $in: user.friends } })
+                Post.find({ $or: [{ author: { $in: user.friends } }, { author: user._id }] })
                     .skip(skip)
                     .limit(limit)
                     .populate({
@@ -113,12 +104,12 @@ router.get('/', async (req, res) => {
 
 
 //@route GET api/posts/search
-//@desc Search posts by query and do regex match on text
+//@desc Search posts by query and do regex match on text field or tags array
 //@access Public
 router.get('/search', async (req, res) => {
     const { search , limit } = req.query;
 
-    Post.find({ text: { $regex: search, $options: 'i' } })
+    Post.find({ $or: [{ text: { $regex: search, $options: 'i' } }, { tags: { $regex: search, $options: 'i' } }] })
         .limit(parseInt(limit) || 20)
         .populate({
             path: 'author',

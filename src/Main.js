@@ -34,7 +34,7 @@ import ProfileScreen from "./screens/views/Profile";
 // import NotificationsScreen from "./screens/views/Notifications";
 // import ChatScreen from "./screens/views/Chat";
 import EventsScreen from "./screens/views/Events";
-// import EventDetailScreen from "./screens/views/EventDetail";
+import EventDetailsScreen from "./screens/views/EventDetails";
 // import OrganizationsScreen from "./screens/views/Organizations";
 // import OrganizationDetailScreen from "./screens/views/OrganizationDetail";
 
@@ -172,15 +172,7 @@ export default function Main() {
                             />
                          </>
                          )}
-                         {/* auth screens */}
-                         {user && (
-                            <DrawerItem
-                                label="Logout"
-                                labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                                onPress={() => props.navigation.navigate('AuthLanding')}
-                                icon={() => <ICONS.Ionicons name="log-out" size={24} color={COLORS.white} />}
-                            />
-                          )}
+                         
                          <DrawerItem
                             label="Donation"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
@@ -246,7 +238,10 @@ export default function Main() {
                         </View>
                         <View style={{ flexDirection: 'row', marginTop: 20 }}>
                             <View style={{ flex: 1, alignItems: 'center' }}>
-                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => props.navigation.navigate('AuthLanding')}>
+                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => {
+                                    AsyncStorage.removeItem('user');
+                                    props.navigation.closeDrawer();
+                                }}>
                                     <ICONS.Ionicons name="log-out" size={24} color={COLORS.primary} />
                                     <Text style={{ marginLeft: 10 }}>Logout</Text>
                                 </TouchableOpacity>
@@ -363,6 +358,10 @@ export default function Main() {
                 <Drawer.Screen name="Events" component={EventsScreen} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
+                <Drawer.Screen name="Event" component={EventDetailsScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+               
                 
             </Drawer.Navigator>
        </View>

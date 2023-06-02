@@ -12,8 +12,8 @@ const { Event } = require('../models');
 //     title: String,
 //     description: String,
 //     location: {
-//         type: 'Point',
-//         coordinates: [Number, Number]
+//         type: { type: String, default: 'Point'},
+//         coordinates: { type: [Number], default: [0, 0] }
 //     },
 //     organizer: String,
 //     attendees: [String],
@@ -29,7 +29,20 @@ const { Event } = require('../models');
 //         enum: ['pending', 'approved', 'rejected', 'completed'],
 //         default: 'pending'
 //     },
-// }, { typeKey: '$type' , timestamps: true });
+//     author: {
+//         type: Schema.Types.ObjectId,
+//         ref: 'User'
+//     },
+//     collectedFunds: Number,
+//     upvotes: [String],
+//     downvotes: [String],
+//     comments: [{
+//         type: Schema.Types.ObjectId,
+//         ref: 'Comment'
+//     }],
+//     isVerified: Boolean,
+//     type: String
+// }, { timestamps: true });
 
 
 //@route POST api/events/new
@@ -60,7 +73,7 @@ router.post('/new', async (req, res) => {
 
 
 //@route GET api/events
-//@desc Get all events if number of events is below 20 or fetch maximum 20
+//@desc Get all events if number of events is below 20 or fetch maximum 20 events and give priority to events with more upvotes
 //@access Public
 router.get('/', async (req, res) => {
     const { page } = req.query;
@@ -68,13 +81,15 @@ router.get('/', async (req, res) => {
     const skip = (parseInt(page) - 1) * limit;
 
     Event.find()
+        .sort({ upvotes: -1 })
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 })
         .populate('author')
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })
+
+        
 
 
 //@route GET api/events/search
@@ -91,10 +106,58 @@ router.get('/search', async (req, res) => {
 })
 
 
+//@route PUT api/events/upvote
+//@desc First delete downvote if it exists and then add upvote
+//@access Private
+router.put('/upvote', async (req, res) => {
+    const { eventId, userId } = req.body;
 
-    
+    Event.findById(eventId)
+        .then(event => {
+            if (event.downvotes.includes(userId)) {
+                event.downvotes.pull(userId);
+            }
+            // make sure user has not already upvoted
+            if (event.upvotes.includes(userId)) {
+                return res.status(400).json({ success: false, message: 'You have already upvoted this event' });
+            }
+            
+            event.upvotes.push(userId);
+            event.save()
+                .then(event => res.status(200).json({ success: true, event, message: 'Upvoted successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to upvote', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to upvote', error: err }));
+})
 
-    
+
+//@route PUT api/events/downvote
+//@desc First delete upvote if it exists and then add downvote
+//@access Private
+router.put('/downvote', async (req, res) => {
+    const { eventId, userId } = req.body;
+
+    Event.findById(eventId)
+        .then(event => {
+            if (event.upvotes.includes(userId)) {
+                event.upvotes.pull(userId);
+            }
+            // make sure user has not already downvoted
+            if (event.downvotes.includes(userId)) {
+                return res.status(400).json({ success: false, message: 'You have already downvoted this event' });
+            }
+            event.downvotes.push(userId);
+            event.save()
+                .then(event => res.status(200).json({ success: true, event, message: 'Downvoted successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to downvote', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to downvote', error: err }));
+})
+
+
+   
+
+
 
 
 module.exports = router;

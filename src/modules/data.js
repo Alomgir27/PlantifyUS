@@ -21,9 +21,14 @@ const ORGANIZATIONS_SEARCH_STATE_CHANGE = 'ORGANIZATIONS_SEARCH_STATE_CHANGE'
 const TREES_SEARCH_STATE_CHANGE = 'TREES_SEARCH_STATE_CHANGE'
 const USERS_SEARCH_STATE_CHANGE = 'USER_SEARCH_STATE_CHANGE'
 
+const HANDLE_EVENT_UPVOTE = 'HANDLE_EVENT_UPVOTE'
+const HANDLE_EVENT_DOWNVOTE = 'HANDLE_EVENT_DOWNVOTE'
+
+
 
 
 const CLEAR_DATA = 'CLEAR_DATA'
+const LOGOUT = 'LOGOUT'
 
 
 
@@ -132,6 +137,30 @@ export default  data = (state = INITIAL_STATE, action) => {
                 ...state,
                 usersSearch: action.usersSearch
             }
+        case HANDLE_EVENT_UPVOTE:
+            return {
+                ...state,
+                events: (state.events.map((event) => {
+                    if(event._id === action.events._id) {
+                        return action.events
+                    }
+                    else {
+                        return event
+                    }
+                }))
+            }
+        case HANDLE_EVENT_DOWNVOTE:
+            return {
+                ...state,
+                events: (state.events.map((event) => {
+                    if(event._id === action.events._id) {
+                        return action.events
+                    }
+                    else {
+                        return event
+                    }
+                }))
+            }
         case CLEAR_DATA:
             return {
                 ...state,
@@ -151,6 +180,12 @@ export default  data = (state = INITIAL_STATE, action) => {
                 treesSearch: [],
                 usersSearch: []
             }
+        case LOGOUT:
+            return {
+                ...state,
+                currentUser: null,
+                users: [],
+        }
         default:
             return state;
     }
@@ -164,6 +199,12 @@ export const clearData = () => {
     })
 }
 
+export const logout = () => {
+    return ((dispatch) => {
+        dispatch({ type: LOGOUT })
+    })
+}
+
 export const fetchUser = ( _id) => {
     return (async (dispatch) => {
         await axios.get(`${API_URL}/users/get/${_id}`)
@@ -172,8 +213,8 @@ export const fetchUser = ( _id) => {
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: res.data.user
             })
-            dispatch(fetchPosts(res?.data?.user?._id))
-            dispatch(fetchUsers(res?.data?.user?._id))
+            // dispatch(fetchPosts(res?.data?.user?._id))
+            // dispatch(fetchUsers(res?.data?.user?._id))
         })
         .catch((err) => {
             console.log(err?.data?.message);
@@ -417,5 +458,45 @@ export const fetchAllSearchData = (search, limit) => {
         await dispatch(fetchTreesSearch(search, limit))
         await dispatch(fetchUsersSearch(search, limit))
         await dispatch(fetchPostsSearch(search, limit))
+    })
+}
+
+
+
+export const handleEventUpvote = (event, user) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/events/upvote`, {
+            eventId: event,
+            userId: user
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_EVENT_UPVOTE, events: res.data.event
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+            console.log(err)
+        })
+    })
+}
+
+export const handleEventDownvote = (event, user) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/events/downvote`, {
+            eventId: event,
+            userId: user
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_EVENT_DOWNVOTE, events: res.data.event
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
     })
 }

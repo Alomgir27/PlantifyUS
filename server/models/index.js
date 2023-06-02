@@ -27,8 +27,15 @@ const eventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    collectedFunds: Number
-
+    collectedFunds: Number,
+    upvotes: [String],
+    downvotes: [String],
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    }],
+    isVerified: Boolean,
+    type: String
 }, { timestamps: true });
 
 
@@ -193,6 +200,31 @@ const progressSchema = new Schema({
     volunteers: Number,
     treesNeeds: Number,
     
+}, { timestamps: true });
+
+const commentSchema = new Schema({
+    text: String,
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    replyTo: {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    },
+    upvotes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    downvotes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    replies: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    }]
+   
 }, { timestamps: true });
 
 

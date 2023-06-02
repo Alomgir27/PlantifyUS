@@ -35,6 +35,7 @@ const Home = ({ navigation }) => {
     const posts = useSelector(state => state?.data?.posts);
     const user = useSelector(state => state?.data?.currentUser);
 
+
     const dispatch = useDispatch();
     
 
@@ -906,14 +907,6 @@ const Home = ({ navigation }) => {
                 {/* notification & signup */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',  backgroundColor: COLORS.primary, paddingTop: 10 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {/* {user && (
-                        <Text style={{ 
-                            marginLeft: 20, 
-                            color: COLORS.white,
-                            ...FONTS.body3
-                        }}>Welcome {user?.name} </Text>
-                    )} */}
-                    
                   </View>
                   <View style={{  flexDirection: 'row', alignItems: 'center' }}>
                   {!user ? (
@@ -999,7 +992,7 @@ const Home = ({ navigation }) => {
                             <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>New Events</Text>
 
                             <TouchableOpacity
-                                onPress={() => { console.log("See All on pressed") }}
+                                onPress={() => navigation.navigate("Events")}
                             >
                                 <Text style={{ color: COLORS.secondary, ...FONTS.body3 }}>See All</Text>
                             </TouchableOpacity>

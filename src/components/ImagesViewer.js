@@ -4,7 +4,7 @@ import { COLORS } from "../constants";
 import Swiper from 'react-native-swiper';
 
 
-const ImagesViewer = ({ images, resize }) => {
+const ImagesViewer = ({ images, resizeMode }) => {
     const [index, setIndex] = useState(0);
     
     return (
@@ -20,7 +20,7 @@ const ImagesViewer = ({ images, resize }) => {
                 <View style={styles.slide} key={index}>
                     <Image
                     source={{ uri: image?.uri ? image?.uri : image }}
-                    resizeMode={resize ? resize : 'cover'}
+                    resizeMode={resizeMode ? resizeMode : 'cover'}
                     style={styles.image}
                     />
                 </View>

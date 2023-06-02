@@ -71,6 +71,7 @@ router.get('/', async (req, res) => {
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
+        .populate('author')
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })

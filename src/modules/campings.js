@@ -8,9 +8,9 @@ const SET_LOADING = "Spots/campings/SET_LOADING";
 // Initial state
 const INITIAL_STATE = {
   spots: [],
-  mylocation: {
-    latitude: 37.79035,
-    longitude: -122.4384,
+  mylocation: { 
+    latitude: 23.6850,
+    longitude: 90.3563,
   },
   filters: {
     sort: 'distance',

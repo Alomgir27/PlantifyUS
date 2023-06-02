@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PlantifyUs",
-    "slug": "PlantifyUs",
+    "name": "Plantify",
+    "slug": "Plantify",
     "privacy": "public",
     "platforms": [
       "ios",

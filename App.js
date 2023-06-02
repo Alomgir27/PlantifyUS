@@ -77,14 +77,14 @@ export default function App() {
     
     return (
         <NavigationContainer theme={theme}>
-           <GestureHandlerRootView style={{ flex: 1 }}>
-                <PaperProvider>
+             <PaperProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
                     <Provider store={store}>
-                        <StatusBar barStyle="default" />
-                         <Main />
+                        <StatusBar barStyle="dark-content" />
+                        <Main />
                     </Provider>
-                </PaperProvider>
-            </GestureHandlerRootView>
+                </GestureHandlerRootView>
+            </PaperProvider>
         </NavigationContainer>
     );
 };

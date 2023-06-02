@@ -26,7 +26,8 @@ const eventSchema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    collectedFunds: Number
 
 }, { timestamps: true });
 

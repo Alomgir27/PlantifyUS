@@ -25,6 +25,20 @@ import * as ICONS from '@expo/vector-icons'
 // upload post
 import PostUpload from "./components/PostUpload";
 
+//views
+// import SearchScreen from "./screens/views/Search";
+import ProfileScreen from "./screens/views/Profile";
+// import EditProfileScreen from "./screens/views/EditProfile";
+// import PostScreen from "./screens/views/Posts";
+// import SavedScreen from "./screens/views/Saved";
+// import NotificationsScreen from "./screens/views/Notifications";
+// import ChatScreen from "./screens/views/Chat";
+import EventsScreen from "./screens/views/Events";
+// import EventDetailScreen from "./screens/views/EventDetail";
+// import OrganizationsScreen from "./screens/views/Organizations";
+// import OrganizationDetailScreen from "./screens/views/OrganizationDetail";
+
+
 // constants
 import { COLORS, icons } from "./constants";
 
@@ -63,7 +77,7 @@ export default function Main() {
                         {user ? (
                             <Text style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold', marginTop: 10 }}>{user?.name}</Text>
                         ) : (
-                            <Text style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold', marginTop: 10 }}>Guest</Text>
+                            <Text style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold', marginTop: 10 }}>Hello, Guest</Text>
                         )}
                     </TouchableOpacity>
                     <View style={{ marginTop: 30 }}>
@@ -102,6 +116,96 @@ export default function Main() {
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('Camera')}
                             icon={() => <ICONS.Ionicons name="cloud-upload" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Search"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Search')}
+                            icon={() => <ICONS.Ionicons name="search" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Profile"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Profile')}
+                            icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Edit Profile"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('EditProfile')}
+                            icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Post"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Post')}
+                            icon={() => <ICONS.Ionicons name="add-circle" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Saved"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Saved')}
+                            icon={() => <ICONS.Ionicons name="bookmark" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Notifications"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Notifications')}
+                            icon={() => <ICONS.Ionicons name="notifications" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Chat"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Chat')}
+                            icon={() => <ICONS.Ionicons name="chatbubbles" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Logout"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('AuthLanding')}
+                            icon={() => <ICONS.Ionicons name="log-out" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Login"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Login')}
+                            icon={() => <ICONS.Ionicons name="log-in" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Signup"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Signup')}
+                            icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Forgot Password"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('ForgotPassword')}
+                            icon={() => <ICONS.Ionicons name="key" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Events"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Events')}
+                            icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Event Detail"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('EventDetail')}
+                            icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Organizations"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Organizations')}
+                            icon={() => <ICONS.Ionicons name="people" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Organization Detail"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('OrganizationDetail')}
+                            icon={() => <ICONS.Ionicons name="people" size={24} color={COLORS.white} />}
                         />
                     </View>
                 </View>
@@ -197,6 +301,13 @@ export default function Main() {
                 }}/>
                 <Drawer.Screen name="ForgotPassword" component={ForgotPassword} options={{
                     headerShown: false,
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Profile" component={ProfileScreen} options={{
+                    headerShown: false,
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Events" component={EventsScreen} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                 

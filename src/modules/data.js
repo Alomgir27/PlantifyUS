@@ -24,8 +24,14 @@ const USERS_SEARCH_STATE_CHANGE = 'USER_SEARCH_STATE_CHANGE'
 const HANDLE_EVENT_UPVOTE = 'HANDLE_EVENT_UPVOTE'
 const HANDLE_EVENT_DOWNVOTE = 'HANDLE_EVENT_DOWNVOTE'
 
+const HANDLE_COMMENT_SHOW = 'HANDLE_COMMENT_SHOW'
+const HANDLE_COMMENT_HIDE = 'HANDLE_COMMENT_HIDE'
 
-
+const HANDLE_COMMENT_DATA_STATE_CHANGE = 'HANDLE_COMMENT_DATA_STATE_CHANGE'
+const HANDLE_NEW_COMMENT_DATA_STATE_CHANGE = 'HANDLE_NEW_COMMENT_DATA_STATE_CHANGE'
+const HANDLE_COMMENT_REMOVED = 'HANDLE_COMMENT_REMOVED'
+const HANDLE_COMMENT_EDITED = 'HANDLE_COMMENT_EDITED'
+const HANDLE_COMMENT_DATA_RESET = 'HANDLE_COMMENT_DATA_RESET'
 
 const CLEAR_DATA = 'CLEAR_DATA'
 const LOGOUT = 'LOGOUT'
@@ -49,7 +55,10 @@ const INITIAL_STATE = {
     postsSearch: [],
     organizationsSearch: [],
     treesSearch: [],
-    usersSearch: []
+    usersSearch: [],
+    comments: [],
+    commentsLoaded: 0,
+    commentsShow: false
 }
 
 
@@ -67,11 +76,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 ...state,
                 posts: action.posts
             }
-        case EVENTS_STATE_CHANGE:
-            return {
-                ...state,
-                events: action.events
-            }
+       
         case ORGANIZATIONS_STATE_CHANGE:
             return {
                 ...state,
@@ -94,12 +99,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 postsLoaded: state.postsLoaded + 1,
                 posts: [...state.posts, ...action.posts]
             }
-        case EVENTS_DATA_STATE_CHANGE:
-            return {
-                ...state,
-                eventsLoaded: state.eventsLoaded + 1,
-                events: [...state.events, ...action.events]
-            }
+        
         case ORGANIZATIONS_DATA_STATE_CHANGE:
             return {
                 ...state,
@@ -112,11 +112,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 treesLoaded: state.treesLoaded + 1,
                 trees: [...state.trees, ...action.trees]
             }
-        case EVENTS_SEARCH_STATE_CHANGE:
-            return {
-                ...state,
-                eventsSearch: action.eventsSearch
-            }
+        
         case POSTS_SEARCH_STATE_CHANGE:
             return {
                 ...state,
@@ -136,6 +132,20 @@ export default  data = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 usersSearch: action.usersSearch
+            }
+
+
+        // Handle Events
+        case EVENTS_STATE_CHANGE:
+            return {
+                ...state,
+                events: action.events
+            }
+        case EVENTS_DATA_STATE_CHANGE:
+            return {
+                ...state,
+                eventsLoaded: state.eventsLoaded + 1,
+                events: [...state.events, ...action.events]
             }
         case HANDLE_EVENT_UPVOTE:
             return {
@@ -158,6 +168,57 @@ export default  data = (state = INITIAL_STATE, action) => {
                     }
                     else {
                         return event
+                    }
+                }))
+            }
+        case EVENTS_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                eventsSearch: action.eventsSearch
+            }
+
+        // Handle Comments
+        case HANDLE_COMMENT_SHOW:
+            return {
+                ...state,
+                commentsShow: true
+            }
+        case HANDLE_COMMENT_HIDE:
+            return {
+                ...state,
+                commentsShow: false
+            }
+        case HANDLE_COMMENT_DATA_STATE_CHANGE:
+            return {
+                ...state,
+                commentsLoaded: state.commentsLoaded + 1,
+                comments: [...state.comments, ...action.comments]
+            }
+        case HANDLE_NEW_COMMENT_DATA_STATE_CHANGE:
+            return {
+                ...state,
+                comments: [...state.comments, action.comments]
+            }
+        case HANDLE_COMMENT_DATA_RESET:
+            return {
+                ...state,
+                commentsLoaded: 0,
+                comments: []
+            }
+        case HANDLE_COMMENT_REMOVED:
+            return {
+                ...state,
+                comments: (state.comments.filter((comment) => comment._id !== action.comments._id))
+            }
+        case HANDLE_COMMENT_EDITED:
+            return {
+                ...state,
+                comments: (state.comments.map((comment) => {
+                    if(comment._id === action.comments._id) {
+                        return action.comments
+                    }
+                    else {
+                        return comment
                     }
                 }))
             }
@@ -213,8 +274,6 @@ export const fetchUser = ( _id) => {
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: res.data.user
             })
-            // dispatch(fetchPosts(res?.data?.user?._id))
-            // dispatch(fetchUsers(res?.data?.user?._id))
         })
         .catch((err) => {
             console.log(err?.data?.message);
@@ -492,6 +551,174 @@ export const handleEventDownvote = (event, user) => {
             console.log(res?.data?.message)
             dispatch({
                 type: HANDLE_EVENT_DOWNVOTE, events: res.data.event
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+// Handle Comments
+
+export const handleCommentShow = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_COMMENT_SHOW })
+    })
+}
+
+export const handleCommentHide = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_COMMENT_HIDE })
+    })
+}
+
+export const fetchComments = (comments) => {
+    return (async (dispatch, getState) => {
+        if(getState().data.commentsLoaded * 10 !== getState().data.comments.length) return
+        await axios.get(`${API_URL}/comments`, {
+            params: {
+                comments: comments,
+                page: getState().data.commentsLoaded + 1
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_COMMENT_DATA_STATE_CHANGE, comments: res.data.comments
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const fetchCommentsReset = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_COMMENT_DATA_RESET })
+    })
+}
+
+export const handleCommentUpvote = (comment) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/comments/upvote`, {
+            commentId: comment,
+            userId: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_COMMENT_EDITED, comments: res.data.comment
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+export const handleCommentDownvote = (comment) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/comments/downvote`, {
+            commentId: comment,
+            userId: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_COMMENT_EDITED, comments: res.data.comment
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+export const handleCommentSubmit = (type, id, comment) => {
+    return (async (dispatch, getState) => {
+        await axios.post(`${API_URL}/comments`, {
+            type: type,
+            id: id,
+            comment: comment,
+            user: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_NEW_COMMENT_DATA_STATE_CHANGE, comments: res.data.comment
+            })
+            dispatch({
+                type: HANDLE_EVENT_UPVOTE, events: res.data.event
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+export const handleCommentDelete = (type, id, comment) =>  {
+    return (async (dispatch, getState) => {
+        await axios.delete(`${API_URL}/comments`, {
+            params: {
+                type: type,
+                id: id,
+                comment: comment,
+                user: getState().data.currentUser._id
+            }
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_COMMENT_REMOVED, comments: res.data.comment
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+export const handleCommentEdit = (type, id, newComment) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/comments`, {
+            type: type,
+            id: id,
+            newComment: newComment,
+            user: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_COMMENT_EDITED, comments: res.data.comment
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+export const handleCommentReply = (id, comment, reply) => {
+    return (async (dispatch, getState) => {
+        await axios.post(`${API_URL}/comments/reply`, {
+            id: id,
+            comment: comment,
+            reply: reply,
+            user: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_COMMENT_EDITED, comments: res.data.comment
             })
         })
         .catch((err) => {

@@ -69,170 +69,231 @@ const EventDetails = ({ route }) => {
     
     return (
         <ScrollView>
-            <View style={styles.root}>
-                <View style={styles.container}>
-                    <View style={styles.ImageContainer}>
-                        <ImagesViewer images={item.images} resizeMode="cover" />
+           <View style={styles.container}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+                        <ICONS.Ionicons name="arrow-back" size={24} color="black" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Event Details</Text>
+                </View>
+                <View style={styles.eventContainer}>
+                    <View style={styles.eventHeader}>
+                        <View style={styles.eventHeaderLeft}>
+                            <Image source={{uri: item.author.image}} style={styles.avatar} />
+                            <View style={styles.eventHeaderLeftText}>
+                                <Text style={styles.eventHeaderLeftTextTitle}>{item.title}</Text>
+                                <Text style={styles.eventHeaderLeftTextAuthor}>by {item.author.name}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.eventHeaderRight}>
+                            <Text style={styles.eventHeaderRightText}>{item.status}</Text>
+                        </View>
                     </View>
-                    <View style={styles.detailsContainer}>
-                        <MapView
-                            style={styles.map}
-                            initialRegion={{
-                                latitude: item.location.coordinates[0],
-                                longitude: item.location.coordinates[1],
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
-                            }}
-                        >
-                            <Marker
-                                coordinate={{
-                                    latitude: item.location.coordinates[0],
-                                    longitude: item.location.coordinates[1],
-                                }}
-                                title={item.title}
-                                description={item.description}
+                    <View style={styles.eventBody}>
+                        <View style={styles.eventBodyImageContainer}>
+                            <ImagesViewer
+                                images={item.images}
+                                resizeMode={'cover'}
+                                imageStyle={styles.eventBodyImage}
+                                containerStyle={styles.eventBodyImageContainer}
+                                navigation={navigation}
+                                item={item}
                             />
-                        </MapView>
-                     </View>    
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.title}>{item.title}</Text>
-                        <Text style={styles.description}>{item.description}</Text>
-                        <Text style={styles.description}>{item.landsDescription}</Text>
+                        </View>
+                        <View style={styles.eventBodyDescription}>
+                            <Text style={styles.eventBodyDescriptionText}>{item.description}</Text>
+                        </View>
+                        <View style={styles.eventBodyDetails}>
+                            <View style={styles.eventBodyDetailsItem}>
+                                <Text style={styles.eventBodyDetailsItemTitle}>Location</Text>
+                                <MapView
+                                    style={styles.map}
+                                    initialRegion={{
+                                        latitude: item?.location?.coordinates[0],
+                                        longitude: item?.location?.coordinates[1], 
+                                        latitudeDelta: 0.0922,
+                                        longitudeDelta: 0.0421,
+                                    }}
+                                    initialCamera={{
+                                        center: {
+                                            latitude: item?.location?.coordinates[0],
+                                            longitude: item?.location?.coordinates[1],
+                                        },
+                                        pitch: 0,
+                                        heading: 0,
+                                        altitude: 1000,
+                                        zoom: 10,
+                                    }}
+
+                                >
+                                    <Marker
+                                        coordinate={{
+                                            latitude: item?.location?.coordinates[0],
+                                            longitude: item?.location?.coordinates[1],
+                                        }}
+                                        title={item?.title}
+                                        description={item?.description}
+                                        zoomEnabled={true}
+                                        zoomControlEnabled={true}
+                                        zoomTapEnabled={true}
+                                        draggable={true}
+                                        flat={true}
+                                        onPress={() => console.log('Marker Pressed')}
+                                        onDragEnd={(e) => console.log('Marker Dragged', e.nativeEvent.coordinate)}
+                                    />
+                              </MapView>
+                            </View>
+                            <View style={styles.eventBodyDetailsItem}>
+                                <Text style={styles.eventBodyDetailsItemTitle}>Requirements</Text>
+                                <View style={styles.eventBodyDetailsItemRequirements}>
+                                    <View style={styles.eventBodyDetailsItemRequirementsItem}>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemTitle}>Trees</Text>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item.requirements.trees}</Text>
+                                    </View>
+                                    <View style={styles.eventBodyDetailsItemRequirementsItem}>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemTitle}>Volunteers</Text>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item.requirements.volunteers}</Text>
+                                    </View>
+                                    <View style={styles.eventBodyDetailsItemRequirementsItem}>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemTitle}>Funds</Text>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item.requirements.funds}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={styles.eventBodyDetailsItem}>
+                                <Text style={styles.eventBodyDetailsItemTitle}>Lands Description</Text>
+                                <Text style={styles.eventBodyDetailsItemText}>{item.landsDescription}</Text>
+                            </View>
+                        </View>
                     </View>
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.title}>Requirements</Text>
-                        <Text style={styles.description}>Trees: {item.requirements.trees}</Text>
-                        <Text style={styles.description}>Volunteers: {item.requirements.volunteers}</Text>
-                        <Text style={styles.description}>Funds: {item.requirements.funds}</Text>
-                    </View>
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.title}>Organizer</Text>
-                        <Text style={styles.description}>{item.organizer}</Text>
-                    </View>
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.title}>Attendees</Text>
-                        <Text style={styles.description}>{item.attendees}</Text>
-                    </View>
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.title}>Status</Text>
-                        <Text style={styles.description}>{item.status}</Text>
-                    </View>
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.title}>Author</Text>
-                        <Image
-                            style={{ width: 60, height: 60, borderRadius: 30 }}
-                            source={{ uri: item.author.image }}
-                        />
-                        <Text style={styles.description}>{item.author.name}</Text>
-                    </View>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        style={styles.scrollView}
-                    >
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => console.log("Button pressed")}
-                        >
-                            <ICONS.FontAwesome
-                                name="thumbs-up"
-                                size={24}
-                                color={COLORS.white}
-                            />
-                            <Text style={styles.buttonText}>Upvote</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => console.log("Button pressed")}
-                        >
-                            <ICONS.FontAwesome
-                                name="thumbs-down"
-                                size={24}
-                                color={COLORS.white}
-                            />
-                            <Text style={styles.buttonText}>Downvote</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => console.log("Button pressed")}
-                        >
-                            <ICONS.FontAwesome
-                                name="comment"
-                                size={24}
-                                color={COLORS.white}
-                            />
-                            <Text style={styles.buttonText}>Comment</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => console.log("Button pressed")}
-                        >
-                            <ICONS.FontAwesome
-                                name="share"
-                                size={24}
-                                color={COLORS.white}
-                            />
-                            <Text style={styles.buttonText}>Share</Text>
-                        </TouchableOpacity>
-                    </ScrollView>
                 </View>
             </View>
         </ScrollView>
     );
 };
 
-
+                                
 const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-        backgroundColor: COLORS.white,
-    },
     container: {
         flex: 1,
+        backgroundColor: COLORS.white,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
     },
-    detailsContainer: {
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginLeft: 20,
+    },
+    eventContainer: {
         flex: 1,
         backgroundColor: COLORS.white,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginBottom: 10,
+    eventHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
-    description: {
-        fontSize: 18,
-        marginBottom: 10,
+    eventHeaderLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    map: {
-        width: "100%",
-        height: 200,
-        marginBottom: 10,
+    avatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
     },
-    scrollView: {
-        flexDirection: "row",
-        marginHorizontal: 20,
-    },
-    button: {
-        backgroundColor: COLORS.primary,
-        borderRadius: 20,
-        padding: 10,
-        margin: 10,
-        flexDirection: "row",
-    },
-    buttonText: {
-        color: COLORS.white,
-        fontSize: 18,
+    eventHeaderLeftText: {
         marginLeft: 10,
     },
-    ImageContainer: {
+    eventHeaderLeftTextTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    eventHeaderLeftTextAuthor: {
+        fontSize: 14,
+        color: COLORS.gray,
+    },
+    eventHeaderRight: {
+        backgroundColor: COLORS.primary,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 5,
+    },
+    eventHeaderRightText: {
+        color: COLORS.white,
+        fontSize: 14,
+    },
+    eventBody: {
         flex: 1,
-        paddingHorizontal: 20,
-        backgroundColor: COLORS.white,
-        width: width,
-        height: height / 1.5,
+    },
+    eventBodyImageContainer: {
+        width: '100%',
+        height: 300,
+        borderRadius: 10,
+        overflow: 'hidden',
+        marginBottom: 20,
+    },
+    eventBodyImage: {
+        width: '100%',
+        height: '100%',
+    },
+    eventBodyDescription: {
+        marginBottom: 20,
+    },
+    eventBodyDescriptionText: {
+        fontSize: 16,
+        color: COLORS.gray,
+    },
+    eventBodyDetails: {
+        marginBottom: 20,
+    },
+    eventBodyDetailsItem: {
+        marginBottom: 20,
+    },
+    eventBodyDetailsItemTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    eventBodyDetailsItemText: {
+        fontSize: 16,
+        color: COLORS.gray,
+    },
+    eventBodyDetailsItemRequirements: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    eventBodyDetailsItemRequirementsItem: {
+        width: '30%',
+        backgroundColor: COLORS.lightGray,
+        borderRadius: 5,
+        padding: 10,
+    },
+    eventBodyDetailsItemRequirementsItemTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    eventBodyDetailsItemRequirementsItemValue: {
+        fontSize: 16,
+        color: COLORS.gray,
+    },
+    map: {
+        flex: 1,
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+        marginBottom: 20,
     },
 });
 
 export default EventDetails;
-
-                    

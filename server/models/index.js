@@ -30,10 +30,7 @@ const eventSchema = new Schema({
     collectedFunds: Number,
     upvotes: [String],
     downvotes: [String],
-    comments: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
-    }],
+    comments: [String],
     isVerified: Boolean,
     type: String
 }, { timestamps: true });
@@ -220,10 +217,6 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
-    replies: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
-    }]
    
 }, { timestamps: true });
 
@@ -241,6 +234,7 @@ const Post = mongoose.model('Post', postSchema);
 const Notification = mongoose.model('Notification', notificationSchema);
 const Badge = mongoose.model('Badge', badgeSchema);
 const Progress = mongoose.model('Progress', progressSchema);
+const Comment = mongoose.model('Comment', commentSchema);
 
 Event.createIndexes({ location: '2dsphere' });
 User.createIndexes({ location: '2dsphere' });
@@ -256,5 +250,6 @@ module.exports = {
     Badge,
     Progress,
     Organizations,
-    Favourites
+    Favourites,
+    Comment
 };

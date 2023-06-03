@@ -20,6 +20,8 @@ import { Provider as  PaperProvider } from "react-native-paper";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+
 
 
 
@@ -81,7 +83,9 @@ export default function App() {
                 <GestureHandlerRootView style={{ flex: 1 }}>
                     <Provider store={store}>
                         <StatusBar barStyle="dark-content" />
-                        <Main />
+                         <BottomSheetModalProvider>
+                           <Main />
+                        </BottomSheetModalProvider>
                     </Provider>
                 </GestureHandlerRootView>
             </PaperProvider>

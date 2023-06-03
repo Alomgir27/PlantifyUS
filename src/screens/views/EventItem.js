@@ -24,10 +24,11 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { handleComments, handleEventDownvote, handleEventUpvote } from './../../modules/data';
+import { handleEventDownvote, handleEventUpvote } from './../../modules/data';
 
 import { API_URL } from "./../../constants";
 import { connect } from 'react-redux';
+import Comments from '../../components/Comments';
 
 
 
@@ -39,11 +40,13 @@ export class EventItem extends React.PureComponent {
         this.state = {
             collapsed: true,
             user: null,
+            isVisible: false,
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.handleUpVote = this.handleUpVote.bind(this);
         this.handleDownVote = this.handleDownVote.bind(this);
         this.handleComments = this.handleComments.bind(this);
+        this.handleToggleComments = this.handleToggleComments.bind(this);
 
     }
 
@@ -72,12 +75,15 @@ export class EventItem extends React.PureComponent {
 
     }
 
+    handleToggleComments = () => {
+        this.setState({ isVisible: !this.state.isVisible });
+    }
+
     handleComments = (id) => {
         if(!this.state.user) {
             return Alert.alert('You need to login first');
         }
-        const { dispatch } = this.props;
-        dispatch(handleComments(id, this.state.user?._id));
+        this.handleToggleComments();
     }
 
 
@@ -87,6 +93,7 @@ export class EventItem extends React.PureComponent {
     render() {
         const { item, navigation } = this.props;
         return (
+        <>
             <View
                 style={styles.card}
             >
@@ -193,7 +200,6 @@ export class EventItem extends React.PureComponent {
                             altitude: 1000,
                             zoom: 10,
                         }}
-
                     >
                         <Marker
                             coordinate={{
@@ -209,8 +215,6 @@ export class EventItem extends React.PureComponent {
                             flat={true}
                             onPress={() => console.log('Marker Pressed')}
                             onDragEnd={(e) => console.log('Marker Dragged', e.nativeEvent.coordinate)}
-
-
                         />
                     </MapView>
                 </View>
@@ -307,6 +311,8 @@ export class EventItem extends React.PureComponent {
                 </ScrollView>
                 
             </View>
+            <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} />
+        </>
         )
     }
 }

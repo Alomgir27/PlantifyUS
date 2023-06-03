@@ -235,7 +235,7 @@ const Home = ({ navigation }) => {
                         ...styles.shadow
                     }}
                     
-                    onPress={() => { console.log("Event on pressed") }}
+                    onPress={() => navigation.navigate('Event', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -293,7 +293,7 @@ const Home = ({ navigation }) => {
                         backgroundColor: COLORS.white,
                         ...styles.shadow
                     }}
-                    onPress={() => { console.log("Event on pressed") }}
+                    onPress={() => navigation.navigate('Event', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -352,7 +352,7 @@ const Home = ({ navigation }) => {
             return (
                 <TouchableOpacity
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
-                    onPress={() => { console.log("Event on pressed") }}
+                    onPress={() => navigation.navigate('Event', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -423,7 +423,7 @@ const Home = ({ navigation }) => {
             return (
                 <TouchableOpacity
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
-                    onPress={() => { console.log("Event on pressed") }}
+                    onPress={() => navigation.navigate('Event', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <View style={{ flexDirection: 'row' }}>

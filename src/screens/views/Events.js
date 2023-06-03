@@ -31,6 +31,7 @@ import axios from "axios";
 
 import { useNavigation } from "@react-navigation/native";
 
+
 import EventItem from './EventItem';
 
 const { width, height } = Dimensions.get('window');
@@ -43,6 +44,7 @@ const Events = ({ navigation }) => {
     
         const [refreshing, setRefreshing] = useState(false);
         const [scrollTop, setScrollTop] = useState(false);
+
     
         const dispatch = useDispatch();
     
@@ -106,7 +108,6 @@ const Events = ({ navigation }) => {
             <View style={styles.container}>
 
                 {renderHeader()}
-            
 
                 <FlatList
                     data={events}

@@ -38,6 +38,8 @@ import EventDetailsScreen from "./screens/views/EventDetails";
 // import OrganizationsScreen from "./screens/views/Organizations";
 // import OrganizationDetailScreen from "./screens/views/OrganizationDetail";
 
+import ImageDetails from "./components/ImageDetails";
+
 
 // constants
 import { COLORS, icons } from "./constants";
@@ -359,6 +361,9 @@ export default function Main() {
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="Event" component={EventDetailsScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="ImageDetails" component={ImageDetails} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                

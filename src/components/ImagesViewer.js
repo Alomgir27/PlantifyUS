@@ -1,14 +1,15 @@
 import React , { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { COLORS } from "../constants";
 import Swiper from 'react-native-swiper';
 
 
-const ImagesViewer = ({ images, resizeMode }) => {
+
+const ImagesViewer = ({ images, resizeMode, imageStyle, containerStyle, navigation, item }) => {
     const [index, setIndex] = useState(0);
     
     return (
-        <View style={{ flex: 1, backgroundColor: COLORS.black }}>
+        <View style={[styles.wrapper, containerStyle]}>
             <Swiper
                 style={styles.wrapper}
                 showsButtons={true}
@@ -17,13 +18,14 @@ const ImagesViewer = ({ images, resizeMode }) => {
                 onIndexChanged={(index) => setIndex(index)}
             >
                 {images.map((image, index) => (
-                <View style={styles.slide} key={index}>
+                <TouchableWithoutFeedback style={styles.slide} key={index} onPress={() => navigation.navigate('ImageDetails', { image, item })}>
                     <Image
-                    source={{ uri: image?.uri ? image?.uri : image }}
-                    resizeMode={resizeMode ? resizeMode : 'cover'}
-                    style={styles.image}
+                        source={{ uri: image?.uri ? image?.uri : image }}
+                        resizeMode={resizeMode ? resizeMode : 'cover'}
+                        style={[styles.image, imageStyle]}
+                        
                     />
-                </View>
+                </TouchableWithoutFeedback>
                 ))}
             </Swiper>
             <View style={styles.pagination}>
@@ -51,6 +53,7 @@ const styles = StyleSheet.create({
         top: 40,
         right: 20,
     },
+
 });
 
 export default ImagesViewer;

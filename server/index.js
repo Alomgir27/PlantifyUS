@@ -29,7 +29,7 @@ app.use('/api/events', require('./routes/events'));
 app.use('/api/organizations', require("./routes/organizations"));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/plants', require('./routes/plants'));
-
+app.use('/api/comments', require('./routes/comments'));
 
 
 

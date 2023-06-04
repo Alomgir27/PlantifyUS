@@ -106,10 +106,8 @@ const Events = ({ navigation }) => {
 
         return (
             <View style={styles.container}>
-
-                {renderHeader()}
-
                 <FlatList
+                    ListHeaderComponent={renderHeader}
                     data={events}
                     renderItem={({ item }) => renderItem({ item })}
                     keyExtractor={(item) => item._id.toString()}

@@ -81,6 +81,7 @@ router.get('/', async (req, res) => {
                         path: 'event',
                         select: 'title images status location'
                     })
+                    .sort({ upvotes: -1 })
                     .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
                     .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
             })
@@ -97,6 +98,7 @@ router.get('/', async (req, res) => {
                 path: 'event',
                 select: 'title images status location'
             })
+            .sort({ upvotes: -1 })
             .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
             .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
     }
@@ -119,6 +121,7 @@ router.get('/search', async (req, res) => {
             path: 'event',
             select: 'title images status location'
         })
+        .sort({ upvotes: -1 })
         .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
 })

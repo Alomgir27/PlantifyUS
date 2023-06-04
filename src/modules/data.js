@@ -21,8 +21,7 @@ const ORGANIZATIONS_SEARCH_STATE_CHANGE = 'ORGANIZATIONS_SEARCH_STATE_CHANGE'
 const TREES_SEARCH_STATE_CHANGE = 'TREES_SEARCH_STATE_CHANGE'
 const USERS_SEARCH_STATE_CHANGE = 'USER_SEARCH_STATE_CHANGE'
 
-const HANDLE_EVENT_UPVOTE = 'HANDLE_EVENT_UPVOTE'
-const HANDLE_EVENT_DOWNVOTE = 'HANDLE_EVENT_DOWNVOTE'
+const HANDLE_EVENT_EDITED = 'HANDLE_EVENT_EDITED'
 
 const HANDLE_COMMENT_SHOW = 'HANDLE_COMMENT_SHOW'
 const HANDLE_COMMENT_HIDE = 'HANDLE_COMMENT_HIDE'
@@ -32,6 +31,7 @@ const HANDLE_NEW_COMMENT_DATA_STATE_CHANGE = 'HANDLE_NEW_COMMENT_DATA_STATE_CHAN
 const HANDLE_COMMENT_REMOVED = 'HANDLE_COMMENT_REMOVED'
 const HANDLE_COMMENT_EDITED = 'HANDLE_COMMENT_EDITED'
 const HANDLE_COMMENT_DATA_RESET = 'HANDLE_COMMENT_DATA_RESET'
+
 
 const CLEAR_DATA = 'CLEAR_DATA'
 const LOGOUT = 'LOGOUT'
@@ -147,19 +147,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 eventsLoaded: state.eventsLoaded + 1,
                 events: [...state.events, ...action.events]
             }
-        case HANDLE_EVENT_UPVOTE:
-            return {
-                ...state,
-                events: (state.events.map((event) => {
-                    if(event._id === action.events._id) {
-                        return action.events
-                    }
-                    else {
-                        return event
-                    }
-                }))
-            }
-        case HANDLE_EVENT_DOWNVOTE:
+        case HANDLE_EVENT_EDITED:
             return {
                 ...state,
                 events: (state.events.map((event) => {
@@ -531,7 +519,7 @@ export const handleEventUpvote = (event, user) => {
         .then((res) => {
             console.log(res?.data?.message)
             dispatch({
-                type: HANDLE_EVENT_UPVOTE, events: res.data.event
+                type: HANDLE_EVENT_EDITED, events: res.data.event
             })
         })
         .catch((err) => {
@@ -550,7 +538,7 @@ export const handleEventDownvote = (event, user) => {
         .then((res) => {
             console.log(res?.data?.message)
             dispatch({
-                type: HANDLE_EVENT_DOWNVOTE, events: res.data.event
+                type: HANDLE_EVENT_EDITED, events: res.data.event
             })
         })
         .catch((err) => {
@@ -639,7 +627,7 @@ export const handleCommentDownvote = (comment) => {
     })
 }
 
-export const handleCommentSubmit = (type, id, comment) => {
+export const handleCommentSubmit = (type, id, comment, callback) => {
     return (async (dispatch, getState) => {
         await axios.post(`${API_URL}/comments`, {
             type: type,
@@ -649,12 +637,17 @@ export const handleCommentSubmit = (type, id, comment) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
+            let data = res.data.comment
+            data.author = getState().data.currentUser
             dispatch({
-                type: HANDLE_NEW_COMMENT_DATA_STATE_CHANGE, comments: res.data.comment
+                type: HANDLE_NEW_COMMENT_DATA_STATE_CHANGE, comments: data
             })
-            dispatch({
-                type: HANDLE_EVENT_UPVOTE, events: res.data.event
-            })
+            if(type === 'event') {
+                dispatch({
+                    type: HANDLE_EVENT_EDITED, events: res.data.event
+                })
+            }
+            if(callback) callback((prevState) => ({...prevState, replyTo: [...prevState.replyTo, res.data.comment._id]}))
         })
         .catch((err) => {
             console.log(err?.data)
@@ -663,13 +656,13 @@ export const handleCommentSubmit = (type, id, comment) => {
     })
 }
 
-export const handleCommentDelete = (type, id, comment) =>  {
+export const handleCommentDelete = (type, id, commentId, callback) =>  {
     return (async (dispatch, getState) => {
         await axios.delete(`${API_URL}/comments`, {
             params: {
                 type: type,
                 id: id,
-                comment: comment,
+                commentId: commentId,
                 user: getState().data.currentUser._id
             }
         })
@@ -678,6 +671,12 @@ export const handleCommentDelete = (type, id, comment) =>  {
             dispatch({
                 type: HANDLE_COMMENT_REMOVED, comments: res.data.comment
             })
+            if(type === 'event') {
+                dispatch({
+                    type: HANDLE_EVENT_EDITED, events: res.data.event
+                })
+            }
+            if(callback) callback((prevState) => ({...prevState, replyTo: prevState.replyTo.filter((id) => id !== res.data.comment._id)}))
         })
         .catch((err) => {
             console.log(err?.data)
@@ -707,23 +706,44 @@ export const handleCommentEdit = (type, id, newComment) => {
     })
 }
 
-export const handleCommentReply = (id, comment, reply) => {
+export const handleAddToFavorite = (type, id) => {
     return (async (dispatch, getState) => {
-        await axios.post(`${API_URL}/comments/reply`, {
+        await axios.post(`${API_URL}/favourites/add`, {
+            type: type,
             id: id,
-            comment: comment,
-            reply: reply,
             user: getState().data.currentUser._id
         })
         .then((res) => {
             console.log(res?.data?.message)
             dispatch({
-                type: HANDLE_COMMENT_EDITED, comments: res.data.comment
+                type: HANDLE_EVENT_EDITED, events: res.data.event
             })
         })
         .catch((err) => {
             console.log(err?.data)
             console.log(err)
         })
+    })
+}
+
+export const handleRemoveFromFavorite = (type, id) => {
+    return (async (dispatch, getState) => {
+        await axios.post(`${API_URL}/favourites/remove`, {
+            type: type,
+            id: id,
+            user: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_EVENT_EDITED, events: res.data.event
+            })
+        }
+        )
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        }
+        )
     })
 }

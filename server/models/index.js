@@ -27,6 +27,10 @@ const eventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    favourites: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Favourites'
+    }],
     collectedFunds: Number,
     upvotes: [String],
     downvotes: [String],
@@ -93,10 +97,6 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Notification'
     }],
-    favourites: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Favourite'
-    }],
     type: String,
     uuid: String
 }, { timestamps: true });
@@ -157,12 +157,35 @@ const postSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Event'
     },
+    favourites: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Favourites'
+    }],
     isVerified: Boolean
 }, { timestamps: true });
 
 const favouriteSchema = new Schema({
     type : String,
-    Id: Schema.Types.ObjectId
+    event: {
+        type: Schema.Types.ObjectId,
+        ref: 'Event'
+    },
+    tree: {
+        type: Schema.Types.ObjectId,
+        ref: 'Tree'
+    },
+    organization: {
+        type: Schema.Types.ObjectId,
+        ref: 'Organization'
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    post: {
+        type: Schema.Types.ObjectId,
+        ref: 'Post'
+    }
 }, { timestamps: true });
 
 
@@ -205,10 +228,10 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    replyTo: {
+    replyTo: [{
         type: Schema.Types.ObjectId,
         ref: 'Comment'
-    },
+    }],
     upvotes: [{
         type: Schema.Types.ObjectId,
         ref: 'User'

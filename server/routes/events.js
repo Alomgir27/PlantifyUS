@@ -84,7 +84,11 @@ router.get('/', async (req, res) => {
         .sort({ upvotes: -1 })
         .skip(skip)
         .limit(limit)
-        .populate('author')
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
+        .sort({ upvotes: -1 })
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })

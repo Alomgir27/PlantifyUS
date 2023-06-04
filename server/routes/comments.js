@@ -32,15 +32,15 @@ const { User, Event, Post, Comment } = require('../models');
 router.get('/', async (req, res) => {
     const { comments, page } = req.query
 
-    console.log(comments, page);
     
     Comment.find({ _id: { $in: comments } })
-        .populate('author')
-        .populate('replyTo')
-        .populate('upvotes')
-        .populate('downvotes')
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
         .skip((page - 1) * 10)
         .limit(10)
+        .sort({ upvotes: -1 })
         .then((comments) => {
             return res.status(200).json({ success: true, comments: comments, message: "Comments fetched successfully" })
         })
@@ -57,6 +57,10 @@ router.put('/upvote', async (req, res) => {
     const { commentId, userId } = req.body;
 
     Comment.findById(commentId)
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
         .then((comment) => {
             // Check if user has already downvoted the comment
             if (comment.downvotes.includes(userId)) {
@@ -87,6 +91,10 @@ router.put('/downvote', async (req, res) => {
     const { commentId, userId } = req.body;
 
     Comment.findById(commentId)
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
         .then((comment) => {
             // Check if user has already upvoted the comment
             if (comment.upvotes.includes(userId)) {
@@ -118,8 +126,12 @@ router.post('/', async (req, res) => {
 
     const newComment = new Comment({
         text: comment,
-        author: user
+        author: user,
+        replyTo: [],
+        upvotes: [],
+        downvotes: []
     })
+
 
     if (type === "event") {
         Event.findById(id)
@@ -167,24 +179,15 @@ router.post('/', async (req, res) => {
         .catch((err) => {
             return res.status(500).json({ success: false, message: err.message })
         })
-    }
-})
-
-//@route    DELETE api/comments
-//@desc     Delete a comment
-//@access   Public
-router.delete('/', async (req, res) => {
-    const { type, id, comment, user } = req.query;
-
-    if (type === "event") {
-        Event.findById(id)
-            .then((event) => {
-                event.comments.pull(comment);
-                event.save()
-                    .then((event) => {
-                        Comment.findByIdAndDelete(comment)
+    } else if (type === "replyTo") {
+        Comment.findById(id)
+            .then((comment) => {
+                comment.replyTo.push(newComment._id);
+                comment.save()
+                    .then((comment) => {
+                        newComment.save()
                             .then((comment) => {
-                                return res.status(200).json({ success: true, comment: comment, message: "Comment deleted successfully" })
+                                return res.status(200).json({ success: true, comment: comment, message: "Comment created successfully" })
                             })
                             .catch((err) => {
                                 return res.status(500).json({ success: false, message: err.message })
@@ -195,14 +198,97 @@ router.delete('/', async (req, res) => {
                     })
             }
         )
+        .catch((err) => {
+            return res.status(500).json({ success: false, message: err.message })
+        }
+    )
     }
+})
+
+//@route    DELETE api/comments
+//@desc     Delete a comment
+//@access   Public
+router.delete('/', async (req, res) => {
+    const { type, id, commentId } = req.query;
+
+    if (type === "event") {
+        Event.findById(id)
+            .then((event) => {
+                event.comments.pull(commentId);
+                event.save()
+                    .then((event) => {
+                        Comment.findByIdAndDelete(commentId)
+                            .then((comment) => {
+                                comment.replyTo.forEach((reply) => {
+                                    Comment.findByIdAndDelete(reply)
+                                        .then((reply) => {
+                                            return res.status(200).json({ success: true, comment: comment, message: "Comment deleted successfully" })
+                                        }
+                                    )
+                                    .catch((err) => {
+                                        return res.status(500).json({ success: false, message: err.message })
+                                    }
+                                )
+                                })
+                                if(comment.replyTo.length === 0) {
+                                    return res.status(200).json({ success: true, comment: comment, message: "Comment deleted successfully" })
+                                }
+                            }
+                        )
+                        .catch((err) => {
+                            return res.status(500).json({ success: false, message: err.message })
+                        }
+                    )
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({ success: false, message: err.message })
+                    }
+                )
+            }
+        )
+    }                        
     else if (type === "post") {
         Post.findById(id)
             .then((post) => {
-                post.comments.pull(comment);
+                post.comments.pull(commentId);
                 post.save()
                     .then((post) => {
-                        Comment.findByIdAndDelete(comment)
+                        Comment.findByIdAndDelete(commentId)
+                            .then((comment) => {
+                                comment.replyTo.forEach((reply) => {
+                                    Comment.findByIdAndDelete(reply)
+                                        .then((reply) => {
+                                            return res.status(200).json({ success: true, comment: comment, message: "Comment deleted successfully" })
+                                        }
+                                    )
+                                    .catch((err) => {
+                                        return res.status(500).json({ success: false, message: err.message })
+                                    }
+                                )
+                                })
+                                if(comment.replyTo.length === 0) {
+                                    return res.status(200).json({ success: true, comment: comment, message: "Comment deleted successfully" })
+                                }
+                            })
+                            .catch((err) => {
+                                return res.status(500).json({ success: false, message: err.message })
+                            }
+                        )
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({ success: false, message: err.message })
+                    }
+                )      
+            }
+        )
+    }
+    else if (type === "replyTo") {
+        Comment.findById(id)
+            .then((comment) => {
+                comment.replyTo.pull(commentId);
+                comment.save()
+                    .then((comment) => {
+                        Comment.findByIdAndDelete(commentId)
                             .then((comment) => {
                                 return res.status(200).json({ success: true, comment: comment, message: "Comment deleted successfully" })
                             })

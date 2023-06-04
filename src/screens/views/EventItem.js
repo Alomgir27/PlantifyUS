@@ -8,10 +8,14 @@ import {
     Alert,
     Animated,
     Easing,
-    Dimensions
+    Dimensions,
+    Share
 } from 'react-native';
 
-import { FlatList , RefreshControl} from 'react-native-gesture-handler';
+import { 
+    FlatList , 
+    RefreshControl
+} from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
@@ -24,7 +28,7 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { handleEventDownvote, handleEventUpvote } from './../../modules/data';
+import { handleEventDownvote, handleEventUpvote, handleAddToFavorite, handleRemoveFromFavorite } from './../../modules/data';
 
 import { API_URL } from "./../../constants";
 import { connect } from 'react-redux';
@@ -41,12 +45,17 @@ export class EventItem extends React.PureComponent {
             collapsed: true,
             user: null,
             isVisible: false,
+            shareText: 'https://www.google.com/',
+            shareUrl: 'https://www.google.com/',
+            shareTitle: 'Google',
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.handleUpVote = this.handleUpVote.bind(this);
         this.handleDownVote = this.handleDownVote.bind(this);
         this.handleComments = this.handleComments.bind(this);
         this.handleToggleComments = this.handleToggleComments.bind(this);
+        this.handleShare = this.handleShare.bind(this);
+        this.handleToggleFavorite = this.handleToggleFavorite.bind(this);
 
     }
 
@@ -84,6 +93,41 @@ export class EventItem extends React.PureComponent {
             return Alert.alert('You need to login first');
         }
         this.handleToggleComments();
+    }
+
+    handleToggleFavorite = (id) => {
+        if(!this.state.user) {
+            return Alert.alert('You need to login first');
+        }
+        console.log(this.props.item?.favourites?.includes(this.state.user?._id));
+        const { dispatch } = this.props;
+        if(this.props.item?.favourites?.includes(this.state.user?._id)) {
+            dispatch(handleRemoveFromFavorite('event', id));
+        } else {
+            dispatch(handleAddToFavorite('event', id));
+        }
+    }
+
+
+    handleShare = async () => {
+        try {
+            const result = await Share.share({
+                message: this.state.shareText,
+                url: this.state.shareUrl,
+                title: this.state.shareTitle,
+            });
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    console.log('shared with activity type of', result.activityType);
+                } else {
+                    console.log('shared');
+                }
+            } else if (result.action === Share.dismissedAction) {
+                console.log('dismissed');
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
     }
 
 
@@ -283,7 +327,7 @@ export class EventItem extends React.PureComponent {
                     </TouchableOpacity>
                     
                     <TouchableOpacity style={styles.share}
-                        onPress={() => console.log('share')}
+                        onPress={() => this.handleShare()}
                     >
                         <Text style={styles.shareIcon}>
                             <ICONS.Ionicons name="share-social" size={24} color={COLORS.primary} />
@@ -293,17 +337,17 @@ export class EventItem extends React.PureComponent {
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.favorite}
-                        onPress={() => console.log('favorite')}
+                        onPress={() => this.handleToggleFavorite(item?._id)}
                     >
                         <Text style={styles.favoriteIcon}>
-                            {item?.favorites?.includes(user?._id) ? (
+                            {item?.favourites?.includes(this.state.user?._id) ? (
                                 <ICONS.Ionicons name="heart" size={24} color={COLORS.primary} />
                             ) : (
                                 <ICONS.Ionicons name="heart-outline" size={24} color={COLORS.primary} />
                             )}
                         </Text>
                         <Text style={styles.favoriteText}>
-                            {item?.favorites?.includes(user?._id) ? 'my favorite' : 'add to favorite'}
+                            {item?.favourites?.includes(this.state.user?._id) ? 'my favorite' : 'add to favorite'}
                         </Text>
                         
                     </TouchableOpacity>
@@ -325,7 +369,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
     },
     card: {
-        marginHorizontal: 20,
+        marginHorizontal: 10,
         marginVertical: 10,
         backgroundColor: COLORS.white,
         borderRadius: 10,

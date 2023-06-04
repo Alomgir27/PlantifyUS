@@ -9,8 +9,7 @@ import {
     Dimensions,
     Alert,
     Animated,
-    Easing,
-    RefreshControl,
+    Easing
 } from "react-native";
 
 import { COLORS, FONTS, SIZES } from "./../constants";
@@ -18,7 +17,7 @@ import { COLORS, FONTS, SIZES } from "./../constants";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 
-import { TextInput, FlatList} from "react-native-gesture-handler";
+import { TextInput, FlatList, RefreshControl} from "react-native-gesture-handler";
 
 import { API_URL } from "./../constants";
 
@@ -32,7 +31,7 @@ import {
     fetchComments, 
     fetchCommentsReset,
     handleCommentSubmit,
-    handleCommentReply
+    handleCommentDelete
 } from "./../modules/data";
 
 import * as ICONS from "@expo/vector-icons";
@@ -56,6 +55,7 @@ const wait = (timeout) => {
 const Comments = ({ item, isVisible, handleToggleComments }) => {
     const comments = useSelector((state) => state?.data?.comments);
     const commentsShow = useSelector((state) => state?.data?.commentsShow);
+    const currentUser = useSelector((state) => state?.data?.currentUser);
 
     const dispatch = useDispatch();
 
@@ -66,7 +66,8 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
 
     const [commentId, setCommentId] = useState("");
 
-    const [commentIndex, setCommentIndex] = useState("");
+
+    const [currentComment, setCurrentComment] = useState("");
 
     const sheetRef = useRef(null);
     const inputRef = useRef(null)
@@ -76,7 +77,14 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
     const onRefresh = () => {
         setRefreshing(true);
         dispatch(fetchCommentsReset());
-        dispatch(fetchComments(item?.comments));
+        // dispatch(fetchComments(item?.comments));
+        wait(2000).then(() => setRefreshing(false));
+    }
+
+    const onReplayRefresh = () => {
+        setRefreshing(true);
+        dispatch(fetchCommentsReset());
+        // dispatch(fetchComments(currentComment?.replyTo));
         wait(2000).then(() => setRefreshing(false));
     }
 
@@ -103,6 +111,9 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
     useEffect(() => {
         if (commentsShow && isVisible) {
             sheetRef.current?.present();
+            setComment("");
+            setCommentId("");
+            setCurrentComment("");
         }
         else {
             sheetRef.current?.close();
@@ -111,34 +122,67 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
 
     const handleSubmit = () => {
         if (comment) {
-            dispatch(handleCommentSubmit('event', item?._id, comment));
+            if(commentId !== "") {
+                handleCommentReplySubmit();
+                return;
+            } else {
+                dispatch(handleCommentSubmit('event', item?._id, comment));
+                setComment("");
+                inputRef.current?.clear();
+                Keyboard.dismiss();
+            }
+        }
+    }
+
+    
+   
+    const handleCommentReply = (commentId, item) => {
+        dispatch(fetchCommentsReset());
+        setCommentId(commentId);
+        setCurrentComment(item);
+    }
+
+    const handleCommentReplyCancel = () => {
+        dispatch(fetchCommentsReset());
+        setCommentId("");
+        setCurrentComment("");
+       
+    }
+
+    const handleCommentReplySubmit = () => {
+        if (comment) {
+            dispatch(handleCommentSubmit('replyTo', currentComment?._id, comment, setCurrentComment));
             setComment("");
             inputRef.current?.clear();
             Keyboard.dismiss();
         }
     }
 
-    
-   
-    const handleCommentReply = (commentId, commentIndex) => {
-        setCommentId(commentId);
-        setCommentIndex(commentIndex);
-    }
-
-    const handleCommentReplyCancel = () => {
-        setCommentId("");
-        setCommentIndex("");
-        dispatch(handleCommentHide());
-    }
-
-    const handleCommentReplySubmit = () => {
-        if (comment) {
-            dispatch(handleCommentHide());
-            dispatch(fetchCommentsReset());
-            dispatch(fetchComments());
-            setComment("");
-            Keyboard.dismiss();
+    const handleCommentDeleteConfirm = (Id) => {
+        if (commentId !== "") {
+            dispatch(handleCommentDelete('replyTo', commentId, Id, setCurrentComment));
+            if(Id === currentComment?._id) {
+                setCommentId("");
+                setCurrentComment("");
+            }
+        } else {
+            dispatch(handleCommentDelete('event', item?._id, Id));
         }
+    }
+
+
+    const handleDelete = (commentId) => {
+        Alert.alert('Delete Comment', 'Are you sure you want to delete this comment?', [
+            {
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel'
+            },
+            {
+                text: 'OK',
+                onPress: () => handleCommentDeleteConfirm(commentId)
+            }
+        ])
     }
 
     const renderComment = ({ item, index }) => {
@@ -152,6 +196,11 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                         <Text style={styles.commentHeaderLeftText}>{item?.author?.name}</Text>
                         <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
                     </View>
+                    {item?.author?._id === currentUser?._id && (
+                        <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
+                            <ICONS.Ionicons name="trash" size={20} color={COLORS.red} />
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.commentBody}>
                     <Text style={styles.commentBodyText}>{item?.text}</Text>
@@ -170,9 +219,15 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                                <Text style={styles.commentFooterLeftText}>{item?.downvotes?.length}</Text>
                             </View>
                         </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleCommentReply(item?._id, item)}>
+                            <View style={{ flex: 1, flexDirection: 'row', marginLeft: 10, marginTop: 5}} >
+                                 <ICONS.Ionicons name='chatbox-ellipses' size={20} color={COLORS.black} style={[styles.commentFooterLeftText, { fontSize: 20 }]} />
+                                <Text style={styles.commentFooterLeftText}>{item?.replyTo?.length}</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.commentFooterRight}>
-                        <TouchableOpacity onPress={() => handleCommentReply(item?._id, index)}>
+                        <TouchableOpacity onPress={() => handleCommentReply(item?._id, item)}>
                             <Text style={[styles.commentFooterRightText, { color: COLORS.white}]}>Reply</Text>
                         </TouchableOpacity>
                     </View>
@@ -183,17 +238,20 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
 
     const renderCommentReply = ({ item, index }) => {
         return (
-            <View style={styles.commentContainer}>
+            <View style={[styles.commentContainer, { marginLeft: 40}]}>
                 <View style={styles.commentHeader}>
                     <View style={styles.commentHeaderLeft}>
-                        <Text style={styles.commentHeaderLeftText}>{item?.user?.name}</Text>
-                        <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
+                        <Image source={{ uri: item?.author?.image}} style={{width : 40, height: 40, borderRadius: 25}} />
                     </View>
                     <View style={styles.commentHeaderRight}>
-                        <TouchableOpacity onPress={() => handleCommentReplyCancel()}>
-                            <Text style={styles.commentHeaderRightText}>Cancel</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.commentHeaderLeftText}>{item?.author?.name}</Text>
+                        <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
                     </View>
+                    {item?.author?._id === currentUser?._id && (
+                        <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
+                            <ICONS.Ionicons name="trash" size={20} color={COLORS.red} />
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.commentBody}>
                     <Text style={styles.commentBodyText}>{item?.text}</Text>
@@ -201,15 +259,16 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                 <View style={styles.commentFooter}>
                     <View style={styles.commentFooterLeft}>
                         <TouchableOpacity onPress={() => handleCommentUpvotePress(item?._id, index)}>
-                            <Text style={styles.commentFooterLeftText}>{item?.upvotes?.length}</Text>
+                           <View style={{ flex: 1, flexDirection: 'row'}} >
+                               <ICONS.Ionicons name='thumbs-up' size={20} color={COLORS.black} style={[styles.commentFooterLeftText, { fontSize: 20 }]} />
+                               <Text style={styles.commentFooterLeftText}>{item?.upvotes?.length}</Text>
+                            </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleCommentDownvotePress(item?._id, index)}>
-                            <Text style={styles.commentFooterLeftText}>{item?.downvotes?.length}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.commentFooterRight}>
-                        <TouchableOpacity onPress={() => handleCommentReply(item?._id, index)}>
-                            <Text style={[styles.commentFooterRightText, { color: COLORS.white}]}>Reply</Text>
+                            <View style={{ flex: 1, flexDirection: 'row', marginLeft: 10, marginTop: 4}} >
+                               <ICONS.Ionicons name='thumbs-down' size={20} color={COLORS.black} style={[styles.commentFooterLeftText, { fontSize: 20 }]} />
+                               <Text style={styles.commentFooterLeftText}>{item?.downvotes?.length}</Text>
+                            </View>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -242,8 +301,32 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                             <ICONS.Ionicons name="close" size={30} color={COLORS.black} />
                         </TouchableOpacity>
                     </View>
+                    {commentId !== "" && (
+                     <View style={styles.header}>
+                        <TouchableOpacity onPress={() => handleCommentReplyCancel()} style={{ flex: 1 / 12, height: 40, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10}} >
+                            <ICONS.Ionicons name="arrow-back" size={30} color={COLORS.black} />
+                        </TouchableOpacity>
+                      </View>
+                     )}
                     <View style={styles.body}>
-                        <FlatList
+                      {commentId !== "" ? (
+                            <FlatList
+                                ListHeaderComponent={() => renderComment({ item: currentComment , index: 0})}
+                                data={comments}
+                                renderItem={renderCommentReply}
+                                keyExtractor={(item) => `${item?._id}`}
+                                showsVerticalScrollIndicator={false}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={refreshing}
+                                        onRefresh={onReplayRefresh}
+                                    />
+                                }
+                                onEndReachedThreshold={0.5}
+                                onEndReached={() => dispatch(fetchComments(currentComment?.replyTo))}
+                            />
+                        ) : (
+                         <FlatList
                             data={comments}
                             renderItem={renderComment}
                             keyExtractor={(item) => `${item?._id}`}
@@ -255,7 +338,9 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                                 />
                             }
                             onEndReached={() => dispatch(fetchComments(item?.comments))}
-                        />
+                            onEndReachedThreshold={0.5}
+                         /> 
+                        )}
                     </View>
                     <View style={styles.commentFooter}>
                         <View style={styles.commentFooterLeft}>

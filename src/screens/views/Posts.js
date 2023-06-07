@@ -1,109 +1,140 @@
-import React, { useState, useEffect} from "react";
-import { View, Text, StyleSheet, Image, FlatList, Alert } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
-import { ScrollView } from "react-native-gesture-handler";
-import { Card, Button } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
-import { COLORS } from "../../constants";
-import { API_URL } from "../../constants";
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+    StyleSheet,
+    View,
+    Text,
+    TouchableOpacity,
+    Image,
+    Alert,
+    Animated,
+    Easing,
+    Dimensions
+} from 'react-native';
+
+import { FlatList , RefreshControl} from 'react-native-gesture-handler';
+
+import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
+import MapView, { Marker } from 'react-native-maps';
+
+import * as ICONS from "@expo/vector-icons";
+
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+
+import moment from 'moment';
+
+import { fetchPosts, handleResetPostsData } from './../../modules/data';
+
+import { API_URL } from "./../../constants";
+
 import axios from "axios";
 
 
 
-const Posts = ({ navigation }) => {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+import PostItem from './PostItem';
+
+const { width, height } = Dimensions.get('window');
+
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
+const Posts = ({ route,  navigation }) => {
+    const [refreshing, setRefreshing] = useState(false);
+
     const dispatch = useDispatch();
-    const { posts } = useSelector((state) => state.posts);
-    const { user } = useSelector((state) => state.auth);
-    const navigation = useNavigation();
-    const [visible, setVisible] = useState(false);
 
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
+    const { posts } = useSelector((state) => state?.data);
 
-    const [expanded, setExpanded] = useState(true);
 
-    const handlePress = () => setExpanded(!expanded);
-
-    const fetchData = () => {
-        axios
-            .get(`${API_URL}/posts`)
-            .then((res) => {
-                setData(res.data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
-
-    useEffect(() => {
-        fetchData();
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch(handleResetPostsData());
+        dispatch(fetchPosts());
+        wait(2000).then(() => setRefreshing(false));
     }
     , []);
 
-    const renderList = (item) => {
+    const fetchMore = () => {
+        dispatch(fetchPosts());
+    }
+
+    const renderHeader = () => {
         return (
-            <Card
-                style={styles.mycard}
-                onPress={() => navigation.navigate("Post", { item })}
-            >
-                <View style={styles.cardView}>
-                    <Image
-                        style={{ width: 60, height: 60, borderRadius: 30 }}
-                        source={{ uri: item.picture }}
-                    />
-                    <View style={{ marginLeft: 10 }}>
-                        <Text style={styles.text}>{item.title}</Text>
-                        <Text style={styles.text}>{item.body}</Text>
-                    </View>
+            <View style={styles.header}>
+                <View style={styles.headerLeft}>
+                    <ICONS.MaterialCommunityIcons name="format-list-bulleted" size={24} color={COLORS.primary} onPress={() => navigation.openDrawer()} />
+                    <Text style={styles.headerText}>Posts</Text>
                 </View>
-            </Card>
-        );
+                <View style={styles.headerRight}>
+                    <Text style={{ ...FONTS.body3, color: COLORS.primary }}>Sort by: </Text>
+                    <TouchableOpacity style={styles.headerRightButton}>
+                        <Text style={{ ...FONTS.body3, color: COLORS.primary }}>Newest</Text>
+                    </TouchableOpacity>
+
+                </View>
+            </View>
+        )
+    }
+
+    const renderPosts = () => {
+        return (
+            <FlatList
+                data={route?.params?.item ?  route?.params?.item?.length > 0 ? route?.params?.item : [route?.params?.item] : posts}
+                renderItem={({ item }) => <PostItem item={item} navigation={navigation} />}
+                keyExtractor={item => `${item._id}`}
+                showsVerticalScrollIndicator={false}
+                onEndReached={fetchMore}
+                onEndReachedThreshold={0.5}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            />
+        )
     }
 
     return (
-        <View style={{ flex: 1 }}>
-            <FlatList
-                data={data}
-                renderItem={({ item }) => {
-                    return renderList(item);
-                }
-                }
-                keyExtractor={(item) => `${item._id}`}
-                onRefresh={() => fetchData()}
-                refreshing={loading}
-            />
-            <FAB
-                onPress={() => navigation.navigate("CreatePost")}
-                style={styles.fab}
-                small={false}
-                icon="plus"
-                theme={{ colors: { accent: COLORS.primary } }}
-            />
+        <View style={styles.container}>
+            {renderHeader()}
+            {renderPosts()}
         </View>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
-    mycard: {
-        margin: 5,
-        padding: 5,
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.white
     },
-    cardView: {
-        flexDirection: "row",
-        padding: 6,
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: SIZES.padding,
+        paddingVertical: SIZES.padding,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.lightGray2
     },
-    text: {
-        fontSize: 18,
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center'
     },
-    fab: {
-        position: "absolute",
-        margin: 16,
-        right: 0,
-        bottom: 0,
+    headerText: {
+        marginLeft: SIZES.padding,
+        ...FONTS.h2
     },
-});
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    headerRightButton: {
+        padding: 10,
+        borderRadius: SIZES.radius,
+        backgroundColor: COLORS.lightGray2
+    }
+})
 
 export default Posts;

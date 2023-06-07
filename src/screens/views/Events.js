@@ -23,7 +23,7 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { fetchEvents, clearData } from './../../modules/data';
+import { fetchEvents, handleResetEventsData } from './../../modules/data';
 
 import { API_URL } from "./../../constants";
 
@@ -40,10 +40,9 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-const Events = ({ navigation }) => {
+const Events = ({ route, navigation }) => {
     
         const [refreshing, setRefreshing] = useState(false);
-        const [scrollTop, setScrollTop] = useState(false);
 
     
         const dispatch = useDispatch();
@@ -52,7 +51,7 @@ const Events = ({ navigation }) => {
     
         const onRefresh = useCallback(() => {
             setRefreshing(true);
-            dispatch(clearData());
+            dispatch(handleResetEventsData());
             dispatch(fetchEvents());
             wait(2000).then(() => setRefreshing(false));
         }, []);
@@ -65,8 +64,6 @@ const Events = ({ navigation }) => {
        
         const renderHeader = useCallback(() => {
             return (
-                <>
-                {!scrollTop && (
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -89,12 +86,9 @@ const Events = ({ navigation }) => {
                         <Text style={{ ...FONTS.body4, color: COLORS.secondary }}>Together we can make a difference</Text>
                         <Text style={{ ...FONTS.body4, color: COLORS.primary }}>#TogetherWeCan</Text>
                     </View>
-                    
                 </View>
-                )}
-                </>
             )
-        }, [scrollTop]);
+        }, []);
 
         const renderItem = useCallback(({ item }) => {
             return (
@@ -108,7 +102,7 @@ const Events = ({ navigation }) => {
             <View style={styles.container}>
                 <FlatList
                     ListHeaderComponent={renderHeader}
-                    data={events}
+                    data={route?.params?.item ? route?.params?.item?.length > 0 ? route?.params?.item : [route?.params?.item] : events}
                     renderItem={({ item }) => renderItem({ item })}
                     keyExtractor={(item) => item._id.toString()}
                     refreshControl={
@@ -118,14 +112,12 @@ const Events = ({ navigation }) => {
                         />
                     }
                     onEndReached={fetchMore}
-                    onScroll={(e) => {
-                        if(e.nativeEvent.contentOffset.y > 0 && !scrollTop) {
-                            setScrollTop(true);
-                        } else if(e.nativeEvent.contentOffset.y == 0 && scrollTop) {
-                            setScrollTop(false);
-                        }
-                    }
-                    }
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={() => {
+                        return (
+                            <View style={{ height: 100 }}></View>
+                        )
+                    }}
                     
                 />
             </View>

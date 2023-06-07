@@ -69,7 +69,7 @@ export class EventItem extends React.PureComponent {
 
     handleUpVote = (id) => {
         if(!this.state.user) {
-            return Alert.alert('You need to login first');
+            return Alert.alert('You need to login first', 'Please login to upvote');
         }
         const { dispatch } = this.props;
         dispatch(handleEventUpvote(id, this.state.user?._id));
@@ -77,7 +77,7 @@ export class EventItem extends React.PureComponent {
 
     handleDownVote = (id) => {
         if(!this.state.user) {
-            return Alert.alert('You need to login first');
+            return Alert.alert('You need to login first', 'Please login to downvote');
         }
         const { dispatch } = this.props;
         dispatch(handleEventDownvote(id, this.state.user?._id));
@@ -90,14 +90,14 @@ export class EventItem extends React.PureComponent {
 
     handleComments = (id) => {
         if(!this.state.user) {
-            return Alert.alert('You need to login first');
+            return Alert.alert('You need to login first', 'Please login to comment');
         }
         this.handleToggleComments();
     }
 
     handleToggleFavorite = (id) => {
         if(!this.state.user) {
-            return Alert.alert('You need to login first');
+            return Alert.alert('You need to login first', 'Please login to add to favorite');
         }
         console.log(this.props.item?.favourites?.includes(this.state.user?._id));
         const { dispatch } = this.props;
@@ -149,10 +149,10 @@ export class EventItem extends React.PureComponent {
                             style={styles.authorImg}
                         />
                     </View>
-                    <View style={styles.authorInfo}>
+                    <TouchableOpacity style={styles.authorInfo} onPress={() => navigation.navigate("Profile", { user: item?.author })}>
                         <Text style={styles.authorName}>{item?.author?.name} </Text>
                         <Text style={styles.time}>{moment(item?.createdAt).fromNow()}</Text>
-                    </View>
+                    </TouchableOpacity>
                     <View style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}>
                         <TouchableOpacity
                             onPress={() => console.log('more')}
@@ -188,29 +188,47 @@ export class EventItem extends React.PureComponent {
                         />
                     )}
                     <View style={styles.cardInfo}>
-                        <Text style={styles.cardTitle}>{item?.title}</Text>
-                        <Text numberOfLines={2} style={styles.cardDetails}>
-                            {item?.description}
-                        </Text>
                         <TouchableOpacity
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                marginHorizontal: 20,
-                                marginVertical: 10,
                                 borderBottomColor: COLORS.lightGray,
                                 borderBottomWidth: 1,
                             }}
                             onPress={this.toggleExpanded}
                         >
-                            {this.state.collapsed ? (
-                                <ICONS.Ionicons name="chevron-down" size={24} color={COLORS.primary} />
-                            ) : (
-                                <ICONS.Ionicons name="chevron-up" size={24} color={COLORS.primary} />
+                        
+                        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                            {this.state.collapsed && (
+                                <Text numberOfLines={1} style={styles.cardTitle}>
+                                    {item?.title}
+                                </Text>
                             )}
+                           </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                {this.state.collapsed ? (
+                                    <ICONS.Ionicons name="chevron-down" size={24} color={COLORS.primary} />
+                                ) : (
+                                    <ICONS.Ionicons name="chevron-up" size={24} color={COLORS.primary} />
+                                )}
+                            </View>
+
+                        </View>
                         </TouchableOpacity>
+                       {this.state.collapsed && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text numberOfLines={1} style={{ ...FONTS.body4, color: COLORS.secondary }}>
+                                {item?.description}
+                            </Text>
+                        </View>
+                        )}
                         {!this.state.collapsed && (
                             <View>
+                                <Text style={styles.cardTitle}>{item?.title}</Text>
+                                <Text numberOfLines={2} style={styles.cardDetails}>
+                                    {item?.description}
+                                </Text>
                                 <Text style={styles.cardDetails}>
                                     {item?.landsDescription}
                                 </Text>
@@ -355,7 +373,10 @@ export class EventItem extends React.PureComponent {
                 </ScrollView>
                 
             </View>
-            <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} />
+            {/* comments */}
+            {this.state.isVisible && (
+               <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} type={'event'} />
+            )}
         </>
         )
     }

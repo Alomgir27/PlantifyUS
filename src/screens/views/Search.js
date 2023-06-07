@@ -49,43 +49,13 @@ const SearchScreen = ({ navigation }) => {
     }, [navigation]);
 
 
-    useEffect(() => {
-      const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-              setSearch('');
-                setSearchResults([]);
-                setSearchType('All');
-                setSearchTypeText('All');
-                setLoading(false);
-        });
-        return () => {
-            keyboardDidHideListener.remove();
-        }
-    }, []);
 
+   
     useEffect(() => {
-        // open keyboard if search is empty
-        if(search.length === 0) {
-            inputRef?.current.focus();
-        }
-    }, [search]);
-
-      
-    useEffect(() => {
-        //open keyboard if search type is changed
-        inputRef?.current.focus();
-    }, [searchType]);
-
-    useEffect(() => {
-       // open keyboard during initial render
-         inputRef?.current.focus(); 
-    }, []);
-
-    useEffect(() => {
-        // initially Keyboard is open
-        Keyboard.addListener('keyboardDidShow', () => {
-            inputRef?.current.focus();
-        });
-    }, []);
+       if(inputRef?.current) {
+              inputRef?.current.focus();
+         }
+    }, [inputRef])
 
    
         
@@ -142,22 +112,23 @@ const SearchScreen = ({ navigation }) => {
         }
     }
 
-    const handleSearchResult = (item) => {
-        if(searchType === 'Events') {
-            navigation.navigate('Event', { event: item });
+    const handleSearchResult = (type, item) => {
+        if(searchType === 'Events' || type === 'Events') {
+            navigation.navigate('Events', {  item });
         }
-        else if(searchType === 'Organizations') {
-            navigation.navigate('Organization', { organization: item });
+        else if(searchType === 'Organizations' || type === 'Organizations') {
+            navigation.navigate('Organizations', { item });
         }
-        else if(searchType === 'Trees') {
-            navigation.navigate('Tree', { tree: item });
+        else if(searchType === 'Trees' || type === 'Trees') {
+            navigation.navigate('Trees', { item });
         }
-        else if(searchType === 'Users') {
+        else if(searchType === 'Users' || type === 'Users') {
             navigation.navigate('Profile', { user: item });
         }
-        else if(searchType === 'Posts') {
-            navigation.navigate('Post', { post: item });
+        else if(searchType === 'Posts' || type === 'Posts') {
+            navigation.navigate('Posts', { item });
         }
+       
     }
 
     useEffect(() => {
@@ -208,15 +179,18 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.events?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Events</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('SearchResults', { searchResults: searchResults.events, searchType: 'Events' })}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Events', { item: searchResults.events })}>
                             <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
                         </TouchableOpacity>
                     </View>
                 )}
                   {searchResults.events?.map((item) => (
-                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Events', item)} key={item._id.toString()}>
                              <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
-                                <Text style={styles.searchResultText}>{item?.title}</Text>
+                             <View style={{flex: 1, flexDirection: 'column'}}>
+                                <Text numberOfLines={1} style={styles.searchResultText}>{item?.title}</Text>
+                                <Text multiline={true} numberOfLines={2} style={styles.searchResultText}>{item?.description}</Text>
+                            </View>
                         </TouchableOpacity>
                     )
                  )}
@@ -233,9 +207,9 @@ const SearchScreen = ({ navigation }) => {
                 )}
         
                     {searchResults?.organizations?.map(( item ) => (
-                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Organizations', item)} key={item._id.toString()}>
                                 <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
-                                <Text style={styles.searchResultText}>{item?.name}</Text>
+                                  <Text style={styles.searchResultText}>{item?.name}</Text>
                             </TouchableOpacity>
                         )
                     )}
@@ -251,7 +225,7 @@ const SearchScreen = ({ navigation }) => {
                 )}
                   
                     {searchResults?.trees?.map(( item ) => (
-                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Trees', item)} key={item._id.toString()}>
                             <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
                             <Text style={styles.searchResultText}>{item?.name}</Text>
                         </TouchableOpacity>
@@ -269,9 +243,12 @@ const SearchScreen = ({ navigation }) => {
                 )}
                     
                     {searchResults?.users?.map(( item ) => (
-                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Users', item)} key={item._id.toString()}>
                             <Image source={{uri: item?.image}} style={styles.searchResultImage} />
-                            <Text style={styles.searchResultText}>{item?.name}</Text>
+                            <View style={{flex: 1, flexDirection: 'column'}}>
+                                <Text style={styles.searchResultText}>{item?.name}</Text>
+                                <Text style={styles.searchResultText}>{item?.type}</Text>
+                            </View>
                         </TouchableOpacity>
                      )
                     )}
@@ -280,16 +257,27 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.posts?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Posts</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('SearchResults', { searchResults: searchResults.posts, searchType: 'Posts' })}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Posts', { item: searchResults.posts })}>
                             <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
                         </TouchableOpacity>
                     </View> 
                     )}
 
                     {searchResults?.posts?.map(( item ) => (
-                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Posts', item)} key={item._id.toString()}>
                                 <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
-                                <Text style={styles.searchResultText}>{item?.text}</Text>
+                              <View style={{flex: 1, flexDirection: 'column'}}>
+                                  <Text multiline={true} numberOfLines={2} style={styles.searchResultText}>{item?.text}</Text>
+                                  <Text style={styles.searchResultText}>posted by {item?.author?.name}</Text>
+                                  {item?.tags?.length > 0 && <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                    {item?.tags?.slice(0, 5)?.map((tag) => (
+                                        <View style={{backgroundColor: COLORS.lightGray, borderRadius: 10, padding: 5, marginRight: 5}} key={tag}>
+                                            <Text style={{color: COLORS.black, fontSize: 16}}>{tag}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                                }
+                              </View>
                             </TouchableOpacity>
                         )
                     )}
@@ -300,9 +288,12 @@ const SearchScreen = ({ navigation }) => {
             return (
                 <View style={styles.searchResultsContainer}>
                    {searchResults.events?.map((item) => (
-                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Events', item)} key={item._id.toString()} >
                              <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
-                                <Text style={styles.searchResultText}>{item?.title}</Text>
+                             <View style={{flex: 1, flexDirection: 'column'}}>
+                                <Text numberOfLines={1} style={styles.searchResultText}>{item?.title}</Text>
+                                <Text multiline={true} numberOfLines={2} style={styles.searchResultText}>{item?.description}</Text>
+                             </View>
                         </TouchableOpacity>
                     )
                    )}
@@ -313,7 +304,7 @@ const SearchScreen = ({ navigation }) => {
             return (
                 <View style={styles.searchResultsContainer}>
                     {searchResults?.organizations?.map(( item ) => (
-                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Organizations', item)} key={item._id.toString()} >
                                 <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
                                 <Text style={styles.searchResultText}>{item?.name}</Text>
                             </TouchableOpacity>
@@ -326,7 +317,7 @@ const SearchScreen = ({ navigation }) => {
             return (
                 <View style={styles.searchResultsContainer}>
                      {searchResults?.trees?.map(( item ) => (
-                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                        <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Trees', item)} key={item._id.toString()} >
                             <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
                             <Text style={styles.searchResultText}>{item?.name}</Text>
                         </TouchableOpacity>
@@ -339,9 +330,12 @@ const SearchScreen = ({ navigation }) => {
             return (
                 <View style={styles.searchResultsContainer}>
                      {searchResults?.users?.map(( item ) => (
-                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Users', item)} key={item._id.toString()} >
                                 <Image source={{uri: item?.image}} style={styles.searchResultImage} />
-                                <Text style={styles.searchResultText}>{item?.name}</Text>
+                                <View style={{flex: 1, flexDirection: 'column'}}>
+                                    <Text style={styles.searchResultText}>{item?.name}</Text>
+                                    <Text style={styles.searchResultText}>{item?.type}</Text>
+                                </View>
                             </TouchableOpacity>
                         )
                     )}
@@ -352,9 +346,12 @@ const SearchScreen = ({ navigation }) => {
             return (
                 <View style={styles.searchResultsContainer}>
                     {searchResults?.posts?.map(( item ) => (
-                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult(item)} key={item._id.toString()}>
+                            <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Posts', item)} key={item._id.toString()} >
                                 <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
-                                <Text style={styles.searchResultText}>{item?.text}</Text>
+                                <View style={{flex: 1, flexDirection: 'column'}}>
+                                    <Text multiline={true} numberOfLines={2} style={styles.searchResultText}>{item?.text}</Text>
+                                    <Text style={styles.searchResultText}>posted by {item?.author?.name}</Text>
+                                </View>
                             </TouchableOpacity>
                         )
                     )}
@@ -383,7 +380,6 @@ const SearchScreen = ({ navigation }) => {
                         placeholder="Search"
                         placeholderTextColor={COLORS.gray}
                         onChangeText={handleSearch}
-                        value={search}
                     />
                 </View>
                 <View style={styles.searchType}>
@@ -500,6 +496,7 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         fontSize: 16,
     },
+
 })
 
 export default SearchScreen

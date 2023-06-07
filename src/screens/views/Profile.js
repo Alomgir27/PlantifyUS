@@ -111,31 +111,21 @@ const Profile = ({ navigation, route }) => {
     }
     , []);
 
+    useEffect(() => {
+        if(route?.params?.user) {
+            setUser(route?.params?.user);
+        }
+        else {
+            setUser(currentUser);
+        }
+    }, [route?.params?.user]);
+
 
     const fetchData = async () => {
-        try {
-            const res = await axios.get(`${API_URL}/users/get/${currentUser._id}`);
-            setData(res.data.user);
-            setUser(res.data.user);
-            setUserLocation(res.data?.user?.location);
-            setUserEvents(res.data?.user?.eventsAttending);
-            setUserPosts(res.data?.user?.posts);
-            setUserBadges(res.data?.user?.badges);
-            setUserFriends(res.data?.user?.friends);
-            setUserFavourites(res.data?.user?.favourites);
-            setUserNotifications(res.data?.user?.notifications);
-            setUserOrganizations(res.data?.user?.organizations);
-            setUserAttending(res.data?.user?.eventsAttending);
-            setLoading(false);
-        } catch (err) {
-            console.log(err);
-        }
+       
     }
 
-    useEffect(() => {
-        fetchData();
-    }
-    , []);
+   
 
     const handleLogout = () => {
         auth.signOut().then(() => {
@@ -144,20 +134,11 @@ const Profile = ({ navigation, route }) => {
     }
 
     const handleDelete = () => {
-        db.collection("users").doc(currentUser.uid).delete();
-        navigation.replace("Login");
+        
     }
 
     const handleUpdate = async () => {
-        try {
-            await axios.put(`${API_URL}/users/${currentUser._id}`, {
-                image: image,
-                location: location,
-            });
-            fetchData();
-        } catch (err) {
-            console.log(err);
-        }
+        
     }
 
     const handlePickAvatar = async () => {

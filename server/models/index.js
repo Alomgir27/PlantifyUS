@@ -29,7 +29,7 @@ const eventSchema = new Schema({
     },
     favourites: [{
         type: Schema.Types.ObjectId,
-        ref: 'Favourites'
+        ref: 'User'
     }],
     collectedFunds: Number,
     upvotes: [String],
@@ -145,21 +145,25 @@ const postSchema = new Schema({
     text: String,
     images: [String],
     tags: [String],
-    likes: [{
+    upvotes: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
-    comments: [{author: {
+    downvotes: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }, text: String, date: Date }],
+    }],
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    }],
     event: {
         type: Schema.Types.ObjectId,
         ref: 'Event'
     },
     favourites: [{
         type: Schema.Types.ObjectId,
-        ref: 'Favourites'
+        ref: 'User'
     }],
     isVerified: Boolean
 }, { timestamps: true });

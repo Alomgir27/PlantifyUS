@@ -22,6 +22,7 @@ const TREES_SEARCH_STATE_CHANGE = 'TREES_SEARCH_STATE_CHANGE'
 const USERS_SEARCH_STATE_CHANGE = 'USER_SEARCH_STATE_CHANGE'
 
 const HANDLE_EVENT_EDITED = 'HANDLE_EVENT_EDITED'
+const HANDLE_POST_EDITED = 'HANDLE_POST_EDITED'
 
 const HANDLE_COMMENT_SHOW = 'HANDLE_COMMENT_SHOW'
 const HANDLE_COMMENT_HIDE = 'HANDLE_COMMENT_HIDE'
@@ -34,6 +35,10 @@ const HANDLE_COMMENT_DATA_RESET = 'HANDLE_COMMENT_DATA_RESET'
 
 
 const CLEAR_DATA = 'CLEAR_DATA'
+const HANDLE_EVENTS_DATA_RESET = 'HANDLE_EVENTS_DATA_RESET'
+const HANDLE_POSTS_DATA_RESET = 'HANDLE_POSTS_DATA_RESET'
+const HANDLE_ORGANIZATIONS_DATA_RESET = 'HANDLE_ORGANIZATIONS_DATA_RESET'
+const HANDLE_TREES_DATA_RESET = 'HANDLE_TREES_DATA_RESET'
 const LOGOUT = 'LOGOUT'
 
 
@@ -71,11 +76,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 ...state,
                 currentUser: action.currentUser
             }
-        case POSTS_STATE_CHANGE:
-            return {
-                ...state,
-                posts: action.posts
-            }
+       
        
         case ORGANIZATIONS_STATE_CHANGE:
             return {
@@ -113,11 +114,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 trees: [...state.trees, ...action.trees]
             }
         
-        case POSTS_SEARCH_STATE_CHANGE:
-            return {
-                ...state,
-                postsSearch: action.postsSearch
-            }
+        
         case ORGANIZATIONS_SEARCH_STATE_CHANGE:
             return {
                 ...state,
@@ -165,6 +162,31 @@ export default  data = (state = INITIAL_STATE, action) => {
                 eventsSearch: action.eventsSearch
             }
 
+        // Handle Posts
+        case POSTS_STATE_CHANGE:
+            return {
+                ...state,
+                posts: action.posts
+            }
+
+        case HANDLE_POST_EDITED:
+            return {
+                ...state,
+                posts: (state.posts.map((post) => {
+                    if(post._id === action.posts._id) {
+                        return action.posts
+                    }
+                    else {
+                        return post
+                    }
+                }))
+            }
+        case POSTS_SEARCH_STATE_CHANGE:
+            return {
+                ...state,
+                postsSearch: action.postsSearch
+            }
+
         // Handle Comments
         case HANDLE_COMMENT_SHOW:
             return {
@@ -210,6 +232,9 @@ export default  data = (state = INITIAL_STATE, action) => {
                     }
                 }))
             }
+
+
+        // Handle Resets
         case CLEAR_DATA:
             return {
                 ...state,
@@ -229,6 +254,34 @@ export default  data = (state = INITIAL_STATE, action) => {
                 treesSearch: [],
                 usersSearch: []
             }
+        case HANDLE_EVENTS_DATA_RESET:
+            return {
+                ...state,
+                events: [],
+                eventsLoaded: 0,
+                eventsSearch: []
+            }
+        case HANDLE_POSTS_DATA_RESET:
+            return {
+                ...state,
+                posts: [],
+                postsLoaded: 0,
+                postsSearch: []
+            }
+        case HANDLE_ORGANIZATIONS_DATA_RESET:
+            return {
+                ...state,
+                organizations: [],
+                organizationsLoaded: 0,
+                organizationsSearch: []
+            }
+        case HANDLE_TREES_DATA_RESET:
+            return {
+                ...state,
+                trees: [],
+                treesLoaded: 0,
+                treesSearch: []
+            }
         case LOGOUT:
             return {
                 ...state,
@@ -241,7 +294,7 @@ export default  data = (state = INITIAL_STATE, action) => {
 }
 
 
-//Actions
+//Actions data reset
 export const clearData = () => {
     return ((dispatch) => {
         dispatch({ type: CLEAR_DATA })
@@ -254,6 +307,33 @@ export const logout = () => {
     })
 }
 
+export const handleResetEventsData = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_EVENTS_DATA_RESET })
+    })
+}
+
+export const handleResetPostsData = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_POSTS_DATA_RESET })
+    })
+}
+
+export const handleResetOrganizationsData = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_ORGANIZATIONS_DATA_RESET }) 
+    })
+}
+
+export const handleResetTreesData = () => {
+    return ((dispatch) => {
+        dispatch({ type: HANDLE_TREES_DATA_RESET })
+    })
+}
+
+
+
+//Actions
 export const fetchUser = ( _id) => {
     return (async (dispatch) => {
         await axios.get(`${API_URL}/users/get/${_id}`)
@@ -262,12 +342,15 @@ export const fetchUser = ( _id) => {
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: res.data.user
             })
+            dispatch(clearData())
+            dispatch(fetchAllDefaultData())
         })
         .catch((err) => {
             console.log(err?.data?.message);
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: null
             })
+            dispatch(fetchAllDefaultData())
         })
     })
 }
@@ -383,20 +466,7 @@ export const fetchUsers = ( _id) => {
 
 
 
-export const fetchAllDefaultData = () => {
-    return (async (dispatch, getState) => {
-        await dispatch(fetchEvents())
-        await dispatch(fetchOrganizations())
-        await dispatch(fetchTrees())
-        if(getState().data.currentUser) {
-            await dispatch(fetchPosts(getState().data.currentUser._id))
-            await dispatch(fetchUsers(getState().data.currentUser._id))
-        }
-        else {
-            await dispatch(fetchPosts(null))
-        }
-    })
-}
+
 
 export const fetchEventsSearch = (search, limit) => {
     return (async (dispatch, getState) => {
@@ -498,15 +568,6 @@ export const fetchPostsSearch = (search, limit) => {
     })
 }
 
-export const fetchAllSearchData = (search, limit) => {
-    return (async (dispatch, getState) => {
-        await dispatch(fetchEventsSearch(search, limit))
-        await dispatch(fetchOrganizationsSearch(search, limit))
-        await dispatch(fetchTreesSearch(search, limit))
-        await dispatch(fetchUsersSearch(search, limit))
-        await dispatch(fetchPostsSearch(search, limit))
-    })
-}
 
 
 
@@ -547,6 +608,47 @@ export const handleEventDownvote = (event, user) => {
         })
     })
 }
+
+
+// Handle Posts
+export const handlePostUpvote = (post) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/posts/upvote`, {
+            postId: post,
+            userId: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_POST_EDITED, posts: res.data.post
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data?.message)
+        })
+    })
+}
+
+export const handlePostDownvote = (post) => {
+    return (async (dispatch, getState) => {
+        await axios.put(`${API_URL}/posts/downvote`, {
+            postId: post,
+            userId: getState().data.currentUser._id
+        })
+        .then((res) => {
+            console.log(res?.data?.message)
+            dispatch({
+                type: HANDLE_POST_EDITED, posts: res.data.post
+            })
+        })
+        .catch((err) => {
+            console.log(err?.data)
+            console.log(err)
+        })
+    })
+}
+
+
 
 // Handle Comments
 
@@ -647,6 +749,12 @@ export const handleCommentSubmit = (type, id, comment, callback) => {
                     type: HANDLE_EVENT_EDITED, events: res.data.event
                 })
             }
+            else if(type === 'post') {
+                dispatch({
+                    type: HANDLE_POST_EDITED, posts: res.data.post
+                })
+            }
+
             if(callback) callback((prevState) => ({...prevState, replyTo: [...prevState.replyTo, res.data.comment._id]}))
         })
         .catch((err) => {
@@ -676,7 +784,12 @@ export const handleCommentDelete = (type, id, commentId, callback) =>  {
                     type: HANDLE_EVENT_EDITED, events: res.data.event
                 })
             }
-            if(callback) callback((prevState) => ({...prevState, replyTo: prevState.replyTo.filter((id) => id !== res.data.comment._id)}))
+            else if(type === 'post') {
+                dispatch({
+                    type: HANDLE_POST_EDITED, posts: res.data.post
+                })
+            }
+            if(callback) callback((prevState) => ({...prevState, replyTo: prevState.replyTo.filter((id) => id !== res?.data?.comment?._id)}))
         })
         .catch((err) => {
             console.log(err?.data)
@@ -715,9 +828,16 @@ export const handleAddToFavorite = (type, id) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
-            dispatch({
-                type: HANDLE_EVENT_EDITED, events: res.data.event
-            })
+            if(type === 'event') {
+                dispatch({
+                    type: HANDLE_EVENT_EDITED, events: res.data.event
+                })
+            }
+            else if(type === 'post') {
+                dispatch({
+                    type: HANDLE_POST_EDITED, posts: res.data.post
+                })
+            }
         })
         .catch((err) => {
             console.log(err?.data)
@@ -735,9 +855,15 @@ export const handleRemoveFromFavorite = (type, id) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
-            dispatch({
-                type: HANDLE_EVENT_EDITED, events: res.data.event
-            })
+            if(type === 'event') {
+                dispatch({
+                    type: HANDLE_EVENT_EDITED, events: res.data.event
+                })
+            } else if(type === 'post') {
+                dispatch({
+                    type: HANDLE_POST_EDITED, posts: res.data.post
+                })
+            }
         }
         )
         .catch((err) => {
@@ -745,5 +871,32 @@ export const handleRemoveFromFavorite = (type, id) => {
             console.log(err)
         }
         )
+    })
+}
+
+
+export const fetchAllSearchData = (search, limit) => {
+    return (async (dispatch, getState) => {
+        await dispatch(fetchEventsSearch(search, limit))
+        await dispatch(fetchOrganizationsSearch(search, limit))
+        await dispatch(fetchTreesSearch(search, limit))
+        await dispatch(fetchUsersSearch(search, limit))
+        await dispatch(fetchPostsSearch(search, limit))
+    })
+}
+
+export const fetchAllDefaultData = () => {
+    return (async (dispatch, getState) => {
+        await dispatch(fetchEvents())
+        if(getState().data.currentUser) {
+            await dispatch(fetchPosts(getState().data.currentUser._id))
+            await dispatch(fetchUsers(getState().data.currentUser._id))
+        }
+        else {
+            await dispatch(fetchPosts(null))
+        }
+        await dispatch(fetchOrganizations())
+        await dispatch(fetchTrees())
+        
     })
 }

@@ -159,6 +159,18 @@ router.post('/', async (req, res) => {
 
     } else if (type === "post") {
         Post.findById(id)
+            .populate({
+                path: 'author',
+                select: 'name image type'
+            })
+            .populate({
+                path: 'event',
+                select: 'title images status location createdAt author requirements',
+                populate: {
+                    path: 'author',
+                    select: 'name image type'
+                }
+            })
             .then((post) => {
                 post.comments.push(newComment._id);
                 post.save()
@@ -249,6 +261,18 @@ router.delete('/', async (req, res) => {
     }                        
     else if (type === "post") {
         Post.findById(id)
+            .populate({
+                path: 'author',
+                select: 'name image type'
+            })
+            .populate({
+                path: 'event',
+                select: 'title images status location createdAt author requirements',
+                populate: {
+                    path: 'author',
+                    select: 'name image type'
+                }
+            })
             .then((post) => {
                 post.comments.pull(commentId);
                 post.save()

@@ -72,7 +72,7 @@ const EventDetails = ({ route }) => {
            <View style={styles.container}>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.navigate('Events')}>
-                        <ICONS.Ionicons name="arrow-back" size={24} color="black" />
+                        <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Event Details</Text>
                 </View>
@@ -98,6 +98,7 @@ const EventDetails = ({ route }) => {
                                 containerStyle={styles.eventBodyImageContainer}
                                 navigation={navigation}
                                 item={item}
+                                routeName={'Event'}
                             />
                         </View>
                         <View style={styles.eventBodyDescription}>
@@ -148,15 +149,15 @@ const EventDetails = ({ route }) => {
                                 <View style={styles.eventBodyDetailsItemRequirements}>
                                     <View style={styles.eventBodyDetailsItemRequirementsItem}>
                                         <Text style={styles.eventBodyDetailsItemRequirementsItemTitle}>Trees</Text>
-                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item.requirements.trees}</Text>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item?.requirements?.trees}</Text>
                                     </View>
                                     <View style={styles.eventBodyDetailsItemRequirementsItem}>
                                         <Text style={styles.eventBodyDetailsItemRequirementsItemTitle}>Volunteers</Text>
-                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item.requirements.volunteers}</Text>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item?.requirements?.volunteers}</Text>
                                     </View>
                                     <View style={styles.eventBodyDetailsItemRequirementsItem}>
                                         <Text style={styles.eventBodyDetailsItemRequirementsItemTitle}>Funds</Text>
-                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item.requirements.funds}</Text>
+                                        <Text style={styles.eventBodyDetailsItemRequirementsItemValue}>{item?.requirements?.funds}</Text>
                                     </View>
                                 </View>
                             </View>

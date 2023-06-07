@@ -65,6 +65,14 @@ router.post('/add', async (req, res) => {
                 path: 'author',
                 select: 'name image type'
              })
+             .populate({
+                path: 'event',
+                select: 'title images status location createdAt author requirements',
+                populate: {
+                    path: 'author',
+                    select: 'name image type'
+                }
+            })
             .then((post) => {
                 if(post.favourites.includes(user)) {
                     return res.status(200).json({ success: true, post: post,  message: "Favourite already exists" })
@@ -121,6 +129,14 @@ router.post('/remove', async (req, res) => {
                 path: 'author',
                 select: 'name image type'
              })
+             .populate({
+                path: 'event',
+                select: 'title images status location createdAt author requirements',
+                populate: {
+                    path: 'author',
+                    select: 'name image type'
+                }
+            })
             .then((post) => {
                 if(!post.favourites.includes(user)) {
                     return res.status(200).json({ success: true, post: post,  message: "Favourite doesn't exist" })

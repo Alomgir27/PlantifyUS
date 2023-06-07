@@ -5,8 +5,11 @@ import Swiper from 'react-native-swiper';
 
 
 
-const ImagesViewer = ({ images, resizeMode, imageStyle, containerStyle, navigation, item }) => {
+const ImagesViewer = ({ route, images, resizeMode, imageStyle, containerStyle, navigation, item, routeName }) => {
     const [index, setIndex] = useState(0);
+
+   
+
     
     return (
         <View style={[styles.wrapper, containerStyle]}>
@@ -17,13 +20,12 @@ const ImagesViewer = ({ images, resizeMode, imageStyle, containerStyle, navigati
                 index={index}
                 onIndexChanged={(index) => setIndex(index)}
             >
-                {images.map((image, index) => (
-                <TouchableWithoutFeedback style={styles.slide} key={index} onPress={() => navigation.navigate('ImageDetails', { image, item })}>
+                {images?.map((image, index) => (
+                <TouchableWithoutFeedback style={styles.slide} key={index} onPress={() => navigation.navigate('ImageDetails', { image, item, routeName })}>
                     <Image
                         source={{ uri: image?.uri ? image?.uri : image }}
                         resizeMode={resizeMode ? resizeMode : 'cover'}
                         style={[styles.image, imageStyle]}
-                        
                     />
                 </TouchableWithoutFeedback>
                 ))}

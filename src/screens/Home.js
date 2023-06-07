@@ -41,7 +41,6 @@ const Home = ({ navigation }) => {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            dispatch(clearData())
             dispatch(fetchAllDefaultData());
         }
         );
@@ -235,7 +234,7 @@ const Home = ({ navigation }) => {
                         ...styles.shadow
                     }}
                     
-                    onPress={() => navigation.navigate('Event', { item })}
+                    onPress={() => navigation.navigate('Events', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -293,7 +292,7 @@ const Home = ({ navigation }) => {
                         backgroundColor: COLORS.white,
                         ...styles.shadow
                     }}
-                    onPress={() => navigation.navigate('Event', { item })}
+                    onPress={() => navigation.navigate('Events', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -352,7 +351,7 @@ const Home = ({ navigation }) => {
             return (
                 <TouchableOpacity
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
-                    onPress={() => navigation.navigate('Event', { item })}
+                    onPress={() => navigation.navigate('Events', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -423,7 +422,7 @@ const Home = ({ navigation }) => {
             return (
                 <TouchableOpacity
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
-                    onPress={() => navigation.navigate('Event', { item })}
+                    onPress={() => navigation.navigate('Events', { item })}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <View style={{ flexDirection: 'row' }}>
@@ -525,7 +524,7 @@ const Home = ({ navigation }) => {
         return (
             <TouchableOpacity
                 style={{ flex: 1, marginBottom: SIZES.padding * 2 , paddingRight: index == posts?.length - 1 ? SIZES.padding * 2 : 0 }}
-                onPress={() => { console.log("Post on pressed") }}
+                onPress={() => navigation.navigate('Posts', { item })}
             >
                 <View style={{ flex: 1, marginBottom: SIZES.padding }}>
                     {/* Post Image */}
@@ -1020,7 +1019,7 @@ const Home = ({ navigation }) => {
                             <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>New Posts</Text>
 
                             <TouchableOpacity
-                                onPress={() => { console.log("See All on pressed") }}
+                                onPress={() => navigation.navigate("Posts")}
                             >
                                 <Text style={{ color: COLORS.secondary, ...FONTS.body3 }}>See All</Text>
                             </TouchableOpacity>

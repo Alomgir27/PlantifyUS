@@ -29,7 +29,7 @@ import PostUpload from "./components/PostUpload";
 // import SearchScreen from "./screens/views/Search";
 import ProfileScreen from "./screens/views/Profile";
 // import EditProfileScreen from "./screens/views/EditProfile";
-// import PostScreen from "./screens/views/Posts";
+import PostsScreen from "./screens/views/Posts";
 // import SavedScreen from "./screens/views/Saved";
 // import NotificationsScreen from "./screens/views/Notifications";
 // import ChatScreen from "./screens/views/Chat";
@@ -39,12 +39,13 @@ import EventDetailsScreen from "./screens/views/EventDetails";
 // import OrganizationDetailScreen from "./screens/views/OrganizationDetail";
 
 import ImageDetails from "./components/ImageDetails";
+import Images from "./components/Images";
 
 
 // constants
 import { COLORS, icons } from "./constants";
 
-import { fetchUser } from "./modules/data";
+import { clearData, fetchUser, fetchAllDefaultData } from "./modules/data";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -242,6 +243,8 @@ export default function Main() {
                             <View style={{ flex: 1, alignItems: 'center' }}>
                                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => {
                                     AsyncStorage.removeItem('user');
+                                    dispatch(clearData());
+                                    dispatch(fetchAllDefaultData());
                                     props.navigation.closeDrawer();
                                 }}>
                                     <ICONS.Ionicons name="log-out" size={24} color={COLORS.primary} />
@@ -364,6 +367,33 @@ export default function Main() {
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="ImageDetails" component={ImageDetails} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Posts" component={PostsScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                {/* <Drawer.Screen name="Search" component={SearchScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                {/* <Drawer.Screen name="EditProfile" component={EditProfileScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                {/* <Drawer.Screen name="Saved" component={SavedScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                {/* <Drawer.Screen name="Notifications" component={NotificationsScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                {/* <Drawer.Screen name="Chat" component={ChatScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                {/* <Drawer.Screen name="Organizations" component={OrganizationsScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                {/* <Drawer.Screen name="OrganizationDetail" component={OrganizationDetailScreen} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/> */}
+                <Drawer.Screen name="Images" component={Images} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                

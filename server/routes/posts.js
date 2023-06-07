@@ -79,9 +79,13 @@ router.get('/', async (req, res) => {
                     })
                     .populate({
                         path: 'event',
-                        select: 'title images status location'
+                        select: 'title images status location createdAt author requirements',
+                        populate: {
+                            path: 'author',
+                            select: 'name image type'
+                        }
                     })
-                    .sort({ upvotes: -1 })
+                    .sort({ createdAt: -1 })
                     .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
                     .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
             })
@@ -96,9 +100,13 @@ router.get('/', async (req, res) => {
             })
             .populate({
                 path: 'event',
-                select: 'title images status location'
+                select: 'title images status location createdAt author requirements',
+                populate: {
+                    path: 'author',
+                    select: 'name image type'
+                }
             })
-            .sort({ upvotes: -1 })
+            .sort({ createdAt: -1 })
             .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
             .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
     }
@@ -119,13 +127,102 @@ router.get('/search', async (req, res) => {
         })
         .populate({
             path: 'event',
-            select: 'title images status location'
+            select: 'title images status location createdAt author requirements',
+            populate: {
+                path: 'author',
+                select: 'name image type'
+            }
         })
-        .sort({ upvotes: -1 })
+        .sort({ createdAt: -1 })
         .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
 })
 
+
+//@route PUT api/posts/upvote
+//@desc Upvote a post
+//@access Public
+router.put('/upvote', async (req, res) => {
+    const { postId, userId } = req.body;
+
+
+    Post.findById(postId)
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
+        .populate({
+            path: 'event',
+            select: 'title images status location createdAt author requirements',
+            populate: {
+                path: 'author',
+                select: 'name image type'
+            }
+        })
+        .then(post => {
+            console.log(post);
+            if (!post) {
+                return res.status(400).json({ success: false, message: 'Post does not exist' });
+            }
+
+            if(post.downvotes.includes(userId)) {
+                post.downvotes.pull(userId);
+            }
+
+            if(post.upvotes.includes(userId)) {
+                return res.status(400).json({ success: false, message: 'Post already upvoted' });
+            }
+
+            post.upvotes.push(userId);
+            post.save()
+                .then(post => res.status(200).json({ success: true, post, message: 'Post upvoted successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to upvote post', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to upvote post', error: err }));
+})
+
+
+//@route PUT api/posts/downvote
+//@desc Downvote a post
+//@access Public
+router.put('/downvote', async (req, res) => {
+    const { postId, userId } = req.body;
+
+    Post.findById(postId)
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
+        .populate({
+            path: 'event',
+            select: 'title images status location createdAt author requirements',
+            populate: {
+                path: 'author',
+                select: 'name image type'
+            }
+        })
+        .then(post => {
+            if (!post) {
+                return res.status(400).json({ success: false, message: 'Post does not exist' });
+            }
+
+            if(post.upvotes.includes(userId)) {
+                post.upvotes.pull(userId);
+            }
+
+            if(post.downvotes.includes(userId)) {
+                return res.status(400).json({ success: false, message: 'Post already downvoted' });
+            }
+
+            post.downvotes.push(userId);
+            post.save()
+                .then(post => res.status(200).json({ success: true, post, message: 'Post downvoted successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to downvote post', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to downvote post', error: err }));
+})
+
+            
 
 
 

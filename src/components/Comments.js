@@ -44,6 +44,7 @@ import {
 
 
 import { Keyboard } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 
 const { width, height } = Dimensions.get("window");
@@ -52,12 +53,14 @@ const wait = (timeout) => {
     return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
-const Comments = ({ item, isVisible, handleToggleComments }) => {
+const Comments = ({  item, isVisible, handleToggleComments, type }) => {
     const comments = useSelector((state) => state?.data?.comments);
     const commentsShow = useSelector((state) => state?.data?.commentsShow);
     const currentUser = useSelector((state) => state?.data?.currentUser);
 
     const dispatch = useDispatch();
+
+    const navigation = useNavigation();
 
 
     const [refreshing, setRefreshing] = useState(false);
@@ -126,7 +129,7 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                 handleCommentReplySubmit();
                 return;
             } else {
-                dispatch(handleCommentSubmit('event', item?._id, comment));
+                dispatch(handleCommentSubmit(type, item?._id, comment));
                 setComment("");
                 inputRef.current?.clear();
                 Keyboard.dismiss();
@@ -166,7 +169,7 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                 setCurrentComment("");
             }
         } else {
-            dispatch(handleCommentDelete('event', item?._id, Id));
+            dispatch(handleCommentDelete(type, item?._id, Id));
         }
     }
 
@@ -192,10 +195,13 @@ const Comments = ({ item, isVisible, handleToggleComments }) => {
                     <View style={styles.commentHeaderLeft}>
                         <Image source={{ uri: item?.author?.image}} style={{width : 40, height: 40, borderRadius: 25}} />
                     </View>
-                    <View style={styles.commentHeaderRight}>
+                    <TouchableOpacity style={styles.commentHeaderRight} onPress={() => {
+                        sheetRef.current?.close();
+                        navigation.navigate('Profile', { user: item?.author })
+                    }}>
                         <Text style={styles.commentHeaderLeftText}>{item?.author?.name}</Text>
                         <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
-                    </View>
+                    </TouchableOpacity>
                     {item?.author?._id === currentUser?._id && (
                         <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
                             <ICONS.Ionicons name="trash" size={20} color={COLORS.red} />

@@ -7,14 +7,14 @@ import * as ICONS from "@expo/vector-icons";
 
 
 const ImageDetails = ({ route, navigation}) => {
-    const { image, item } = route.params;
+    const { image, item, routeName } = route.params;
 
 
     return (
         <View style={styles.container}>
             <TouchableOpacity
                 style={{ position: 'absolute', top: 20, right: 20, zIndex: 1 }}
-                onPress={() => navigation.navigate('Event', { item })}
+                onPress={() => navigation.navigate(routeName, { item })}
             >
                 <ICONS.Ionicons name="close" size={30} color={COLORS.white} />
             </TouchableOpacity>

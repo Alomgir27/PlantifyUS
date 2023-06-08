@@ -29,18 +29,21 @@ import PostUpload from "./components/PostUpload";
 // import SearchScreen from "./screens/views/Search";
 import ProfileScreen from "./screens/views/Profile";
 // import EditProfileScreen from "./screens/views/EditProfile";
-import PostsScreen from "./screens/views/Posts";
+import PostsScreen from "./screens/views/Posts/Posts";
 // import SavedScreen from "./screens/views/Saved";
 // import NotificationsScreen from "./screens/views/Notifications";
 // import ChatScreen from "./screens/views/Chat";
-import EventsScreen from "./screens/views/Events";
-import EventDetailsScreen from "./screens/views/EventDetails";
+import EventsScreen from "./screens/views/Events/Events";
+import EventDetailsScreen from "./screens/views/Events/EventDetails";
 // import OrganizationsScreen from "./screens/views/Organizations";
 // import OrganizationDetailScreen from "./screens/views/OrganizationDetail";
 
 import ImageDetails from "./components/ImageDetails";
 import Images from "./components/Images";
 
+
+// Tree Identify
+import TreeIdentify from "./screens/views/Identify/TreeIdentify";
 
 // constants
 import { COLORS, icons } from "./constants";
@@ -104,9 +107,9 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="search" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
-                            label="Plant Detail"
+                            label="Identify"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('PlantDetail')}
+                            onPress={() => props.navigation.navigate('TreeIdentify')}
                             icon={() => <ICONS.Ionicons name="leaf" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
@@ -394,6 +397,9 @@ export default function Main() {
                     drawerItemStyle: { height: 0 }
                 }}/> */}
                 <Drawer.Screen name="Images" component={Images} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="TreeIdentify" component={TreeIdentify} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                

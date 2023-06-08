@@ -13,7 +13,7 @@ import {
 
 import { FlatList , RefreshControl} from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -23,9 +23,9 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { fetchPosts, handleResetPostsData } from './../../modules/data';
+import { fetchPosts, handleResetPostsData } from '../../../modules/data';
 
-import { API_URL } from "./../../constants";
+import { API_URL } from "../../../constants";
 
 import axios from "axios";
 
@@ -45,6 +45,22 @@ const Posts = ({ route,  navigation }) => {
     const dispatch = useDispatch();
 
     const { posts } = useSelector((state) => state?.data);
+
+    const [selectedPost, setSelectedPost] = useState([]);
+
+    useEffect(() => {
+        setSelectedPost([]);
+        if(route?.params?.item) {
+            if(route?.params?.item?.length > 0) {
+                route?.params?.item?.map((item) => {
+                    setSelectedPost((prev) => [...prev, item?._id])
+                })
+            }
+            else {
+                setSelectedPost((prev) => [...prev, route?.params?.item?._id])
+            }
+        }
+    }, [route?.params?.item])
 
 
     const onRefresh = useCallback(() => {
@@ -77,10 +93,10 @@ const Posts = ({ route,  navigation }) => {
         )
     }
 
-    const renderPosts = () => {
+    const renderPosts = useCallback(() => {
         return (
             <FlatList
-                data={route?.params?.item ?  route?.params?.item?.length > 0 ? route?.params?.item : [route?.params?.item] : posts}
+                data={selectedPost?.length > 0 ? posts?.filter((item) => selectedPost?.includes(item?._id)) : posts}
                 renderItem={({ item }) => <PostItem item={item} navigation={navigation} />}
                 keyExtractor={item => `${item._id}`}
                 showsVerticalScrollIndicator={false}
@@ -94,7 +110,7 @@ const Posts = ({ route,  navigation }) => {
                 }
             />
         )
-    }
+    }, [posts, selectedPost, refreshing])
 
     return (
         <View style={styles.container}>

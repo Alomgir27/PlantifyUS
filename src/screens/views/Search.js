@@ -15,7 +15,9 @@ import {
     fetchTreesSearch,
     fetchUsersSearch,
     fetchPostsSearch,
-    fetchAllSearchData
+    fetchAllSearchData,
+    handlePostsMerge,
+    handleEventsMerge,
 } from '../../modules/data';
 
 const SearchScreen = ({ navigation }) => {
@@ -114,6 +116,7 @@ const SearchScreen = ({ navigation }) => {
 
     const handleSearchResult = (type, item) => {
         if(searchType === 'Events' || type === 'Events') {
+            handleEventsMerge([item]);
             navigation.navigate('Events', {  item });
         }
         else if(searchType === 'Organizations' || type === 'Organizations') {
@@ -126,6 +129,7 @@ const SearchScreen = ({ navigation }) => {
             navigation.navigate('Profile', { user: item });
         }
         else if(searchType === 'Posts' || type === 'Posts') {
+            handlePostsMerge([item]);
             navigation.navigate('Posts', { item });
         }
        
@@ -179,7 +183,10 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.events?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Events</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('Events', { item: searchResults.events })}>
+                        <TouchableOpacity onPress={() => {
+                            handleEventsMerge(searchResults.events);
+                            navigation.navigate('Events', { item: searchResults.events })
+                        }} >
                             <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
                         </TouchableOpacity>
                     </View>
@@ -257,7 +264,10 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.posts?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Posts</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('Posts', { item: searchResults.posts })}>
+                        <TouchableOpacity onPress={() => {
+                            handlePostsMerge(searchResults.posts);
+                            navigation.navigate('Posts', { item: searchResults.posts })
+                        }} >
                             <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
                         </TouchableOpacity>
                     </View> 

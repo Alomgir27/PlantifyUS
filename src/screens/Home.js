@@ -953,7 +953,7 @@ const Home = ({ navigation }) => {
                             <Text style={{ color: COLORS.white, ...FONTS.h2, }}>New Plants</Text>
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
-                                    onPress={() => { console.log("Focus on pressed") }}
+                                    onPress={() => navigation.navigate("TreeIdentify")}
                                 >
                                     <Image
                                         source={icons.focus}

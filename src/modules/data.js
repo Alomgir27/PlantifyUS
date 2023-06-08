@@ -33,6 +33,12 @@ const HANDLE_COMMENT_REMOVED = 'HANDLE_COMMENT_REMOVED'
 const HANDLE_COMMENT_EDITED = 'HANDLE_COMMENT_EDITED'
 const HANDLE_COMMENT_DATA_RESET = 'HANDLE_COMMENT_DATA_RESET'
 
+const HANDLE_POST_REMOVE = 'HANDLE_POST_REMOVE'
+const HANDLE_EVENT_REMOVE = 'HANDLE_EVENT_REMOVE'
+
+const HANDLE_POST_ADD = 'HANDLE_POST_ADD'
+const HANDLE_EVENT_ADD = 'HANDLE_EVENT_ADD'
+
 
 const CLEAR_DATA = 'CLEAR_DATA'
 const HANDLE_EVENTS_DATA_RESET = 'HANDLE_EVENTS_DATA_RESET'
@@ -161,6 +167,18 @@ export default  data = (state = INITIAL_STATE, action) => {
                 ...state,
                 eventsSearch: action.eventsSearch
             }
+        case HANDLE_EVENT_REMOVE:
+            return {
+                ...state,
+                events: (state.events.filter((event) => event._id !== action.events._id))
+            }
+        case HANDLE_EVENT_ADD:
+            return {
+                ...state,
+                events: [...state.events, action.events]
+            }
+
+
 
         // Handle Posts
         case POSTS_STATE_CHANGE:
@@ -186,6 +204,17 @@ export default  data = (state = INITIAL_STATE, action) => {
                 ...state,
                 postsSearch: action.postsSearch
             }
+        case HANDLE_POST_REMOVE:
+            return {
+                ...state,
+                posts: (state.posts.filter((post) => post._id !== action.posts._id))
+            }
+        case HANDLE_POST_ADD:
+            return {
+                ...state,
+                posts: [...state.posts, action.posts]
+            }
+
 
         // Handle Comments
         case HANDLE_COMMENT_SHOW:
@@ -871,6 +900,32 @@ export const handleRemoveFromFavorite = (type, id) => {
             console.log(err)
         }
         )
+    })
+}
+
+export const handlePostsMerge = (posts) => {
+    return ((dispatch, getState) => {
+       posts.forEach((post) => {
+              dispatch({
+                    type: HANDLE_POST_REMOVE, posts: post
+                })
+               dispatch({
+                    type: HANDLE_POST_ADD, posts: post
+                })
+        })
+    })
+}
+
+export const handleEventsMerge = (events) => {
+    return ((dispatch, getState) => {
+         events.forEach((event) => {
+                dispatch({
+                    type: HANDLE_EVENT_REMOVE, events: event
+                })
+                dispatch({
+                    type: HANDLE_EVENT_ADD, events: event
+                })
+        })
     })
 }
 

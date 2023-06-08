@@ -18,7 +18,7 @@ import {
 } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -28,11 +28,11 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { handleEventDownvote, handleEventUpvote, handleAddToFavorite, handleRemoveFromFavorite } from './../../modules/data';
+import { handleEventDownvote, handleEventUpvote, handleAddToFavorite, handleRemoveFromFavorite } from '../../../modules/data';
 
-import { API_URL } from "./../../constants";
+import { API_URL } from "../../../constants";
 import { connect } from 'react-redux';
-import Comments from '../../components/Comments';
+import Comments from '../../../components/Comments';
 
 
 

@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Image, FlatList, Alert, TouchableOpacity, Dimen
 import { useSelector, useDispatch } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
-import { COLORS } from "../../constants";
-import { API_URL } from "../../constants";
+import { COLORS } from "../../../constants";
+import { API_URL } from "../../../constants";
 import axios from "axios";
-import ImagesViewer from './../../components/ImagesViewer';
+import ImagesViewer from '../../../components/ImagesViewer';
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 import * as ICONS from "@expo/vector-icons";

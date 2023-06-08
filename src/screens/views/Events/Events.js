@@ -13,7 +13,7 @@ import {
 
 import { FlatList , RefreshControl} from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -23,9 +23,9 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { fetchEvents, handleResetEventsData } from './../../modules/data';
+import { fetchEvents, handleResetEventsData } from '../../../modules/data';
 
-import { API_URL } from "./../../constants";
+import { API_URL } from "../../../constants";
 
 import axios from "axios";
 
@@ -46,8 +46,26 @@ const Events = ({ route, navigation }) => {
 
     
         const dispatch = useDispatch();
-    
+
+        const [selectedEvent, setSelectedEvent] = useState([]);
+
+       
         const { events } = useSelector((state) => state?.data);
+
+
+        useEffect(() => {
+            setSelectedEvent([]);
+            if(route?.params?.item) {
+                if(route?.params?.item?.length > 0) {
+                    route?.params?.item?.map((item) => {
+                        setSelectedEvent((prev) => [...prev, item?._id])
+                    })
+                }
+                else {
+                    setSelectedEvent((prev) => [...prev, route?.params?.item?._id])
+                }
+            }
+        }, [route?.params?.item])
     
         const onRefresh = useCallback(() => {
             setRefreshing(true);
@@ -90,20 +108,12 @@ const Events = ({ route, navigation }) => {
             )
         }, []);
 
-        const renderItem = useCallback(({ item }) => {
+        const renderEvents = useCallback(() => {
             return (
-                <EventItem item={item} navigation={navigation} />
-            )
-        }, []);
-
-
-
-        return (
-            <View style={styles.container}>
                 <FlatList
                     ListHeaderComponent={renderHeader}
-                    data={route?.params?.item ? route?.params?.item?.length > 0 ? route?.params?.item : [route?.params?.item] : events}
-                    renderItem={({ item }) => renderItem({ item })}
+                    data={selectedEvent.length > 0 ? events?.filter((item) => selectedEvent?.includes(item?._id)) : events}
+                    renderItem={({ item }) => <EventItem item={item} />}
                     keyExtractor={(item) => item._id.toString()}
                     refreshControl={
                         <RefreshControl
@@ -120,6 +130,14 @@ const Events = ({ route, navigation }) => {
                     }}
                     
                 />
+            )
+        }, [events, selectedEvent, refreshing]);
+
+
+
+        return (
+            <View style={styles.container}>
+                {renderEvents()}
             </View>
         );
     }

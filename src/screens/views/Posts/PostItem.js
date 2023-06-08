@@ -18,7 +18,7 @@ import {
 } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from './../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -28,40 +28,14 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { handlePostDownvote, handlePostUpvote, handleAddToFavorite, handleRemoveFromFavorite } from './../../modules/data';
+import { handlePostDownvote, handlePostUpvote, handleAddToFavorite, handleRemoveFromFavorite, handleEventsMerge } from '../../../modules/data';
 
-import { API_URL } from "./../../constants";
+import { API_URL } from "../../../constants";
 import { connect } from 'react-redux';
-import Comments from '../../components/Comments';
+import Comments from '../../../components/Comments';
 
 const { width, height } = Dimensions.get('window');
 
-// const postSchema = new Schema({
-//     author: {
-//         type: Schema.Types.ObjectId,
-//         ref: 'User'
-//     },
-//     text: String,
-//     images: [String],
-//     tags: [String],
-//     likes: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'User'
-//     }],
-//     comments: [{author: {
-//         type: Schema.Types.ObjectId,
-//         ref: 'User'
-//     }, text: String, date: Date }],
-//     event: {
-//         type: Schema.Types.ObjectId,
-//         ref: 'Event'
-//     },
-//     favourites: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'Favourites'
-//     }],
-//     isVerified: Boolean
-// }, { timestamps: true });
 
 export class PostItem extends React.Component {
     constructor(props) {
@@ -370,7 +344,10 @@ export class PostItem extends React.Component {
                                     <Text style={styles.eventDate}>{moment(item?.event?.createdAt).format('DD MMM YYYY')}</Text>
                                 </View>
                             </View>
-                            <TouchableOpacity onPress={() => navigation.navigate('Events', {item: item?.event})}>
+                            <TouchableOpacity onPress={() => {
+                                handleEventsMerge([item?.event]);
+                                navigation.navigate('Events', {item: [item?.event]});
+                            }}>
                                 <ICONS.AntDesign name="arrowright" size={24} color={COLORS.primary} />
                             </TouchableOpacity>
                         </View>

@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ImageBackground,
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -14,23 +15,46 @@ import { connect } from "react-redux";
 import MapView, { Marker } from 'react-native-maps';
 import * as Icon from "@expo/vector-icons";
 
+import { COLORS } from "../constants";
+
+
 import { setLocation, setFilters, setCampings } from "../modules/campings";
 import * as mock from "../mock/campings";
 
 const { width, height } = Dimensions.get("screen");
 
+import * as Location from 'expo-location';
+
 class Campings extends React.Component {
   static navigationOptions = {
     headerShown: false
   };
-
-  componentDidMount() {
-    this.props.setCampings(mock.campings);
+  constructor(props) {
+    super(props);
+    this.state = {
+      location: null,
+      errorMessage: null,
+      events: [],
+      loading: false
+    };
+    this.renderHeader = this.renderHeader.bind(this);
+    this.renderMap = this.renderMap.bind(this);
+    this.renderTabs = this.renderTabs.bind(this);
+    this.renderList = this.renderList.bind(this);
   }
+
+  async componentDidMount() {
+    const { events } = this.props?.data;
+    this.props.setCampings(events);
+    this.setState({ events: this.props?.data?.events });
+  }
+
+
 
   handleTab = tabKey => {
     this.props.setFilters({ type: tabKey });
   };
+
 
   renderHeader() {
     return (
@@ -42,59 +66,70 @@ class Campings extends React.Component {
                 <Icon.FontAwesome
                   name="location-arrow"
                   size={14}
-                  color="white"
+                  color={COLORS.white}
                 />
               </View>
             </View>
             <View style={styles.options}>
-              <Text style={{ fontSize: 12, color: "#A5A5A5", marginBottom: 5 }}>
-                Detected Location
+              <Text style={{ fontSize: 12, color: COLORS.gray }}>
+                {this.props.mylocation.latitude.toFixed(4)}, {this.props.mylocation.longitude.toFixed(4)}
               </Text>
-              <Text style={{ fontSize: 14, fontWeight: "300" }}>
-                Northern Islands
+              <Text style={{ fontSize: 14, color: COLORS.gray }}>
+                Where are you going?
               </Text>
             </View>
+             
           </View>
-          <View style={styles.settings}>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("Settings")}
-            >
-              <Icon.Ionicons name="ios-settings" size={24} color="black" />
-            </TouchableOpacity>
+          <View style={{ flex: 1, alignItems: "flex-end" }}>
+            <Icon.MaterialCommunityIcons name="tree" size={24} color={COLORS.primary} />
           </View>
         </View>
+         
         {this.renderTabs()}
       </View>
     );
   }
 
   renderMap() {
-    const campingMarker = ({ type }) => (
-      <View style={[styles.marker, styles[`${type}Marker`]]}>
-        {type === "rv" ? (
-          <Icon.FontAwesome name="truck" size={18} color="#FFF" />
-        ) : (
-          <Icon.Foundation name="mountains" size={18} color="#FFF" />
-        )}
-      </View>
-    );
     const { filters, campings } = this.props;
     const mapSpots =
-      filters.type === "all"
+      filters.type === "pending"
         ? campings
-        : campings.filter(camping => camping.type === filters.type);
+        : campings.filter(camping => camping?.status === filters.type);
 
     return (
       <View style={styles.map}>
         <MapView
           style={{ flex: 1, height: height * 0.5, width }}
-          showsMyLocationButton
-          initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.03,
-            longitudeDelta: 0.03
+         // showsMyLocationButton
+          initialRegion={{ // TODO: change this to the user's location
+            latitude: this.props.mylocation.latitude,
+            longitude: this.props.mylocation.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
           }}
+          //keep zoomed in on user's location but zoom out to see all markers
+          initialCamera={{
+            center: {
+              latitude: this.props.mylocation.latitude,
+              longitude: this.props.mylocation.longitude,
+            },
+            pitch: 0,
+            heading: 0,
+            altitude: 1000,
+            zoom: 10,
+          }}
+          onPress={(e) => this.props.setLocation(e.nativeEvent.coordinate)}
+          showsUserLocation={true}
+          showsMyLocationButton={true}
+          showsCompass={true}
+          showsBuildings={true}
+          showsTraffic={true}
+          showsIndoors={true}
+          showsIndoorLevelPicker={true}
+          showsPointsOfInterest={true}
+          showsScale={true}
+          
         >
           <Marker coordinate={this.props.mylocation}>
             <View style={styles.myMarker}>
@@ -102,14 +137,24 @@ class Campings extends React.Component {
             </View>
           </Marker>
 
-          {mapSpots.map(marker => (
-            <Marker key={`marker-${marker.id}`} coordinate={marker.latlng}>
-              {campingMarker(marker)}
+          {mapSpots.filter(marker => marker?.status === filters.type).map(marker => (
+            <Marker key={`marker-${marker._id}`} coordinate={{
+              latitude: marker.location.coordinates[1],
+              longitude: marker.location.coordinates[0],
+            }}
+              onPress={() => this.props.navigation.navigate("Event", { item: marker })}
+              title={marker.title}
+              description={marker.description}
+              icon={<Icon.FontAwesome name="map-marker" size={24} color={COLORS.red} />}
+            >
+              <View style={[styles.marker, styles[`${marker.status}Marker`]]}>
+                <Image 
+                  source={{ uri: marker.images[0] }}
+                  style={{ width: 40, height: 40, borderRadius: 40 }}
+                />
+              </View>
             </Marker>
           ))}
-
-          
-          
         </MapView>
 
       </View>
@@ -118,69 +163,102 @@ class Campings extends React.Component {
 
   renderTabs() {
     const { filters } = this.props;
-
     return (
-      <View style={styles.tabs}>
+      <ScrollView 
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabs}
+      >
         <View
-          style={[styles.tab, filters.type === "all" ? styles.activeTab : null]}
+          style={[styles.tab, filters.type === "pending" ? styles.activeTab : null]}
         >
           <Text
             style={[
               styles.tabTitle,
-              filters.type === "all" ? styles.activeTabTitle : null
+              filters.type === "pending" ? styles.activeTabTitle : null
             ]}
-            onPress={() => this.handleTab("all")}
+            onPress={() => this.handleTab("pending")}
           >
-            All Spots
+            Requested Events
           </Text>
         </View>
         <View
           style={[
             styles.tab,
-            filters.type === "tent" ? styles.activeTab : null
+            filters.type === "approved" ? styles.activeTab : null
           ]}
         >
           <Text
             style={[
               styles.tabTitle,
-              filters.type === "tent" ? styles.activeTabTitle : null
+              filters.type === "approved" ? styles.activeTabTitle : null
             ]}
-            onPress={() => this.handleTab("tent")}
+            onPress={() => this.handleTab("approved")}
           >
-            Tenting
+            Ongoing Events
           </Text>
         </View>
         <View
-          style={[styles.tab, filters.type === "rv" ? styles.activeTab : null]}
+          style={[styles.tab, filters.type === "completed" ? styles.activeTab : null]}
         >
           <Text
             style={[
               styles.tabTitle,
-              filters.type === "rv" ? styles.activeTabTitle : null
+              filters.type === "completed" ? styles.activeTabTitle : null
             ]}
-            onPress={() => this.handleTab("rv")}
+            onPress={() => this.handleTab("completed")}
           >
-            RV Camping
+            Past Events
           </Text>
         </View>
-      </View>
+        <View
+          style={[styles.tab, filters.type === "rejected" ? styles.activeTab : null]}
+        >
+          <Text
+            style={[
+              styles.tabTitle,
+              filters.type === "rejected" ? styles.activeTabTitle : null
+            ]}
+            onPress={() => this.handleTab("rejected")}
+          >
+            Draft Events
+          </Text>
+        </View>
+      </ScrollView>
     );
   }
 
   renderList() {
     const { filters, campings } = this.props;
-    const mapSpots =
-      filters.type === "all"
-        ? campings
-        : campings.filter(camping => camping.type === filters.type);
+      function toRadians(degrees) {
+        return degrees * Math.PI / 180;
+      }
+    
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      console.log(lat1, lon1, lat2, lon2)
+      const earthRadius = 6371; // Radius of the Earth in kilometers
+      const dLat = toRadians(lat2 - lat1);
+      const dLon = toRadians(lon2 - lon1);
+    
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+      const distance = earthRadius * c;
+      return distance.toFixed(0) + " " + "kilometers"; // Distance in kilometers
+    }
 
-    return mapSpots.map(camping => {
+
+    return campings.filter(camping => camping?.status === filters.type).map(camping => {
       return (
-        <View key={`camping-${camping.id}`} style={styles.camping}>
+        <View key={`camping-${camping._id}`} style={styles.camping}>
           <ImageBackground
             style={styles.campingImage}
             imageStyle={styles.campingImage}
-            source={{ uri: camping.image }}
+            source={{ uri: camping.images[0] }}
           />
 
           <View style={styles.campingDetails}>
@@ -192,44 +270,43 @@ class Campings extends React.Component {
               }}
             >
               <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                {camping.name}
+                {camping.title}
               </Text>
-              <Text style={{ fontSize: 12, color: "#A5A5A5", paddingTop: 5 }}>
-                {camping.description}
+              <Text style={{ fontSize: 12, color: "#A5A5A5", paddingTop: 5 }} multiline={true}>
+                {camping.description ? camping.description : camping.landDesription}
               </Text>
             </View>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <View style={styles.campingInfo}>
                 <Icon.FontAwesome name="star" color="#FFBA5A" size={12} />
                 <Text style={{ marginLeft: 4, color: "#FFBA5A" }}>
-                  {camping.rating}
+                  {camping.upvotes.length}
                 </Text>
               </View>
               <View style={styles.campingInfo}>
                 <Icon.FontAwesome
                   name="location-arrow"
-                  color="#FF7657"
+                  color={"#FF7657"}
                   size={12}
                 />
                 <Text style={{ marginLeft: 4, color: "#FF7657" }}>
-                  {camping.distance} miles
+                  {calculateDistance(this.props.mylocation.latitude, this.props.mylocation.longitude, camping.location.coordinates[0], camping.location.coordinates[1])}
                 </Text>
               </View>
               <View style={styles.campingInfo}>
                 <Icon.Ionicons name="md-pricetag" color="black" size={12} />
                 <Text style={{ marginLeft: 4, color: "black" }}>
-                  {camping.price}
+                  {camping.favourites.length}
                 </Text>
               </View>
             </View>
           </View>
-          <View style={{ flex: 0.2, justifyContent: "center" }}>
-            <Icon.SimpleLineIcons
-              name="options-vertical"
-              color="#A5A5A5"
-              size={24}
-            />
-          </View>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate("Event", { item: camping })}
+            style={{ flex: 0.2, justifyContent: "center", alignItems: "center" }}
+          >
+           <Icon.Ionicons name="ios-arrow-forward" color={COLORS.gray} size={24} />
+          </TouchableOpacity>
         </View>
       );
     });
@@ -251,7 +328,8 @@ class Campings extends React.Component {
 const moduleState = state => ({
   campings: state.campings.spots,
   filters: state.campings.filters,
-  mylocation: state.campings.mylocation
+  mylocation: state.campings.location,
+  data: state.data
 });
 
 const moduleActions = {
@@ -278,7 +356,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: height * 0.15,
-    paddingHorizontal: 14
+    paddingHorizontal: 14,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: "#A5A5A5"
+
   },
   location: {
     height: 24,
@@ -286,22 +368,28 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FF7657"
+    backgroundColor: COLORS.primary
   },
   marker: {
-    width: 40,
-    height: 40,
-    borderRadius: 40,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#FFF"
+    backgroundColor: 'transparent',
   },
-  rvMarker: {
-    backgroundColor: "#FFBA5A"
+  pendingMarker: {
+    borderColor: COLORS.primary
   },
-  tentMarker: {
-    backgroundColor: "#FF7657"
+  approvedMarker: {
+    borderColor: COLORS.green
+  },
+  rejectedMarker: {
+    borderColor: COLORS.red
+  },
+  completedMarker: {
+    borderColor: COLORS.gray
   },
   settings: {
     alignItems: "center",
@@ -314,25 +402,28 @@ const styles = StyleSheet.create({
   tabs: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "flex-end"
+    paddingHorizontal: 14,
+    backgroundColor: COLORS.white,
   },
   tab: {
-    paddingHorizontal: 14,
-    marginHorizontal: 10,
-    borderBottomWidth: 3,
+    marginRight: 14,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    paddingTop: 20,
     borderBottomColor: "transparent"
   },
   tabTitle: {
     fontWeight: "bold",
     fontSize: 14,
-    marginBottom: 10
+    marginBottom: 10,
+    color: COLORS.gray,
+    letterSpacing: 0.5
   },
   activeTab: {
-    borderBottomColor: "#FF7657"
+    borderBottomColor: COLORS.primary,
   },
   activeTabTitle: {
-    color: "#FF7657"
+    color: COLORS.primary
   },
   map: {
     flex: 1

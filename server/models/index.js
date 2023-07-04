@@ -263,9 +263,12 @@ const Badge = mongoose.model('Badge', badgeSchema);
 const Progress = mongoose.model('Progress', progressSchema);
 const Comment = mongoose.model('Comment', commentSchema);
 
-Event.createIndexes({ location: '2dsphere' });
-User.createIndexes({ location: '2dsphere' });
-Organizations.createIndexes({ location: '2dsphere' });
+Event.collection.createIndex({ location: '2dsphere' });
+User.collection.createIndex({ location: '2dsphere' });
+Organizations.collection.createIndex({ location: '2dsphere' });
+
+
+
 
 module.exports = {
     Event,

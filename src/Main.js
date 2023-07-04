@@ -54,6 +54,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { setMyLocation, setLocation } from "./modules/campings";
+
+import * as Location from 'expo-location';
+
 const Drawer = createDrawerNavigator();
 export default function Main() {  
 
@@ -70,6 +74,22 @@ export default function Main() {
         }
       })()
     }, [])
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            dispatch(setMyLocation(location?.coords));
+            dispatch(setLocation(location?.coords));
+        })()
+    }, [])
+
+
 
     const CustomDrawerContent = (props) => {
         return (

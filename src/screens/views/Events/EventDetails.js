@@ -85,7 +85,10 @@ const EventDetails = ({ route }) => {
                                 <Text style={styles.eventHeaderLeftTextAuthor}>by {item.author.name}</Text>
                             </View>
                         </View>
-                        <View style={styles.eventHeaderRight}>
+                        <View style={[styles.eventHeaderRight, {
+                            backgroundColor: item.status === 'pending' ? COLORS.gray : item.status === 'approved' ? COLORS.primary : item.status === 'rejected' ? COLORS.red : COLORS.green
+                        }]}>
+                             {console.log(item.status)}
                             <Text style={styles.eventHeaderRightText}>{item.status}</Text>
                         </View>
                     </View>

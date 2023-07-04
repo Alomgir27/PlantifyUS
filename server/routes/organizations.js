@@ -79,7 +79,7 @@ router.get('/search', async (req, res) => {
 
 
     Organizations.find({ $or: [{ name: { $regex: search, $options: 'i' } }, { bio: { $regex: search, $options: 'i' } }] })
-        .limit(parseInt(limit) || 20)
+        .limit(parseInt(limit) || 10)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
 });

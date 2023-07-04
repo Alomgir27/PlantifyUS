@@ -4,23 +4,29 @@ const SET_CAMPINGS = "Spots/campings/SET_CAMPINGS";
 const SET_LOCATION = "Spots/campings/SET_LOCATION";
 const SET_FILTERS = "Spots/campings/SET_FILTERS";
 const SET_LOADING = "Spots/campings/SET_LOADING";
+const SET_MY_LOCATION = "Spots/campings/SET_MY_LOCATION";
 
 // Initial state
 const INITIAL_STATE = {
   spots: [],
-  mylocation: { 
-    latitude: 23.6850,
-    longitude: 90.3563,
+  mylocation: { // Default location is Dhaka
+    latitude: 23.8103,
+    longitude: 90.4125,
+  },
+  location: {
+    latitude: 23.8103,
+    longitude: 90.4125,
   },
   filters: {
     sort: 'distance',
-    type: 'all',
+    type: 'pending',
     price: 'free',
     option_full: true,
     option_rated: true,
     option_free: false,
   },
   loading: false,
+  
 };
 
 // Reducer
@@ -30,6 +36,11 @@ export default function reducer(state = INITIAL_STATE, action = {}) {
       return {
         ...state,
         spots: action.payload
+      }
+    case SET_MY_LOCATION:
+      return {
+        ...state,
+        mylocation: action.payload
       }
     case SET_LOCATION:
       return {
@@ -68,6 +79,15 @@ export function setLocation(payload) {
   return dispatch => {
     dispatch({
       type: SET_LOCATION,
+      payload
+    })
+  }
+};
+
+export function setMyLocation(payload) {
+  return dispatch => {
+    dispatch({
+      type: SET_MY_LOCATION,
       payload
     })
   }

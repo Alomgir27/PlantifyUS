@@ -34,6 +34,8 @@ export const COLORS = {
     red4: '#8C0000',
     red5: '#660000',
     red6: '#3F0000',
+    green: '#008C00',
+    
     
 };
 export const SIZES = {

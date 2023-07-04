@@ -23,6 +23,16 @@ import { API_URL } from "./../constants";
 
 import moment from "moment";
 
+import {
+    Modal,
+    Portal,
+    Provider,
+    Button,
+    Paragraph,
+    Dialog,
+} from "react-native-paper";
+
+
 import { 
     handleCommentDownvote, 
     handleCommentUpvote, 
@@ -58,6 +68,8 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
     const commentsShow = useSelector((state) => state?.data?.commentsShow);
     const currentUser = useSelector((state) => state?.data?.currentUser);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const dispatch = useDispatch();
 
     const navigation = useNavigation();
@@ -68,6 +80,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
     const [comment, setComment] = useState("");
 
     const [commentId, setCommentId] = useState("");
+    const [commentForDelete, setCommentForDelete] = useState("");
 
 
     const [currentComment, setCurrentComment] = useState("");
@@ -80,14 +93,14 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
     const onRefresh = () => {
         setRefreshing(true);
         dispatch(fetchCommentsReset());
-        // dispatch(fetchComments(item?.comments));
+        dispatch(fetchComments(item?.comments));
         wait(2000).then(() => setRefreshing(false));
     }
 
     const onReplayRefresh = () => {
         setRefreshing(true);
         dispatch(fetchCommentsReset());
-        // dispatch(fetchComments(currentComment?.replyTo));
+        dispatch(fetchComments(currentComment?.replyTo));
         wait(2000).then(() => setRefreshing(false));
     }
 
@@ -171,21 +184,14 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
         } else {
             dispatch(handleCommentDelete(type, item?._id, Id));
         }
+        setIsModalOpen(false);
+        setCommentForDelete("");
     }
 
 
     const handleDelete = (commentId) => {
-        Alert.alert('Delete Comment', 'Are you sure you want to delete this comment?', [
-            {
-                text: 'Cancel',
-                onPress: () => console.log('Cancel Pressed'),
-                style: 'cancel'
-            },
-            {
-                text: 'OK',
-                onPress: () => handleCommentDeleteConfirm(commentId)
-            }
-        ])
+        setIsModalOpen(true);
+        setCommentForDelete(commentId);
     }
 
     const renderComment = ({ item, index }) => {
@@ -202,11 +208,13 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                         <Text style={styles.commentHeaderLeftText}>{item?.author?.name}</Text>
                         <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
                     </TouchableOpacity>
-                    {item?.author?._id === currentUser?._id && (
-                        <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
-                            <ICONS.Ionicons name="trash" size={20} color={COLORS.red} />
-                        </TouchableOpacity>
-                    )}
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingRight: 10}}>
+                        {item?.author?._id === currentUser?._id && (
+                            <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
+                                <ICONS.MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.white} />
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 </View>
                 <View style={styles.commentBody}>
                     <Text style={styles.commentBodyText}>{item?.text}</Text>
@@ -253,11 +261,20 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                         <Text style={styles.commentHeaderLeftText}>{item?.author?.name}</Text>
                         <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
                     </View>
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingRight: 10}}>
+                        <TouchableOpacity onPress={() => handleCommentReplyCancel()} style={{ flex: 1 / 12, height: 40, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10}} >
+                            <ICONS.Ionicons name="arrow-back" size={30} color={COLORS.white} />
+                        </TouchableOpacity>
+                    </View>
+
                     {item?.author?._id === currentUser?._id && (
-                        <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
-                            <ICONS.Ionicons name="trash" size={20} color={COLORS.red} />
+                        <TouchableOpacity onPress={() => handleDelete(item?._id)} style={{  flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 10}}>
+                            <ICONS.MaterialCommunityIcons name="dots-vertical" size={20} color={COLORS.white} />
                         </TouchableOpacity>
                     )}
+
+                   
+
                 </View>
                 <View style={styles.commentBody}>
                     <Text style={styles.commentBodyText}>{item?.text}</Text>
@@ -365,6 +382,47 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                         </View>
                     </View>
                 </View>
+
+                <Modal
+                    visible={isModalOpen}
+                    onDismiss={() => setIsModalOpen(false)}
+                    contentContainerStyle={{
+                        backgroundColor: COLORS.white,
+                        padding: 20,
+                        margin: 20,
+                        borderRadius: 10,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: 200,
+                        width: 300,
+                        alignSelf: 'center'
+
+                    }}
+
+                >
+                <View style={{ flex: 1}}>
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 20}}>
+                        <ICONS.MaterialCommunityIcons name="alert-circle" size={30} color={COLORS.black} />
+                        <Text style={{ color: COLORS.black, fontSize: 20, fontWeight: 'bold', marginLeft: 10}}>Delete Comment</Text>
+                    </View>
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 20}}>
+                        <Text style={{ color: COLORS.black, fontSize: 16, fontWeight: 'bold', marginLeft: 10}}>Are you sure you want to delete this comment?</Text>
+                    </View>
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => setIsModalOpen(false)} style={{ marginRight: 10}}>
+                            <Text style={{ color: COLORS.black, fontSize: 16, fontWeight: 'bold'}}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleCommentDeleteConfirm(commentForDelete)} style={{ marginRight: 10}}>
+                            <Text style={{ color: COLORS.black, fontSize: 16, fontWeight: 'bold'}}>OK</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                    
+                </Modal>
+
+                
+                    
+
          </BottomSheetModal>
     );
 };

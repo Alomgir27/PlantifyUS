@@ -113,7 +113,7 @@ const Events = ({ route, navigation }) => {
                 <FlatList
                     ListHeaderComponent={renderHeader}
                     data={selectedEvent.length > 0 ? events?.filter((item) => selectedEvent?.includes(item?._id)) : events}
-                    renderItem={({ item }) => <EventItem item={item} />}
+                    renderItem={({ item }) => <EventItem item={item} navigation={navigation} />}
                     keyExtractor={(item) => item._id.toString()}
                     refreshControl={
                         <RefreshControl

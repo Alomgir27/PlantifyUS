@@ -59,7 +59,7 @@ router.post('/new', async (req, res) => {
 //@access Public
 router.get('/', async (req, res) => {
     const { page, user } = req.query;
-    const limit = 20;
+    const limit = 10;
     const skip = (parseInt(page) - 1) * limit;
 
     //fetch all users posts if author _id is present in friends array and user is logged in
@@ -120,7 +120,7 @@ router.get('/search', async (req, res) => {
     const { search , limit } = req.query;
 
     Post.find({ $or: [{ text: { $regex: search, $options: 'i' } }, { tags: { $regex: search, $options: 'i' } }] })
-        .limit(parseInt(limit) || 20)
+        .limit(parseInt(limit) || 10)
         .populate({
             path: 'author',
             select: 'name image type'

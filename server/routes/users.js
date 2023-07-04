@@ -96,8 +96,10 @@ router.get('/get/:id', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
     const { page, user } = req.query;
-    const limit = 20;
+    const limit = 10;
     const skip = (parseInt(page) - 1) * limit;
+
+    console.log(req.query);
 
     //fetch all users if _id is present in friends array
     if (user) {
@@ -134,6 +136,145 @@ router.get('/search', async (req, res) => {
         .limit(parseInt(limit) || 10)
         .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+});
+
+// @route   GET api/users/recommend
+// @desc    Recommend users to follow based on friends of friends and location (if provided) all conditions are or conditions
+// @access  Public
+router.get('/recommend', async (req, res) => {
+    const { user, location, page } = req.query;
+
+    console.log(req.query);
+
+    const limit = 10;
+    const skip = (parseInt(page) - 1) * limit;
+
+    User.findOne({ _id: user })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User does not exist' });
+            }
+            User.find({ _id: { $in: user.friends } })
+                .then(friends => {
+                    const friendsOfFriends = friends.map(friend => friend.friends);
+                    const flattenedFriendsOfFriends = [].concat.apply([], friendsOfFriends);
+                    const uniqueFriendsOfFriends = [...new Set(flattenedFriendsOfFriends)];
+                    const recommendedUsers = uniqueFriendsOfFriends.filter(friend => !user.friends.includes(friend) && friend !== user._id);
+                    if (location) {
+                        User.aggregate([
+                            {
+                              $geoNear: {
+                                near: {
+                                  type: 'Point',
+                                  coordinates: [parseFloat(location.longitude), parseFloat(location.latitude)]
+                                },
+                                distanceField: 'distance',
+                                spherical: true
+                              }
+                            },
+                            {
+                              $match: {
+                                $or: [
+                                  { _id: { $in: recommendedUsers } },
+                                  { location: { $geoWithin: { $centerSphere: [[parseFloat(location.longitude), parseFloat(location.latitude)], 100000 / 6371] } } }
+                                ]
+                              }
+                            },
+                            {
+                              $skip: skip
+                            },
+                            {
+                              $limit: limit
+                            }
+                          ])
+                          .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+                          .catch(err => {
+                            console.error('Error fetching users:', err);
+                            res.status(400).json({ success: false, message: 'Unable to fetch users', error: err });
+                          });
+                          
+                          
+                    } else {
+                        User.find({ _id: { $in: recommendedUsers } })
+                            .skip(skip)
+                            .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+                            .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+                    }
+                })
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+});
+
+
+// @route   PUT api/users/follow
+// @desc    Follow a user
+// @access  Public
+router.put('/follow', async (req, res) => {
+    const { user, friend } = req.body;
+
+
+    User.findOne({ _id: user })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User does not exist' });
+            }
+
+            User.findOne({ _id: friend })
+                .then(friend => {
+                    if (!friend) {
+                        return res.status(400).json({ success: false, message: 'Friend does not exist' });
+                    }
+
+                    if (friend.friends.includes(user._id)) {
+                        return res.status(400).json({ success: false, message: 'Already following this user' });
+                    }
+
+                    friend.friends.push(user._id);
+                    friend.save()
+                        .then(friend => res.status(200).json({ success: true, user: friend, message: 'User followed successfully' }))
+                        .catch(err => res.status(400).json({ success: false, message: 'Unable to follow user', error: err }));
+                   
+                })
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to follow user', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to follow user', error: err }));
+});
+
+
+// @route   PUT api/users/unfollow
+// @desc    Unfollow a user
+// @access  Public
+
+router.put('/unfollow', async (req, res) => {
+    const { user, friend } = req.body;
+
+    User.findOne({ _id: user })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User does not exist' });
+            }
+
+            User.findOne({ _id: friend })
+                .then(friend => {
+                    if (!friend) {
+                        return res.status(400).json({ success: false, message: 'Friend does not exist' });
+                    }
+
+                    if (!friend.friends.includes(user._id)) {
+                        return res.status(400).json({ success: false, message: 'Not following this user' });
+                    }
+                    console.log(friend.friends, user._id);
+                    friend.friends.pull(user._id);
+                    friend.save()
+                        .then(friend => res.status(200).json({ success: true, user: friend, message: 'User unfollowed successfully' }))
+                        .catch(err => res.status(400).json({ success: false, message: 'Unable to unfollow user', error: err }));
+
+                    
+                })
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to unfollow user', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to unfollow user', error: err }));
 });
 
 

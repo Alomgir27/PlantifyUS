@@ -21,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
 import { fetchAllDefaultData, clearData } from '../modules/data';
+import RecommendUsers from '../components/RecommendUsers';
 
 
 
@@ -30,21 +31,32 @@ const Home = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState([]);
 
+    const [showRecommendUsers, setShowRecommendUsers] = useState(false);
+
     const events = useSelector(state => state?.data?.events);
     const trees = useSelector(state => state?.data?.trees); 
     const posts = useSelector(state => state?.data?.posts);
     const user = useSelector(state => state?.data?.currentUser);
 
+    const [mounted, setMounted] = useState(false);
 
     const dispatch = useDispatch();
     
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            dispatch(fetchAllDefaultData());
+            if(mounted) {
+               dispatch(clearData())
+               dispatch(fetchAllDefaultData());
+            }
         }
         );
         return unsubscribe;
+    }, [])
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
     }, [])
 
 
@@ -895,6 +907,7 @@ const Home = ({ navigation }) => {
 
 
     return (
+      <>
         <ScrollView 
             refreshControl={
                 <RefreshControl refreshing={loading} onRefresh={onRefresh} />
@@ -1065,7 +1078,7 @@ const Home = ({ navigation }) => {
                                         justifyContent: 'center',
                                         backgroundColor: COLORS.gray
                                     }}
-                                    onPress={() => { console.log("Add friend on pressed") }}
+                                    onPress={() => setShowRecommendUsers(true)}
                                 >
                                     <Image
                                         source={icons.plus}
@@ -1081,7 +1094,12 @@ const Home = ({ navigation }) => {
                     </View>
                 </View>
             </View>
+
         </ScrollView>
+         {showRecommendUsers && (
+            <RecommendUsers navigation={navigation} setShowRecommendUsers={setShowRecommendUsers} />
+         )}
+        </>
     );
 };
 

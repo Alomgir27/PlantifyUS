@@ -29,6 +29,7 @@ const campings = [
   },
 ];
 
+
 export {
   campings,
 };

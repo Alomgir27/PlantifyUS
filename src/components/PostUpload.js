@@ -149,6 +149,58 @@ export default function PostUpload({ navigation, route }) {
 
 
     const handleSubmit = async () => {
+
+        if(type === "newEvent"){
+            if(newEventForm.title === "" || newEventForm.description === "" || newEventForm.landsDescription === "" || newEventForm.requirements.trees === "" || newEventForm.requirements.volunteers === "" || newEventForm.requirements.funds === ""){
+                Alert.alert('Error', 'Please fill in all the fields', [
+                    {
+                        text: 'Ok',
+                    },
+                ])
+                return;
+            }
+        } else if(type === "newPost"){
+            if(newPostForm.text === "" || newPostForm.event === ""){
+                Alert.alert('Error', 'Please fill in all the fields', [
+                    {
+                        text: 'Ok',
+                    },
+                ])
+                return;
+            }
+        } else if(type === "newOrganization"){
+            if(newOrganizationForm.name === "" || newOrganizationForm.bio === ""){
+                Alert.alert('Error', 'Please fill in all the fields', [
+                    {
+                        text: 'Ok',
+                    },
+                ])
+                return;
+            }
+        } else if(type === "newTree"){
+            if(images.length > 1){
+                Alert.alert('Error', 'Please upload only one image', [
+                    {
+                        text: 'Ok',
+                    },
+                ])
+                return;
+            }
+            if(newTreeForm.name === "" || newTreeForm.scientificName === "" || newTreeForm.description === "" || newTreeForm.benefits === "" || newTreeForm.requirements.sun === "" || newTreeForm.requirements.soil === "" || newTreeForm.requirements.water === "" || newTreeForm.requirements.temperature === "" || newTreeForm.requirements.fertilizer === ""){
+                Alert.alert('Error', 'Please fill in all the fields', [
+                    {
+                        text: 'Ok',
+                    },
+                ])
+                return;
+            }
+        }
+
+        
+
+
+
+
         setLoading(true);
 
         if(location.coordinates[0] === 0 && location.coordinates[1] === 0){
@@ -159,8 +211,8 @@ export default function PostUpload({ navigation, route }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
-            setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] } });
+            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
+            setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
         }
         else {
             setEventForm({ ...newEventForm, location: location });

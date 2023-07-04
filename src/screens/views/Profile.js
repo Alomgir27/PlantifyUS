@@ -12,7 +12,10 @@ import axios from "axios";
 import { fetchUser } from "../../modules/data";
 import moment from "moment";
 
-
+import {
+    BottomSheetBackdrop,
+    BottomSheetModal,
+} from "@gorhom/bottom-sheet";
 // const userSchema = new Schema({
 //     name: String,
 //     email: String,
@@ -81,6 +84,9 @@ const Profile = ({ navigation, route }) => {
 
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
+
+    const bottomSheetModalRef = useRef(null);
+    const snapPoints = React.useMemo(() => ["25%", "50%"], []);
 
     useEffect(() => {
         (async () => {
@@ -165,6 +171,27 @@ const Profile = ({ navigation, route }) => {
             console.log(err);
         }
     }
+
+    const renderContent = () => (
+        <View style={styles.panel}>
+            <View style={{ alignItems: 'center' }}>
+                <Text style={styles.panelTitle}>Upload Photo</Text>
+                <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
+            </View>
+            <TouchableOpacity style={styles.panelButton}>
+                <Text style={styles.panelButtonTitle}>Take Photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.panelButton}>
+                <Text style={styles.panelButtonTitle}>Choose From Library</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.panelButton}
+                onPress={() => bottomSheetModalRef.current?.close()}
+            >
+                <Text style={styles.panelButtonTitle}>Cancel</Text>
+            </TouchableOpacity>
+        </View>
+    );
 
    
 
@@ -281,6 +308,21 @@ const Profile = ({ navigation, route }) => {
                 icon="plus"
                 onPress={() => navigation.navigate("CreatePost")}
             />
+
+            <BottomSheetModal
+                ref={bottomSheetModalRef}
+                index={1}
+                snapPoints={snapPoints}
+                onChange={(index) => {
+                    console.log('bsm index:', index);
+                }}
+                backdropComponent={BottomSheetBackdrop}
+            >
+               
+                {renderContent()}
+            </BottomSheetModal>
+
+
         </View>
     );
 };
@@ -350,6 +392,55 @@ const styles = StyleSheet.create({
     button: {
         marginHorizontal: 20,
         marginVertical: 10,
+    },
+    panel: {
+        padding: 20,
+        backgroundColor: '#FFFFFF',
+        paddingTop: 20,
+        height: 600,
+    },
+    header: {
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#333333',
+        shadowOffset: { width: -1, height: -3 },
+        shadowRadius: 2,
+        shadowOpacity: 0.4,
+        paddingTop: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    panelHeader: {
+        alignItems: 'center',
+    },
+    panelHandle: {
+        width: 40,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#00000040',
+        marginBottom: 10,
+    },
+
+    panelTitle: {
+        fontSize: 27,
+        height: 35,
+    },
+    panelSubtitle: {
+        fontSize: 14,
+        color: 'gray',
+        height: 30,
+        marginBottom: 10,
+    },
+    panelButton: {
+        padding: 13,
+        borderRadius: 10,
+        backgroundColor: COLORS.primary,
+        alignItems: 'center',
+        marginVertical: 7,
+    },
+    panelButtonTitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: COLORS.white,
     },
 
 });

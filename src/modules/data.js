@@ -1,19 +1,18 @@
 import { API_URL } from "../constants"
 import axios from "axios"
-
+import { fetchTrees } from "./trees"
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
 //Actions 
 const USER_STATE_CHANGE = 'USER_STATE_CHANGE'
 const POSTS_STATE_CHANGE = 'POSTS_STATE_CHANGE'
 const EVENTS_STATE_CHANGE = 'EVENTS_STATE_CHANGE'
 const ORGANIZATIONS_STATE_CHANGE = 'ORGANIZATIONS_STATE_CHANGE'
-const TREES_STATE_CHANGE = 'TREES_STATE_CHANGE'
 
 const USER_DATA_STATE_CHANGE = 'USER_DATA_STATE_CHANGE'
 const POSTS_DATA_STATE_CHANGE = 'POSTS_DATA_STATE_CHANGE'
 const EVENTS_DATA_STATE_CHANGE = 'EVENTS_DATA_STATE_CHANGE'
 const ORGANIZATIONS_DATA_STATE_CHANGE = 'ORGANIZATIONS_DATA_STATE_CHANGE'
-const TREES_DATA_STATE_CHANGE = 'TREES_DATA_STATE_CHANGE'
 
 const EVENTS_SEARCH_STATE_CHANGE = 'EVENTS_SEARCH_STATE_CHANGE'
 const POSTS_SEARCH_STATE_CHANGE = 'POSTS_SEARCH_STATE_CHANGE'
@@ -44,9 +43,9 @@ const CLEAR_DATA = 'CLEAR_DATA'
 const HANDLE_EVENTS_DATA_RESET = 'HANDLE_EVENTS_DATA_RESET'
 const HANDLE_POSTS_DATA_RESET = 'HANDLE_POSTS_DATA_RESET'
 const HANDLE_ORGANIZATIONS_DATA_RESET = 'HANDLE_ORGANIZATIONS_DATA_RESET'
-const HANDLE_TREES_DATA_RESET = 'HANDLE_TREES_DATA_RESET'
 const LOGOUT = 'LOGOUT'
 
+const LOADING_STATE_CHANGE = 'LOADING_STATE_CHANGE'
 
 
 //Initial State
@@ -55,13 +54,11 @@ const INITIAL_STATE = {
     posts: [],
     events: [],
     organizations: [],
-    trees: [],
     users: [],
     usersLoaded: 0,
     postsLoaded: 0,
     eventsLoaded: 0,
     organizationsLoaded: 0,
-    treesLoaded: 0,
     eventsSearch: [],
     postsSearch: [],
     organizationsSearch: [],
@@ -69,7 +66,8 @@ const INITIAL_STATE = {
     usersSearch: [],
     comments: [],
     commentsLoaded: 0,
-    commentsShow: false
+    commentsShow: false,
+    loading: false
 }
 
 
@@ -88,11 +86,6 @@ export default  data = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 organizations: action.organizations
-            }
-        case TREES_STATE_CHANGE:
-            return {
-                ...state,
-                trees: action.trees
             }
         case USER_DATA_STATE_CHANGE:
             return {
@@ -113,12 +106,7 @@ export default  data = (state = INITIAL_STATE, action) => {
                 organizationsLoaded: state.organizationsLoaded + 1,
                 organizations: [...state.organizations, ...action.organizations]
             }
-        case TREES_DATA_STATE_CHANGE:
-            return {
-                ...state,
-                treesLoaded: state.treesLoaded + 1,
-                trees: [...state.trees, ...action.trees]
-            }
+       
         
         
         case ORGANIZATIONS_SEARCH_STATE_CHANGE:
@@ -262,6 +250,12 @@ export default  data = (state = INITIAL_STATE, action) => {
                 }))
             }
 
+        // Handle Loading
+        case LOADING_STATE_CHANGE:
+            return {
+                ...state,
+                loading: action.loading
+            }
 
         // Handle Resets
         case CLEAR_DATA:
@@ -276,7 +270,6 @@ export default  data = (state = INITIAL_STATE, action) => {
                 postsLoaded: 0,
                 eventsLoaded: 0,
                 organizationsLoaded: 0,
-                treesLoaded: 0,
                 eventsSearch: [],
                 postsSearch: [],
                 organizationsSearch: [],
@@ -303,13 +296,6 @@ export default  data = (state = INITIAL_STATE, action) => {
                 organizations: [],
                 organizationsLoaded: 0,
                 organizationsSearch: []
-            }
-        case HANDLE_TREES_DATA_RESET:
-            return {
-                ...state,
-                trees: [],
-                treesLoaded: 0,
-                treesSearch: []
             }
         case LOGOUT:
             return {
@@ -354,31 +340,35 @@ export const handleResetOrganizationsData = () => {
     })
 }
 
-export const handleResetTreesData = () => {
+
+
+//Actions Loading
+export const handleLoading = (loading) => {
     return ((dispatch) => {
-        dispatch({ type: HANDLE_TREES_DATA_RESET })
+        dispatch({ type: LOADING_STATE_CHANGE, loading: loading })
     })
 }
 
-
-
 //Actions
 export const fetchUser = ( _id) => {
-    return (async (dispatch) => {
+    return (async (dispatch, getState) => {
+        if(!_id) return
         await axios.get(`${API_URL}/users/get/${_id}`)
         .then((res) => {
             console.log(res?.data?.message, 'USER STATE CHANGE')
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: res.data.user
             })
-            dispatch(clearData())
-            dispatch(fetchAllDefaultData())
+            
         })
         .catch((err) => {
             console.log(err?.data?.message);
             dispatch({
                 type: USER_STATE_CHANGE, currentUser: null
             })
+        })
+        .finally(() => {
+            dispatch(handleLoading(false))
             dispatch(fetchAllDefaultData())
         })
     })
@@ -386,7 +376,8 @@ export const fetchUser = ( _id) => {
 
 export const fetchPosts = ( _id) => {
     return (async (dispatch, getState) => {
-        if(getState().data.postsLoaded * 20 !== getState().data.posts.length) return
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.get(`${API_URL}/posts`, {
             params: {
                 page: getState().data.postsLoaded + 1,
@@ -398,9 +389,11 @@ export const fetchPosts = ( _id) => {
             dispatch({
                 type: POSTS_DATA_STATE_CHANGE, posts: res.data.posts
             })
+            dispatch(handleLoading(false))
         })
         .catch((err) => {
             console.log(err?.data?.message)
+            dispatch(handleLoading(false))
         })
     })
 }
@@ -408,7 +401,8 @@ export const fetchPosts = ( _id) => {
 
 export const fetchEvents =  () => {
     return (async (dispatch, getState) => {
-       if(getState().data.eventsLoaded * 20 !== getState().data.events.length) return
+       if(getState().data.loading) return
+         dispatch(handleLoading(true))
         await axios.get(`${API_URL}/events`, {
             params: {
                 page: getState().data.eventsLoaded + 1
@@ -419,9 +413,13 @@ export const fetchEvents =  () => {
             dispatch({
                 type: EVENTS_DATA_STATE_CHANGE, events: res.data.events
             })
+            
         })
         .catch((err) => {
             console.log(err?.data?.message);
+        })
+        .finally(() => {
+            dispatch(handleLoading(false))
         })
      })
 }
@@ -432,7 +430,8 @@ export const fetchEvents =  () => {
 
 export const fetchOrganizations =  () => {
     return (async (dispatch, getState) => {
-        if(getState().data.organizationsLoaded * 20 !== getState().data.organizations.length)return
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.get(`${API_URL}/organizations`, {
             params: {
                 page: getState().data.organizationsLoaded + 1
@@ -447,34 +446,19 @@ export const fetchOrganizations =  () => {
         .catch((err) => {
             console.log(err?.data?.message)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
-
-export const fetchTrees =  () => {
-    return (async (dispatch, getState) => {
-        if(getState().data.treesLoaded * 20 !== getState().data.trees.length) return
-        await axios.get(`${API_URL}/plants`, {
-            params: {
-                page: getState().data.treesLoaded + 1
-            }
-        })
-        .then((res) => {
-            console.log(res?.data?.message)
-            dispatch({
-                type: TREES_DATA_STATE_CHANGE, trees: res.data.trees
-            })
-        })
-        .catch((err) => {
-            console.log(err?.data?.message);
-        })
-    })
-}
 
 
 export const fetchUsers = ( _id) => {
     return (async (dispatch, getState) => {
-        if(getState().data.usersLoaded * 20 !== getState().data.users.length) return
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.get(`${API_URL}/users`, {
             params: {
                 page: getState().data.usersLoaded + 1,
@@ -490,6 +474,10 @@ export const fetchUsers = ( _id) => {
         .catch((err) => {
             console.log(err?.data?.message)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
@@ -602,6 +590,8 @@ export const fetchPostsSearch = (search, limit) => {
 
 export const handleEventUpvote = (event, user) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/events/upvote`, {
             eventId: event,
             userId: user
@@ -616,11 +606,17 @@ export const handleEventUpvote = (event, user) => {
             console.log(err?.data?.message)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleEventDownvote = (event, user) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/events/downvote`, {
             eventId: event,
             userId: user
@@ -635,6 +631,10 @@ export const handleEventDownvote = (event, user) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
@@ -642,6 +642,8 @@ export const handleEventDownvote = (event, user) => {
 // Handle Posts
 export const handlePostUpvote = (post) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/posts/upvote`, {
             postId: post,
             userId: getState().data.currentUser._id
@@ -655,11 +657,17 @@ export const handlePostUpvote = (post) => {
         .catch((err) => {
             console.log(err?.data?.message)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handlePostDownvote = (post) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/posts/downvote`, {
             postId: post,
             userId: getState().data.currentUser._id
@@ -674,6 +682,10 @@ export const handlePostDownvote = (post) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
@@ -695,7 +707,8 @@ export const handleCommentHide = () => {
 
 export const fetchComments = (comments) => {
     return (async (dispatch, getState) => {
-        if(getState().data.commentsLoaded * 10 !== getState().data.comments.length) return
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.get(`${API_URL}/comments`, {
             params: {
                 comments: comments,
@@ -711,6 +724,10 @@ export const fetchComments = (comments) => {
         .catch((err) => {
             console.log(err?.data?.message)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
@@ -722,6 +739,8 @@ export const fetchCommentsReset = () => {
 
 export const handleCommentUpvote = (comment) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/comments/upvote`, {
             commentId: comment,
             userId: getState().data.currentUser._id
@@ -736,11 +755,17 @@ export const handleCommentUpvote = (comment) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleCommentDownvote = (comment) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/comments/downvote`, {
             commentId: comment,
             userId: getState().data.currentUser._id
@@ -755,11 +780,17 @@ export const handleCommentDownvote = (comment) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleCommentSubmit = (type, id, comment, callback) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.post(`${API_URL}/comments`, {
             type: type,
             id: id,
@@ -790,11 +821,17 @@ export const handleCommentSubmit = (type, id, comment, callback) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleCommentDelete = (type, id, commentId, callback) =>  {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.delete(`${API_URL}/comments`, {
             params: {
                 type: type,
@@ -824,11 +861,17 @@ export const handleCommentDelete = (type, id, commentId, callback) =>  {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleCommentEdit = (type, id, newComment) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.put(`${API_URL}/comments`, {
             type: type,
             id: id,
@@ -845,11 +888,17 @@ export const handleCommentEdit = (type, id, newComment) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleAddToFavorite = (type, id) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.post(`${API_URL}/favourites/add`, {
             type: type,
             id: id,
@@ -872,11 +921,17 @@ export const handleAddToFavorite = (type, id) => {
             console.log(err?.data)
             console.log(err)
         })
+        .finally(() => {
+            dispatch(handleLoading(false))
+        }
+        )
     })
 }
 
 export const handleRemoveFromFavorite = (type, id) => {
     return (async (dispatch, getState) => {
+        if(getState().data.loading) return
+        dispatch(handleLoading(true))
         await axios.post(`${API_URL}/favourites/remove`, {
             type: type,
             id: id,
@@ -898,6 +953,10 @@ export const handleRemoveFromFavorite = (type, id) => {
         .catch((err) => {
             console.log(err?.data)
             console.log(err)
+        }
+        )
+        .finally(() => {
+            dispatch(handleLoading(false))
         }
         )
     })

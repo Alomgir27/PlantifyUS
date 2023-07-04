@@ -7,7 +7,7 @@ import {
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
-import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ScrollView, TextInput, Alert } from 'react-native';
 
 
 import { COLORS } from "../constants";
@@ -24,12 +24,7 @@ const BottomSheet = ({ navigation }) => {
 
   const user = useSelector(state => state?.data?.currentUser);
 
-  useEffect(() => {
-    if(!user){
-      setVisible(false);
-      navigation.navigate("AuthLanding");
-    }
-  }, [user, navigation, visible]);
+
 
   useEffect(() => {
     sheetRef.current?.present();
@@ -47,6 +42,9 @@ const BottomSheet = ({ navigation }) => {
     }, []);
 
     const pickImage = async () => {
+      if(!user) {
+        return Alert.alert("Please login to create event", "You can login from profile tab");
+      }
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         quality: 0.5,
@@ -61,6 +59,9 @@ const BottomSheet = ({ navigation }) => {
 
 
     const takePhotoFromCamera = async () => {
+      if(!user) {
+        return Alert.alert("Please login to create event", "You can login from profile tab");
+      }
       let result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         quality: 0.5,

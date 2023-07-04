@@ -77,7 +77,7 @@ router.post('/new', async (req, res) => {
 //@access Public
 router.get('/', async (req, res) => {
     const { page } = req.query;
-    const limit = 20;
+    const limit = 10;
     const skip = (parseInt(page) - 1) * limit;
 
     Event.find()
@@ -104,7 +104,7 @@ router.get('/search', async (req, res) => {
 
 
     Event.find({ $or: [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }] })
-        .limit(parseInt(limit) || 20)
+        .limit(parseInt(limit) || 10)
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })

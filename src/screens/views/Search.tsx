@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef} from "react";
 import { TextInput, ScrollView , FlatList, RefreshControl } from "react-native-gesture-handler";
-import { images, icons, COLORS, FONTS, SIZES } from './../../constants/index';
+import { images, icons, COLORS, FONTS, SIZES } from '../../constants/index';
 import { Keyboard } from 'react-native';
 import * as ICONS from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, Button, Alert } from "react-native";

@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         marginLeft: SIZES.padding,
-        ...FONTS.h2
+        ...FONTS.H2
     },
     headerRight: {
         flexDirection: 'row',

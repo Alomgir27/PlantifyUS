@@ -136,10 +136,10 @@ export const ASSETS: ThemeAssets = {
 export const FONTS: ThemeFonts = {
   // based on font size
   text: 'OpenSans-Regular',
-  // h1: 'OpenSans-Bold',
-  // h2: 'OpenSans-Bold',
-  // h3: 'OpenSans-Bold',
-  // h4: 'OpenSans-Bold',
+  h1: 'OpenSans-Bold',
+  h2: 'OpenSans-Bold',
+  h3: 'OpenSans-Bold',
+  h4: 'OpenSans-Bold',
   h5: 'OpenSans-SemiBold',
   p: 'OpenSans-Regular',
 
@@ -156,14 +156,26 @@ export const FONTS: ThemeFonts = {
 
   // based on font family
     largeTitle: { fontFamily: "OpenSans-ExtraBold", fontSize: SIZES.largeTitle, lineHeight: 55 },
-    h1: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h1, lineHeight: 36 },
-    h2: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h2, lineHeight: 30 },
-    h3: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h3, lineHeight: 22 },
-    h4: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h4, lineHeight: 22 },
+    H1: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h1, lineHeight: 36 },
+    H2: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h2, lineHeight: 30 },
+    H3: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h3, lineHeight: 22 },
+    H4: { fontFamily: "OpenSans-Bold", fontSize: SIZES.h4, lineHeight: 22 },
     body1: { fontFamily: "OpenSans-Regular", fontSize: SIZES.body1, lineHeight: 36 },
     body2: { fontFamily: "OpenSans-Regular", fontSize: SIZES.body2, lineHeight: 30 },
     body3: { fontFamily: "OpenSans-Regular", fontSize: SIZES.body3, lineHeight: 22 },
     body4: { fontFamily: "OpenSans-Regular", fontSize: SIZES.body4, lineHeight: 22 },
+
+    // largeTitle: { fontSize: SIZES.largeTitle, lineHeight: 55 },
+    // h1: { fontSize: SIZES.h1, lineHeight: 36 },
+    // h2: { fontSize: SIZES.h2, lineHeight: 30 },
+    // h3: { fontSize: SIZES.h3, lineHeight: 22 },
+    // h4: { fontSize: SIZES.h4, lineHeight: 22 },
+    // body1: { fontSize: SIZES.body1, lineHeight: 36 },
+    // body2: { fontSize: SIZES.body2, lineHeight: 30 },
+    // body3: { fontSize: SIZES.body3, lineHeight: 22 },
+    // body4: { fontSize: SIZES.body4, lineHeight: 22 },
+
+    
   
 };
 
@@ -226,19 +238,6 @@ export const COLORS = {
     
     
 };
-
-// export const FONTS = {
-//     largeTitle: { fontFamily: "Roboto-Black", fontSize: SIZES.largeTitle, lineHeight: 55 },
-//     h1: { fontFamily: "Roboto-Black", fontSize: SIZES.h1, lineHeight: 36 },
-//     h2: { fontFamily: "Roboto-Bold", fontSize: SIZES.h2, lineHeight: 30 },
-//     h3: { fontFamily: "Roboto-Bold", fontSize: SIZES.h3, lineHeight: 22 },
-//     h4: { fontFamily: "Roboto-Bold", fontSize: SIZES.h4, lineHeight: 22 },
-//     body1: { fontFamily: "Roboto-Regular", fontSize: SIZES.body1, lineHeight: 36 },
-//     body2: { fontFamily: "Roboto-Regular", fontSize: SIZES.body2, lineHeight: 30 },
-//     body3: { fontFamily: "Roboto-Regular", fontSize: SIZES.body3, lineHeight: 22 },
-//     body4: { fontFamily: "Roboto-Regular", fontSize: SIZES.body4, lineHeight: 22 },
-// };
-
 
 
 const appTheme = { COLORS, SIZES, FONTS };

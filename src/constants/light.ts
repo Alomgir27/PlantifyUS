@@ -14,9 +14,9 @@ export const COLORS: ThemeColors = {
 
   // base colors
   /** UI color for #primary */
-  primary: '#CB0C9F',
+  primary: '#00996D', //'#CB0C9F',
   /** UI color for #secondary */
-  secondary: '#627594', // '#8392AB',
+  secondary: "#606d87", //'#627594', // '#8392AB',
   /** UI color for #tertiary */
   tertiary: '#E8AE4C',
 

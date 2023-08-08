@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
     StyleSheet,
     View,
@@ -16,14 +16,13 @@ import { images, icons, COLORS, FONTS, SIZES } from '../constants/index';
 
 import * as ICONS from "@expo/vector-icons";
 
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import moment from 'moment';
 
 import { fetchAllDefaultData, clearData } from '../modules/data';
 import RecommendUsers from '../components/RecommendUsers';
-import { TouchableWithoutFeedbackBase } from 'react-native';
 
 
 
@@ -129,7 +128,7 @@ const Home = ({ navigation }) => {
 
     // Render
 
-    function renderNewPlants(item, index) {
+    function renderNewPlants(item: any, index: any) {
         return (
             <View style={{ alignItems: 'center', justifyContent: 'center', marginHorizontal: SIZES.base }}>
                 <Image
@@ -184,7 +183,7 @@ const Home = ({ navigation }) => {
             )
         } else if (friends.length <= 3) {
             return (
-                friends?.map((item, index) => (
+                friends?.map((item: any, index: any) => (
                     <View
                         key={`friend-${index}`}
                         style={index == 0 ? { flexDirection: 'row' } : { flexDirection: 'row', marginLeft: -20 }}
@@ -275,7 +274,7 @@ const Home = ({ navigation }) => {
                             justifyContent: 'center',
                             ...styles.shadow
                         }}>
-                            <Text style={{ ...FONTS.h4 }}>{item?.title}</Text>
+                            <Text style={{ ...FONTS.H4 }}>{item?.title}</Text>
                             <View style={{ flexDirection: 'row', marginTop: SIZES.radius, paddingLeft: 10, paddingBottom: 10 }}>
                                 {item?.status === "pending" && (
                                     <Text style={{ ...FONTS.body4, color: COLORS.gray }}>Pending</Text>
@@ -342,7 +341,7 @@ const Home = ({ navigation }) => {
                             justifyContent: 'center',
                             ...styles.shadow
                         }}>
-                            <Text style={{ ...FONTS.h4 }}>{item?.title}</Text>
+                            <Text style={{ ...FONTS.H4 }}>{item?.title}</Text>
                             <View style={{ flexDirection: 'row', marginTop: SIZES.radius, paddingLeft: 10, paddingBottom: 10 }}>
                                 {item?.status === "pending" && (
                                     <Text style={{ ...FONTS.body4, color: COLORS.gray }}>Pending</Text>
@@ -412,7 +411,7 @@ const Home = ({ navigation }) => {
                             justifyContent: 'center',
                             ...styles.shadow
                         }}>
-                            <Text style={{ ...FONTS.h4 }}>{item?.title}</Text>
+                            <Text style={{ ...FONTS.H4 }}>{item?.title}</Text>
                             <View style={{ flexDirection: 'row', marginTop: SIZES.radius, paddingLeft: 10, paddingBottom: 10 }}>
                                 {item?.status === "pending" && (
                                     <Text style={{ ...FONTS.body4, color: COLORS.gray }}>Pending</Text>
@@ -509,7 +508,7 @@ const Home = ({ navigation }) => {
                             justifyContent: 'center',
                             ...styles.shadow
                         }}>
-                            <Text style={{ ...FONTS.h4 }}>{item?.title}</Text>
+                            <Text style={{ ...FONTS.H4 }}>{item?.title}</Text>
                             <View style={{ flexDirection: 'row', marginTop: SIZES.radius, paddingLeft: 10, paddingBottom: 10 }}>
                                 {item?.status === "pending" && (
                                     <Text style={{ ...FONTS.body4, color: COLORS.gray }}>Pending</Text>
@@ -641,7 +640,7 @@ const Home = ({ navigation }) => {
                                     }}
                                 />
                                 <View style={{ position: 'absolute', top: '20%', right: '40%', backgroundColor: COLORS.transparentBlack1, width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' }}>
-                                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>{item?.images?.length - 3}+</Text>
+                                    <Text style={{ color: COLORS.white, ...FONTS.H3 }}>{item?.images?.length - 3}+</Text>
                                 </View>
                             </View>
                             <View style={{ flex: 1 }}>
@@ -695,7 +694,7 @@ const Home = ({ navigation }) => {
                         borderTopLeftRadius: SIZES.radius,
                         borderBottomRightRadius: SIZES.radius
                     }}>
-                        <Text style={{ color: COLORS.white, ...FONTS.h4 }}>{item?.tags?.slice(0, 3).map((tag) => "#" +tag + " ")} {item?.tags.length > 3 ? "..." : ""} </Text>
+                        <Text style={{ color: COLORS.white, ...FONTS.H4 }}>{item?.tags?.slice(0, 3).map((tag) => "#" +tag + " ")} {item?.tags.length > 3 ? "..." : ""} </Text>
                     </View>
 
                     {/* Post caption */}
@@ -803,7 +802,7 @@ const Home = ({ navigation }) => {
             <View style={{ paddingHorizontal: SIZES.padding }}>
                 <View style={{ flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ color: COLORS.white, ...FONTS.h2 }}>Hello!</Text>
+                        <Text style={{ color: COLORS.white, ...FONTS.H2 }}>Hello!</Text>
                         <Text style={{ color: COLORS.white, ...FONTS.body3 }}>What would you like to find?</Text>
                     </View>
                     <TouchableOpacity onPress={() => console.log("Profile on pressed")}>
@@ -968,7 +967,7 @@ const Home = ({ navigation }) => {
                 
                     <View style={{ marginHorizontal: SIZES.padding, marginTop: 10  }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ color: COLORS.white, ...FONTS.h2, }}>New Plants</Text>
+                            <Text style={{ color: COLORS.white, ...FONTS.H2, }}>New Plants</Text>
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
                                     onPress={() => navigation.navigate("TreeIdentify")}
@@ -1034,7 +1033,7 @@ const Home = ({ navigation }) => {
                 }}>
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>New Posts</Text>
+                            <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>New Posts</Text>
 
                             <TouchableOpacity
                                 onPress={() => navigation.navigate("Posts")}
@@ -1114,6 +1113,16 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.lightGray,
         flexDirection: 'column'
     },
+    shadow: {
+        shadowColor: COLORS.primary,
+        shadowOffset: {
+            width: 0,
+            height: 10
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5
+    }
 });
 
 export default Home;

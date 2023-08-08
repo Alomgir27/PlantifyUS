@@ -205,7 +205,7 @@ const Events = ({ route, navigation }) => {
             borderBottomRightRadius: 8,
         },
         fundsTitle: {
-            ...FONTS.h3,
+            ...FONTS.H3,
             color: COLORS.primary,
             marginBottom: 5,
         },
@@ -256,7 +256,7 @@ const Events = ({ route, navigation }) => {
             marginVertical: 5,
         },
         authorName: {
-            ...FONTS.h3,
+            ...FONTS.H3,
             color: COLORS.primary,
         },
         time: {

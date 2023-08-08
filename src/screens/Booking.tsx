@@ -1,13 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Text} from 'react-native';
 
 import dayjs from 'dayjs';
 import {RouteProp} from '@react-navigation/native';
-// import {useNavigation, useRoute} from '@react-navigation/core';
 
 import {useData, useTheme, useTranslation} from '../hooks/';
 import {IArticleOptions, ITheme} from '../constants/types';
-import {Block, Button, Calendar, Image, Text, Modal} from '../components/';
+import {Block, Button, Calendar, Image, Modal} from '../components/';
 
 interface IBookingRoute {
   route: RouteProp<{params: {optionId?: number}}, 'params'>;

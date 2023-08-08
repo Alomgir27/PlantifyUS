@@ -284,6 +284,10 @@ export interface ThemeFonts {
   h3: any;
   h4: any;
   h5: any;
+  H1: any;
+  H2: any;
+  H3: any;
+  H4: any;
   p: string;
   thin: string;
   extralight: string;

@@ -12,14 +12,14 @@ import {
     Easing
 } from "react-native";
 
-import { COLORS, FONTS, SIZES } from "./../constants/index";
+import { COLORS, FONTS, SIZES } from "../constants/index";
 
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 
 import { TextInput, FlatList, RefreshControl} from "react-native-gesture-handler";
 
-import { API_URL } from "./../constants/index";
+import { API_URL } from "../constants/index";
 
 import moment from "moment";
 

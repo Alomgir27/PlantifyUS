@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 8,
     },
     fundsTitle: {
-        ...FONTS.h3,
+        ...FONTS.H3,
         color: COLORS.primary,
         marginBottom: 5,
     },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
         color: COLORS.white,
     },
     cardTitle: {
-        ...FONTS.h2,
+        ...FONTS.H2,
         color: COLORS.primary,
         marginBottom: 5,
     },
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
     },
     authorName: {
-        ...FONTS.h3,
+        ...FONTS.H3,
         color: COLORS.primary,
     },
     time: {

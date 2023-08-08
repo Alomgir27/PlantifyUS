@@ -5,13 +5,13 @@ import {Ionicons} from '@expo/vector-icons';
 
 import {Block, Button, Image, Text} from '../components/';
 import {useData, useTheme, useTranslation} from '../hooks/';
+import { COLORS } from '../constants';
 
 const isAndroid = Platform.OS === 'android';
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
   const {user} = useData();
   const {t} = useTranslation();
-  // const navigation = useNavigation();
   const {assets, colors, sizes} = useTheme();
 
   const IMAGE_SIZE = (sizes.width - (sizes.padding + sizes.sm) * 2) / 3;
@@ -51,7 +51,8 @@ const Profile = () => {
             padding={sizes.sm}
             paddingBottom={sizes.l}
             radius={sizes.cardRadius}
-            source={assets.background}>
+            source={assets.background}
+            >
             <Button
               row
               flex={0}

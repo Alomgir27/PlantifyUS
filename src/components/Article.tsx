@@ -132,7 +132,7 @@ const Article = ({
               </Block>
             </Block>
           </Block>
-        </Image>
+         </Image>
       </Block>
     </TouchableWithoutFeedback>
   );

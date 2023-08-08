@@ -1,66 +1,55 @@
 import React, { useState, useEffect } from "react";
-import {  View, Text, Image, TouchableOpacity, StatusBar } from "react-native";
+import {  View, Text, Image, TouchableOpacity, StatusBar, StyleSheet } from "react-native";
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 
-// screens
-import { PlantDetail } from "./screens/";
-// extra screens
+
+import {
+    PlantDetail,
+    Campings,
+    Settings,
+    Donation,
+    AuthLanding,
+    Login,
+    Signup,
+    ForgotPassword,
+    PostUpload,
+    ProfileScreen,
+    PostsScreen,
+    EventsScreen,
+    EventDetailsScreen,
+    OrganizationsScreen,
+    ImageDetails,
+    Images,
+    TreeIdentify,
+    About,
+    Agreement,
+    Articles,
+    Chat,
+    Components,
+    Extras,
+    Notifications,
+    NotificationsSettings,
+    Privacy,
+    Profile,
+    Register,
+    Rental,
+    Rentals,
+    Booking,
+    Shopping,
+} from "./screens";
+
 import Tabs from "./navigation/tabs";
 
-// views screens
-import Campings from "./screens/Campings";
-import Settings from "./screens/Settings";
-import Donation from "./screens/Donation";
-
-
-//auth screens
-import AuthLanding from "./Auth/AuthLanding";
-import Login from "./Auth/Login";
-import Signup from "./Auth/Signup";
-import ForgotPassword from "./Auth/ForgotPassword";
-
-import * as ICONS from '@expo/vector-icons'
-
-
-// upload post
-import PostUpload from "./components/PostUpload";
-
-//views
-import ProfileScreen from "./screens/views/Profile";
-import PostsScreen from "./screens/views/Posts/Posts";
-
-import EventsScreen from "./screens/views/Events/Events";
-import EventDetailsScreen from "./screens/views/Events/EventDetails";
-import OrganizationsScreen from "./screens/views/Organizations";
-
-import ImageDetails from "./components/ImageDetails";
-import Images from "./components/Images";
-
-
-// Tree Identify
-import TreeIdentify from "./screens/views/Identify/TreeIdentify";
 
 // constants
-import { COLORS, icons } from "./constants/index";
-
+import { COLORS } from "./constants/index";
 import { clearData, fetchUser, fetchAllDefaultData } from "./modules/data";
-
 import { useDispatch, useSelector } from "react-redux";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { setMyLocation, setLocation } from "./modules/campings";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
+import * as ICONS from '@expo/vector-icons'
 
-
-const TestScreen = () => {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Test Screen</Text>
-        </View>
-    )
-}
 
 const Drawer = createDrawerNavigator();
 export default function Main() {  
@@ -187,6 +176,79 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Camera')}
                             icon={() => <ICONS.Ionicons name="cloud-upload" size={24} color={COLORS.white} />}
                         />
+                        <DrawerItem
+                            label="About"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('About')}
+                            icon={() => <ICONS.Ionicons name="information-circle" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Agreement"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Agreement')}
+                            icon={() => <ICONS.Ionicons name="document-text" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Articles"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Articles')}
+                            icon={() => <ICONS.Ionicons name="newspaper" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Components"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Components')}
+                            icon={() => <ICONS.Ionicons name="construct" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Extras"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Extras')}
+                            icon={() => <ICONS.Ionicons name="add-circle" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Privacy"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Privacy')}
+                            icon={() => <ICONS.Ionicons name="lock-closed" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Profile"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Profile')}
+                            icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Register"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Register')}
+                            icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Rental"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Rental')}
+                            icon={() => <ICONS.Ionicons name="car-sport" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Rentals"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Rentals')}
+                            icon={() => <ICONS.Ionicons name="car-sport" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Booking"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Booking')}
+                            icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
+                        />
+                        <DrawerItem
+                            label="Shopping"
+                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
+                            onPress={() => props.navigation.navigate('Shopping')}
+                            icon={() => <ICONS.Ionicons name="cart" size={24} color={COLORS.white} />}
+                        />
+
                         {/* auth screens */}
                         {!user && (
                             <>
@@ -298,23 +360,9 @@ export default function Main() {
 
 
     return (
-       <View style={{ flex: 1, marginTop: StatusBar.currentHeight }}>
+       <View style={style.container}>
             <Drawer.Navigator
-                screenOptions={{
-                    headerShown: false,
-                    drawerStyle: {
-                        backgroundColor: COLORS.primary,
-                    },
-                    drawerActiveTintColor: COLORS.gray,
-                    drawerInactiveTintColor: COLORS.white,
-                    drawerActiveBackgroundColor: COLORS.primary,
-                    drawerInactiveBackgroundColor: COLORS.primary,
-                    drawerLabelStyle: {
-                        fontSize: 15,
-                        fontWeight: 'bold'
-                    },
-                    drawerItemStyle: { marginVertical: 5 },
-                }}
+                screenOptions={style.screenOptions}
                 drawerContent={props => <CustomDrawerContent {...props} />}
                 initialRouteName={'Main'}
             >
@@ -411,6 +459,48 @@ export default function Main() {
                 <Drawer.Screen name="TreeIdentify" component={TreeIdentify} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
+                <Drawer.Screen name="About" component={About} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Agreement" component={Agreement} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Articles" component={Articles} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Chat" component={Chat} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Components" component={Components} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Extras" component={Extras} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Notifications" component={Notifications} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="NotificationsSettings" component={NotificationsSettings} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Privacy" component={Privacy} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Register" component={Register} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Rental" component={Rental} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Rentals" component={Rentals} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Booking" component={Booking} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Shopping" component={Shopping} options={{
+                    drawerItemStyle: { height: 0 }
+                }}/>
                
                 
             </Drawer.Navigator>
@@ -420,5 +510,24 @@ export default function Main() {
 };
 
 
-
-
+const style = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.white
+    },
+    screenOptions: {
+        headerShown: false,
+        drawerStyle: {
+            backgroundColor: COLORS.primary,
+        },
+        drawerActiveTintColor: COLORS.gray,
+        drawerInactiveTintColor: COLORS.white,
+        drawerActiveBackgroundColor: COLORS.primary,
+        drawerInactiveBackgroundColor: COLORS.primary,
+        drawerLabelStyle: {
+            fontSize: 15,
+            fontWeight: 'bold'
+        },
+        drawerItemStyle: { marginVertical: 5 },
+    }
+})

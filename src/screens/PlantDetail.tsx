@@ -76,7 +76,7 @@ const RequirementDetail = ({ icon, label, detail }) => {
                     }}
                 />
 
-                <Text style={{ marginLeft: SIZES.base, color: COLORS.secondary, ...FONTS.h2 }}>{label}</Text>
+                <Text style={{ marginLeft: SIZES.base, color: COLORS.secondary, ...FONTS.H2 }}>{label}</Text>
             </View>
             <View style={{ flex: 1, alignItems: 'flex-end' }}>
                 <Text style={{ marginLeft: SIZES.base, color: COLORS.gray, ...FONTS.h2 }}>{detail}</Text>
@@ -215,7 +215,7 @@ const PlantDetail = ({ navigation }) => {
                     }}
                     onPress={() => { console.log("Take Action") }}
                 >
-                    <Text style={{ color: COLORS.white, ...FONTS.h2 }}>Take Action</Text>
+                    <Text style={{ color: COLORS.white, ...FONTS.H2 }}>Take Action</Text>
 
                     <Image
                         source={icons.chevron}
@@ -270,7 +270,7 @@ const PlantDetail = ({ navigation }) => {
                     paddingVertical: SIZES.padding
                 }}
             >
-                <Text style={{ paddingHorizontal: SIZES.padding, color: COLORS.secondary, ...FONTS.h1 }}>Requirements</Text>
+                <Text style={{ paddingHorizontal: SIZES.padding, color: COLORS.secondary, ...FONTS.H1 }}>Requirements</Text>
 
                 {renderRequirementsBar()}
 

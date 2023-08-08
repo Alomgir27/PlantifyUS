@@ -8,7 +8,7 @@ import LottieView from "lottie-react-native";
 import * as Icon from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 export default function ForgotPassword({ navigation }) {
   const [Email, setEmail] = React.useState("");

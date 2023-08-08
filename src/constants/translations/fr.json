@@ -1,0 +1,224 @@
+{
+  "common": {
+    "appDetails": "App Détails",
+    "appName": "Nom de l'application",
+    "appVersion": "Version de l'application",
+    "buildVersion": "Version de construction",
+    "expoVersion": "Version Expo",
+    "about": "Quelque",
+    "visit": "Visite",
+    "posted": "Posté sur {{date}}",
+    "recommended": "Recommandé pour vous",
+    "viewall": "Voir tout",
+    "more": "Plus",
+    "follow": "Suivre",
+    "followed": "Suivie",
+    "search": "Rechercher",
+    "night": "nuit",
+    "day": "jour",
+    "booknow": "Reserve maintenant",
+    "selectDate": "Sélectionnez la date",
+    "checkInOut": "Enregistrement & Départ",
+    "adults": "Adultes",
+    "roomType": "Type de chambre",
+    "luxury": "Luxe",
+    "message": "Entrez votre message",
+    "album": "Album",
+    "or": "ou",
+    "name": "Nom",
+    "namePlaceholder": "Entrez votre nom complet",
+    "email": "E-mail",
+    "emailPlaceholder": "Entrez votre adresse e-mail",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrer un mot de passe",
+    "agree": "Je suis d'accord avec le ",
+    "terms": "Termes et Conditions",
+    "signup": "Inscrivez-vous",
+    "signin": "S'identifier",
+    "goBack": "Retourner",
+    "inStock": "En stock",
+    "outStock": "Rupture de stock",
+    "addToCart": "Ajouter au panier",
+    "checkout": "Passer à la caisse",
+    "readArticle": "Lire l'article",
+    "send": "Expédier",
+    "guests": {
+      "one": "1 invitée",
+      "other": "{{count}} invités",
+      "zero": "0 invités"
+    }
+  },
+  "dates": {
+    "monthNames": [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre"
+    ],
+    "monthNamesShort": [
+      "Janv.",
+      "Févr.",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juil.",
+      "Août",
+      "Sept.",
+      "Oct.",
+      "Nov.",
+      "Déc."
+    ],
+    "dayNames": [
+      "Dimanche",
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi"
+    ],
+    "dayNamesShort": ["Dim.", "Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam."],
+    "today": "Aujourd'hui"
+  },
+  "app": {
+    "name": "Soft UI",
+    "fullname": "Soft UI Kit",
+    "native": "React Native",
+    "link": "creative-tim.com"
+  },
+  "darkMode": "Dark Mode",
+  "screens": {
+    "home": "Accueil",
+    "components": "Composants",
+    "articles": "Articles",
+    "rental": "Location",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "register": "Créer un compte",
+    "extra": "Extra - Automobile"
+  },
+  "navigation": {
+    "home": "Soft UI",
+    "components": "Composants",
+    "articles": "Soft UI",
+    "rentals": "Soft UI",
+    "rental": "Best Deal",
+    "booking": "Réservation",
+    "chat": "Conversation",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "notifications": "Notifications",
+    "agreement": "Accord d'utilisation",
+    "about": "Environ",
+    "privacy": "Confidentialité",
+    "register": "Registre",
+    "login": "S'identifier",
+    "extra": "Automobile",
+    "shopping": "Panier"
+  },
+  "menu": {
+    "started": "Mise en route",
+    "documentation": "Documentation"
+  },
+  "home": {
+    "title": "Soft UI",
+    "following": "Suivant",
+    "trending": "Tendance"
+  },
+  "extras": {
+    "title1": "Envie d'essayer avant",
+    "title2": "d'acheter?",
+    "description": "Pour commencer, il ne s'ensuit pas automatiquement qu'une quantité record de glace fondra cet été.",
+    "schedule": "Planifiez un essai routier:",
+    "available": "Disponible",
+    "unavailable": "Indisponible",
+    "save": "Garder pour plus tard",
+    "saved": "Gardé",
+    "book": "Réserver",
+    "booked": "Réservé",
+    "contactUs": "Contactez-nous"
+  },
+  "register": {
+    "title": "Bienvenu",
+    "subtitle": "Inscrivez-vous avec"
+  },
+  "login": {
+    "title": "Bienvenu",
+    "subtitle": "Connectez-vous avec"
+  },
+  "settings": {
+    "recommended": {
+      "title": "Paramètres recommandés",
+      "subtitle": "Ce sont les plus importants paramètres",
+      "faceid": "Utilisez FaceID pour vous connecter",
+      "autolock": "Auto-Lock sécurité",
+      "notifications": "Notifications",
+      "darkmode": "Dark Mode",
+      "language": "Langue"
+    },
+    "payment": {
+      "title": "Paramètres de paiement",
+      "subtitle": "Ce sont les paramètres de paiement",
+      "options": "Gérer les options de paiement",
+      "giftcards": "Gérer les cartes-cadeaux"
+    },
+    "privacy": {
+      "title": "Paramètres de confidentialité",
+      "subtitle": "Troisièmes paramètres les plus importants",
+      "agreement": "Accord d'utilisation",
+      "privacy": "Confidentialité",
+      "about": "Environ"
+    },
+    "notifications": {
+      "title": "Notifications Paramètres",
+      "subtitle": "Ce sont les plus importants paramètres",
+      "mentions": "Quelqu'un me mentionne",
+      "follows": "Quelqu'un me suit",
+      "comments": "Quelqu'un me commente",
+      "offers": "Offres nouveaux"
+    }
+  },
+  "rentals": {
+    "title": "Soft UI",
+    "flight": "Vol",
+    "hotel": "Hôtel",
+    "train": "Train",
+    "availability": "Vérifier la disponibilité",
+    "interested": "Vous pouvez également être intéressé par",
+    "viewoffer": "Voir l'offre",
+    "notFound1": "N'a pas trouvé ",
+    "notFound2": " dans notre application.",
+    "moreOptions": "Vous pouvez voir plus d'options d'autres catégories."
+  },
+  "profile": {
+    "title": "Profil",
+    "posts": "Des postes",
+    "followers": "Suiveurs",
+    "following": "Suivant",
+    "aboutMe": "Sur moi"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "read": "Notifications lues",
+    "unread": "Notifications non lues",
+    "personal": "Personnel",
+    "business": "Affaires"
+  },
+  "shop": {
+    "subtotal": {
+      "one": "Sous-total du panier (1 article)",
+      "other": "Sous-total du panier ({{count}} articles)",
+      "zero": "Sous-total du panier (0 articles)"
+    },
+    "alsoShopped": "Les clients qui ont acheté des articles dans votre panier ont également acheté"
+  }
+}

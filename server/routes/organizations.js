@@ -84,7 +84,27 @@ router.get('/search', async (req, res) => {
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
 });
 
+//@route GET api/organizations/exist/{name}
+//@desc Check if organization name exists
+//@access Public
 
+router.get('/exist/:name', async (req, res) => {
+    const { name } = req.params;
+    console.log(name, 'name');
+   
+    // name and find name should be same length and name should be same as find name
+    Organizations.find({ $and: [{ name: { $regex: name, $options: 'i' } }, { name: { $regex: `^${name}$`, $options: 'i' } }] })
+        .then(organizations => {
+            if (organizations.length > 0) {
+                res.status(200).json({ success: true, message: 'Organization name exists' });
+            } else {
+                res.status(400).json({ success: false, message: 'Organization name does not exist' });
+            }
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+  
+});
+   
 
 
 

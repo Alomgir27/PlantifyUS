@@ -18,7 +18,7 @@ import {
 } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -30,7 +30,7 @@ import moment from 'moment';
 
 import { handleEventDownvote, handleEventUpvote, handleAddToFavorite, handleRemoveFromFavorite } from '../../../modules/data';
 
-import { API_URL } from "../../../constants";
+import { API_URL } from "../../../constants/index";
 import { connect } from 'react-redux';
 import Comments from '../../../components/Comments';
 
@@ -247,15 +247,15 @@ export class EventItem extends React.PureComponent {
                     <MapView
                         style={styles.map}
                         initialRegion={{
-                            latitude: item?.location?.coordinates[0],
-                            longitude: item?.location?.coordinates[1], 
+                            latitude: item?.location?.coordinates[1],
+                            longitude: item?.location?.coordinates[0], 
                             latitudeDelta: 0.0922,
                             longitudeDelta: 0.0421,
                         }}
                         initialCamera={{
                             center: {
-                                latitude: item?.location?.coordinates[0],
-                                longitude: item?.location?.coordinates[1],
+                                latitude: item?.location?.coordinates[1],
+                                longitude: item?.location?.coordinates[0],
                             },
                             pitch: 0,
                             heading: 0,
@@ -265,8 +265,8 @@ export class EventItem extends React.PureComponent {
                     >
                         <Marker
                             coordinate={{
-                                latitude: item?.location?.coordinates[0],
-                                longitude: item?.location?.coordinates[1],
+                                latitude: item?.location?.coordinates[1],
+                                longitude: item?.location?.coordinates[0],
                             }}
                             title={item?.title}
                             description={item?.description}

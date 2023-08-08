@@ -1,10 +1,10 @@
 import React , { useEffect, useState } from "react";
-import { COLORS } from "../../../constants";
+import { COLORS } from "../../../constants/index";
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import * as ICONS from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
-import { API_URL } from "../../../constants";
+import { API_URL } from "../../../constants/index";
 import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
 import { Linking } from 'react-native';

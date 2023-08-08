@@ -12,14 +12,14 @@ import {
     Easing
 } from "react-native";
 
-import { COLORS, FONTS, SIZES } from "./../constants";
+import { COLORS, FONTS, SIZES } from "./../constants/index";
 
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 
 import { TextInput, FlatList, RefreshControl} from "react-native-gesture-handler";
 
-import { API_URL } from "./../constants";
+import { API_URL } from "./../constants/index";
 
 import moment from "moment";
 
@@ -27,7 +27,8 @@ import moment from "moment";
 
 import * as ICONS from "@expo/vector-icons";
 
-import { fetchUsers } from "../modules/data";
+import { fetchUsers , clearUsers} from "../modules/data";
+
 
 import axios from "axios";
 
@@ -44,17 +45,18 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [tab, setTab] = useState('recommend');
-    const [refreshingFriends, setRefreshingFriends] = useState(false);
     const [friends, setFriends] = useState([]);
 
     const [search, setSearch] = useState('');
 
     const dispatch = useDispatch();
+
+    const inputRef = useRef(null);
  
 
     const currentUser = useSelector((state) => state.data.currentUser);
     const location = useSelector((state) => state.campings.location);
-    const nowfriends = useSelector((state) => state.data.users);
+    const nowfriends = useSelector((state) => state?.data?.users);
 
 
     const handleSearch = async (search) => {
@@ -89,7 +91,8 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
     const handleRefresh = () => {
         setRefreshing(true);
         setPage(1);
-        if(tab !== 'recommend') {
+        if(tab !== 'recommend' && currentUser?._id) {
+            dispatch(clearUsers());
             dispatch(fetchUsers(currentUser._id));
         }
         wait(2000).then(() => setRefreshing(false));
@@ -98,7 +101,9 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
    
 
     const handleLoadMoreFriends = () => {
+        if(currentUser?._id) {
         dispatch(fetchUsers(currentUser._id));
+        }
     }
 
     const handleLoadMore = () => {
@@ -108,7 +113,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
     const handleFetchUsers = async () => {
         await axios.get(`${API_URL}/users/recommend`, {
             params: {
-                user: currentUser._id,
+                user: currentUser?._id || '',
                 location: location,
                 page: page
             }
@@ -134,23 +139,14 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
 
     const handleFollow = async (user) => {
         await axios.put(`${API_URL}/users/follow`, {
-            user: currentUser._id,
-            friend: user._id
+            user: currentUser?._id,
+            friend: user?._id
         })
             .then(response => {
-                console.log(response.data.message, 'RecommendUsers.js')
-                //update users list replace user with updated user
-                const updatedUsers = users.map(item => {
-                    if(item._id === user._id) {
-                        return response.data.user;
-                    }
-                    return item;
-                }
-                )
-
-                setUsers(updatedUsers);
-                
-
+                dispatch({
+                    type: 'USER_STATE_CHANGE',
+                    currentUser: response.data.user
+                })
             })
             .catch(error => {
                 console.log(error);
@@ -160,21 +156,15 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
 
     const handleUnfollow = async (user) => {
         await axios.put(`${API_URL}/users/unfollow`, {
-            user: currentUser._id,
-            friend: user._id
+            user: currentUser?._id,
+            friend: user?._id
         })
             .then(response => {
+                dispatch({
+                    type: 'USER_STATE_CHANGE',
+                    currentUser: response.data.user
+                })
                 console.log(response.data.message, 'RecommendUsers.js')
-                //update users list replace user with updated user
-                const updatedUsers = friends.map(item => {
-                    if(item._id === user._id) {
-                        return response.data.user;
-                    }
-                    return item;
-                }
-                )
-                setFriends(updatedUsers);
-
             })
             .catch(error => {
                 console.log(error);
@@ -185,9 +175,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
         navigation.navigate('Profile', { user });
     }
 
-    const handleViewFriends = (user) => {
-        navigation.navigate('Friends', { user });
-    }
+   
 
    
 
@@ -210,14 +198,15 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
                     <View style={styles.recommendUserDetailsTop}>
                         <TouchableOpacity onPress={() => handleViewProfile(item)}>
                             <Text style={styles.recommendUserName}>{item.name}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleViewFriends(item)}>
                             <Text style={styles.recommendUserFriends}>{item.friends.length} friends</Text>
                         </TouchableOpacity>
                     </View>
+                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <Text style={{ ...FONTS.body4, color: COLORS.gray }}>member since {moment(item.createdAt).format('MMM YYYY')}</Text>
+                    </View>
                     <View style={styles.recommendUserDetailsBottom}>
-                        <TouchableOpacity onPress={() => handleFollow(item)} disabled={item.friends.includes(currentUser._id)}>
-                            <Text style={[styles.recommendUserFollow, { color: item.friends.includes(currentUser._id) ? COLORS.gray : COLORS.primary }]}>{item.friends.includes(currentUser._id) ? 'Following' : 'Follow'}</Text>
+                        <TouchableOpacity onPress={() => handleFollow(item)} disabled={currentUser?.friends.includes(item?._id)}>
+                            <Text style={[styles.recommendUserFollow, { color: currentUser?.friends.includes(item?._id) ? COLORS.gray : COLORS.primary }]}>{currentUser?.friends.includes(item?._id) ? 'Following' : 'Follow'}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -241,14 +230,16 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
                     <View style={styles.recommendUserDetailsTop}>
                         <TouchableOpacity onPress={() => handleViewProfile(item)}>
                             <Text style={styles.recommendUserName}>{item.name}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleViewFriends(item)}>
                             <Text style={styles.recommendUserFriends}>{item.friends.length} friends</Text>
                         </TouchableOpacity>
                     </View>
+                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <Text style={{ ...FONTS.body4, color: COLORS.gray }}>member since {moment(item.createdAt).format('DD MMM YYYY')}</Text>
+                    </View>
+
                     <View style={styles.recommendUserDetailsBottom}>
-                        <TouchableOpacity onPress={() => handleUnfollow(item)} disabled={!item.friends.includes(currentUser._id)}>
-                            <Text style={[styles.recommendUserFollow, { color: !item.friends.includes(currentUser._id) ? COLORS.gray : COLORS.primary }]}>{!item.friends.includes(currentUser._id) ? 'Not Following' : 'Unfollow'}</Text>
+                        <TouchableOpacity onPress={() => handleUnfollow(item)} disabled={!currentUser?.friends.includes(item?._id)}>
+                            <Text style={[styles.recommendUserFollow, { color: !currentUser?.friends.includes(item?._id) ? COLORS.gray : COLORS.primary }]}>{!currentUser?.friends.includes(item?._id) ? 'Not Following' : 'Unfollow'}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -268,7 +259,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
                     <TouchableOpacity onPress={() => setShowRecommendUsers(false)}>
                         <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.white} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Recommend Users</Text>
+                    <Text style={styles.headerTitle}>{tab === 'recommend' ? 'Recommend Users' : 'Friends'}</Text>
                     <TouchableOpacity onPress={() => setTab(tab === 'recommend' ? 'friends' : 'recommend')}>
                         <ICONS.Ionicons name={tab === 'recommend' ? "git-compare" : "git-compare-outline"} size={24} color={COLORS.white} />
                     </TouchableOpacity>
@@ -276,12 +267,13 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
             </View>
             <View style={styles.action}>
                 <TextInput
-                    placeholder="Search"
+                    placeholder={tab === 'recommend' ? "Search for users" : "Search for friends"}
                     placeholderTextColor={COLORS.primary}
                     style={styles.textInput}
                     autoCapitalize="none"
                     onChangeText={(val) => setSearch(val)}
                     onSubmitEditing={() => handleSearch(search)}
+                    ref={inputRef}
                 />
             </View>
             <View style={styles.body}>
@@ -326,7 +318,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white
+        backgroundColor: COLORS.white,
     },
     headerContainer: {
         backgroundColor: COLORS.primary,
@@ -385,7 +377,7 @@ const styles = StyleSheet.create({
         ...FONTS.body3
     },
     recommendUserFriends: {
-        ...FONTS.body5
+        ...FONTS.body4
     },
     recommendUserDetailsBottom: {
         flex: 1,

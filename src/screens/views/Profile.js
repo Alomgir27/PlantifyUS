@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { FAB } from "react-native-paper";
@@ -6,8 +6,8 @@ import { useSelector, useDispatch } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import * as ICONS from "@expo/vector-icons";
-import { COLORS } from "../../constants";
-import { API_URL } from "../../constants";
+import { COLORS } from "../../constants/index";
+import { API_URL } from "../../constants/index";
 import axios from "axios";
 import { fetchUser } from "../../modules/data";
 import moment from "moment";
@@ -16,43 +16,6 @@ import {
     BottomSheetBackdrop,
     BottomSheetModal,
 } from "@gorhom/bottom-sheet";
-// const userSchema = new Schema({
-//     name: String,
-//     email: String,
-//     password: String,
-//     eventsAttending: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'Event'
-//     }],
-//     friends: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'User'
-//     }],
-//     posts: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'Post'
-//     }],
-//     image: String,
-//     bio: String,
-//     location: {
-//         type: { type: String, default: 'Point'},
-//         coordinates: { type: [Number], default: [0, 0] }
-//     },
-//     badges: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'Badge'
-//     }],
-//     notifications: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'Notification'
-//     }],
-//     favourites: [{
-//         type: Schema.Types.ObjectId,
-//         ref: 'Favourite'
-//     }],
-//     type: String,
-//     uuid: String
-// }, { timestamps: true });
 
 
 const Profile = ({ navigation, route }) => {
@@ -60,10 +23,7 @@ const Profile = ({ navigation, route }) => {
     const [image, setImage] = useState(null);
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
-    const [data, setData] = useState([]);
     const [user, setUser] = useState([]);
-    const [userLocation, setUserLocation] = useState([]);
-    const [userEvents, setUserEvents] = useState([]);
     const [userPosts, setUserPosts] = useState([]);
     const [userBadges, setUserBadges] = useState([]);
     const [userFriends, setUserFriends] = useState([]);
@@ -127,10 +87,7 @@ const Profile = ({ navigation, route }) => {
     }, [route?.params?.user]);
 
 
-    const fetchData = async () => {
-       
-    }
-
+   
    
 
     const handleLogout = () => {
@@ -163,14 +120,22 @@ const Profile = ({ navigation, route }) => {
         }
     }   
 
-    const handlePickLocation = async () => {
+    const handlePickCover = async () => {
         try {
-            const res = await Location.getCurrentPositionAsync({});
-            setLocation(res);
+            const res = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 1,
+            });
+            if (!res.cancelled) {
+                setImage(res.uri);
+            }
         } catch (err) {
             console.log(err);
         }
     }
+
 
     const renderContent = () => (
         <View style={styles.panel}>
@@ -178,10 +143,10 @@ const Profile = ({ navigation, route }) => {
                 <Text style={styles.panelTitle}>Upload Photo</Text>
                 <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
             </View>
-            <TouchableOpacity style={styles.panelButton}>
+            <TouchableOpacity style={styles.panelButton} onPress={handlePickCover}>
                 <Text style={styles.panelButtonTitle}>Take Photo</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.panelButton}>
+            <TouchableOpacity style={styles.panelButton} onPress={handlePickAvatar}>
                 <Text style={styles.panelButtonTitle}>Choose From Library</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -197,9 +162,19 @@ const Profile = ({ navigation, route }) => {
 
     return (
         <View style={styles.root}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 10 }}>
+               <ICONS.Ionicons name="arrow-back-outline"
+               size={24} color={COLORS.primary} onPress={() => navigation.goBack()} />
+            </View>
+
             <ScrollView>
                 <View style={styles.profileHeader}>
-                    <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+
+                    }} onPress={() => bottomSheetModalRef.current?.present()}>
                         <Image
                             style={styles.image}
                             source={{ uri: user?.image }}
@@ -208,7 +183,7 @@ const Profile = ({ navigation, route }) => {
                             <Text style={styles.name}>{user?.name}</Text>
                             <Text style={styles.email}>{user?.email}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                     <View style={{ flexDirection: "row" }}>
                         <ICONS.Ionicons
                             name="location"
@@ -260,55 +235,22 @@ const Profile = ({ navigation, route }) => {
                         <Text style={styles.profileItemText}>{userNotifications?.length}</Text>
                     </View>
                 </View>
+
                 <View style={styles.profileFooter}>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={handleLogout}
-                    >
-                        <ICONS.Ionicons name="log-out-outline" size={20} color={COLORS.primary} />
-                        <Text style={{ marginLeft: 10 }}>Logout</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleLogout}>
+                        <Text style={{ color: COLORS.primary }}>Logout</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={handleDelete}
-                    >
-                        <ICONS.Ionicons name="trash-outline" size={20} color={COLORS.primary} />
-                        <Text style={{ marginLeft: 10 }}>Delete Account</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleDelete}>
+                        <Text style={{ color: COLORS.primary }}>Delete Account</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={handleUpdate}
-                    >
-                        <ICONS.Ionicons name="cloud-upload-outline" size={20} color={COLORS.primary} />
-                        <Text style={{ marginLeft: 10 }}>Update Account</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+                        <Text style={{ color: COLORS.primary }}>Update Account</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={handlePickAvatar}
-                    >
-                        <ICONS.Ionicons name="image-outline" size={20} color={COLORS.primary} />
-                        <Text style={{ marginLeft: 10 }}>Pick Avatar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={handlePickLocation}
-                    >
-                        <ICONS.Ionicons name="location-outline" size={20} color={COLORS.primary} />
-                        <Text style={{ marginLeft: 10 }}>Pick Location</Text>
-                    </TouchableOpacity>
-                    
-                    
-                   
                 </View>
+               
             </ScrollView>
 
-            <FAB
-                style={styles.fab}
-                small
-                icon="plus"
-                onPress={() => navigation.navigate("CreatePost")}
-            />
-
+           
             <BottomSheetModal
                 ref={bottomSheetModalRef}
                 index={1}
@@ -318,7 +260,6 @@ const Profile = ({ navigation, route }) => {
                 }}
                 backdropComponent={BottomSheetBackdrop}
             >
-               
                 {renderContent()}
             </BottomSheetModal>
 

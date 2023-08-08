@@ -5,13 +5,14 @@ import {
     Text,
     TouchableOpacity,
     Image,
-    FlatList
+    FlatList,
+    TouchableWithoutFeedback,
 } from 'react-native';
 
 import { ScrollView , RefreshControl} from 'react-native-gesture-handler';
 import { TextInput } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from '../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../constants/index';
 
 import * as ICONS from "@expo/vector-icons";
 
@@ -22,6 +23,7 @@ import moment from 'moment';
 
 import { fetchAllDefaultData, clearData } from '../modules/data';
 import RecommendUsers from '../components/RecommendUsers';
+import { TouchableWithoutFeedbackBase } from 'react-native';
 
 
 
@@ -37,6 +39,7 @@ const Home = ({ navigation }) => {
     const trees = useSelector(state => state?.data?.trees); 
     const posts = useSelector(state => state?.data?.posts);
     const user = useSelector(state => state?.data?.currentUser);
+    const friends = useSelector(state => state?.data?.users);
 
     const [mounted, setMounted] = useState(false);
 
@@ -175,19 +178,19 @@ const Home = ({ navigation }) => {
     }
 
     function renderFriendsComponent() {
-        if (friendList.length == 0) {
+        if (friends.length === 0) {
             return (
                 <View></View>
             )
-        } else if (friendList.length <= 3) {
+        } else if (friends.length <= 3) {
             return (
-                friendList.map((item, index) => (
+                friends?.map((item, index) => (
                     <View
                         key={`friend-${index}`}
                         style={index == 0 ? { flexDirection: 'row' } : { flexDirection: 'row', marginLeft: -20 }}
                     >
                         <Image
-                            source={item.img}
+                            source={{ uri: item?.image }}
                             resizeMode="cover"
                             style={{
                                 width: 50,
@@ -236,7 +239,7 @@ const Home = ({ navigation }) => {
         if(item?.images?.length === 1) {
             //if only one image then cover the whole card with the image and show the title
             return (
-                <TouchableOpacity
+                <TouchableWithoutFeedback
                     style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -289,12 +292,12 @@ const Home = ({ navigation }) => {
                             </View>
                         </View>
                     </View>
-                </TouchableOpacity>
+                </TouchableWithoutFeedback>
             )
         } else if(item?.images?.length === 2) {
             //if there are 2 images then show the images in a collage
             return (
-                <TouchableOpacity
+                <TouchableWithoutFeedback
                     style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -356,12 +359,12 @@ const Home = ({ navigation }) => {
                             </View>
                         </View>
                     </View>
-                </TouchableOpacity>
+                </TouchableWithoutFeedback>
             )
         }   else if(item?.images?.length === 3) {
             //if there are 3 images then show the first two images like a collage and show the third image as a full image
             return (
-                <TouchableOpacity
+                <TouchableWithoutFeedback
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
                     onPress={() => navigation.navigate('Events', { item })}
                 >
@@ -426,13 +429,13 @@ const Home = ({ navigation }) => {
                             </View>
                         </View>
                     </View>
-                </TouchableOpacity>
+                </TouchableWithoutFeedback>
             )
         }
         else {
             //if there are more than 3 images then show the first image and show the number of images on top of the image
             return (
-                <TouchableOpacity
+                <TouchableWithoutFeedback
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
                     onPress={() => navigation.navigate('Events', { item })}
                 >
@@ -524,7 +527,7 @@ const Home = ({ navigation }) => {
 
                         </View>
                     </View>
-                </TouchableOpacity>
+                </TouchableWithoutFeedback>
             )
          }
     }
@@ -534,10 +537,11 @@ const Home = ({ navigation }) => {
 
     function renderPost(item, index){            
         return (
-            <TouchableOpacity
+            <TouchableWithoutFeedback
                 style={{ flex: 1, marginBottom: SIZES.padding * 2 , paddingRight: index == posts?.length - 1 ? SIZES.padding * 2 : 0 }}
                 onPress={() => navigation.navigate('Posts', { item })}
             >
+            <View>
                 <View style={{ flex: 1, marginBottom: SIZES.padding }}>
                     {/* Post Image */}
                     {item?.images?.length === 1 && (
@@ -733,7 +737,8 @@ const Home = ({ navigation }) => {
                         </View>
                     </View>
                 </View>
-            </TouchableOpacity>
+            </View>
+            </TouchableWithoutFeedback>
         )
     }
 
@@ -1058,7 +1063,7 @@ const Home = ({ navigation }) => {
                 }}>
                     <View style={{ marginTop: SIZES.radius, marginHorizontal: SIZES.padding }}>
                         <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>Added Friends</Text>
-                        <Text style={{ color: COLORS.secondary, ...FONTS.body3, }}>{friendList.length} total</Text>
+                        <Text style={{ color: COLORS.secondary, ...FONTS.body3, }}>{friends.length} Total</Text>
                         <View style={{ flexDirection: 'row' }}>
                             {/* Friends */}
                             <View style={{ flex: 1.3, flexDirection: 'row', alignItems: 'center' }}>

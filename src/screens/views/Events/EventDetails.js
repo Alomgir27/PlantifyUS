@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, Image, FlatList, Alert, TouchableOpacity, Dimen
 import { useSelector, useDispatch } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
-import { COLORS } from "../../../constants";
-import { API_URL } from "../../../constants";
+import { COLORS } from "../../../constants/index";
+import { API_URL } from "../../../constants/index";
 import axios from "axios";
 import ImagesViewer from '../../../components/ImagesViewer';
 import MapView from "react-native-maps";
@@ -113,15 +113,15 @@ const EventDetails = ({ route }) => {
                                 <MapView
                                     style={styles.map}
                                     initialRegion={{
-                                        latitude: item?.location?.coordinates[0],
-                                        longitude: item?.location?.coordinates[1], 
+                                        latitude: parseFloat(item?.location?.coordinates[1]),
+                                        longitude: parseFloat(item?.location?.coordinates[0]),
                                         latitudeDelta: 0.0922,
                                         longitudeDelta: 0.0421,
                                     }}
                                     initialCamera={{
                                         center: {
-                                            latitude: item?.location?.coordinates[0],
-                                            longitude: item?.location?.coordinates[1],
+                                            latitude: parseFloat(item?.location?.coordinates[1]),
+                                            longitude: parseFloat(item?.location?.coordinates[0]),
                                         },
                                         pitch: 0,
                                         heading: 0,
@@ -132,8 +132,8 @@ const EventDetails = ({ route }) => {
                                 >
                                     <Marker
                                         coordinate={{
-                                            latitude: item?.location?.coordinates[0],
-                                            longitude: item?.location?.coordinates[1],
+                                            latitude: parseFloat(item?.location?.coordinates[1]),
+                                            longitude: parseFloat(item?.location?.coordinates[0]),
                                         }}
                                         title={item?.title}
                                         description={item?.description}

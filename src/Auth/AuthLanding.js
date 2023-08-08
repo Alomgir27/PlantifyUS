@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Swiper from 'react-native-swiper';
 
-import { COLORS } from '../constants';
+import { COLORS } from '../constants/index';
 
 const AuthLandingPage = ({ navigation }) => {
   return (
@@ -18,21 +18,15 @@ const AuthLandingPage = ({ navigation }) => {
           <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
             We are a community of plant lovers
           </Text>
-          <Text style={{ textAlign: 'center', color: COLORS.primary, marginBottom: 30, fontWeight: 'bold' }} onPress={() => navigation.navigate('Signup')}>
-            Get started
-          </Text>
         </View>
         <View style={styles.slide}>
           <Image
             source={require('../../assets/images/slide2.png')}
             style={styles.slideImage}
           />
-           <Text style={styles.slideText}>Sign up to get started</Text>
+           <Text style={styles.slideText}>Did you know?</Text>
             <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
-              Don't have an account?
-            </Text>
-            <Text style={{ textAlign: 'center', color: COLORS.primary, marginBottom: 30, fontWeight: 'bold' }} onPress={() => navigation.navigate('Signup')}>
-              Sign up
+              Plants can help you sleep better and improve your mood
             </Text>
         </View>
         <View style={styles.slide}>
@@ -40,22 +34,27 @@ const AuthLandingPage = ({ navigation }) => {
             source={require('../../assets/images/slide3.png')}
             style={styles.slideImage}
           />
-          <Text style={styles.slideText}>Login to your account</Text>
-
+          <Text style={styles.slideText}>Join our community!</Text>
+          {/* sologan */}
           <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
-            Already have an account?
+            Share your plants with others and get inspired
           </Text>
-          <Text style={{ textAlign: 'center', color: COLORS.primary, marginBottom: 30, fontWeight: 'bold' }} onPress={() => navigation.navigate('Login')}>
-            Login
+
+          <View style={styles.buttonsContainer}>
+            <Text style={styles.button} onPress={() => navigation.navigate('Signup')}>Sign up</Text>
+            <Text style={styles.button} onPress={() => navigation.navigate('Login')}>Login</Text>
+          </View>
+
+          {/* sologan about trees and plants */}
+          <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
+            We are dreamming of a greener world, where trees and plants are everywhere and everyone is happy. Join us!
           </Text>
+
         </View>
       </Swiper>
 
      
-      {/* <View style={styles.buttonsContainer}>
-        <Text style={styles.button} onPress={() => navigation.navigate('Signup')}>Sign up</Text>
-        <Text style={styles.button} onPress={() => navigation.navigate('Login')}>Login</Text>
-      </View> */}
+      
 
       <Text style={{ textAlign: 'center', color: COLORS.gray, marginBottom: 5 }}>
         By continuing, you agree to our Terms of Use and Privacy Policy
@@ -89,13 +88,13 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    marginBottom: 30,
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
+    marginHorizontal: 10,
     backgroundColor: COLORS.primary,
     borderRadius: 8,
     color: '#fff',

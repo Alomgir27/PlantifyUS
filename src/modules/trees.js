@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL } from "../constants";
+import { API_URL } from "../constants/index";
 
 
 export const TREES_DATA_STATE_CHANGE = 'TREES_DATA_STATE_CHANGE';

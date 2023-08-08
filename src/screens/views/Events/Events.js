@@ -13,7 +13,7 @@ import {
 
 import { FlatList , RefreshControl} from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -25,7 +25,7 @@ import moment from 'moment';
 
 import { fetchEvents, handleResetEventsData } from '../../../modules/data';
 
-import { API_URL } from "../../../constants";
+import { API_URL } from "../../../constants/index";
 
 import axios from "axios";
 

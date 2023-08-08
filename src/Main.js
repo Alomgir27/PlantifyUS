@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {  View, Text, Image, TouchableOpacity } from "react-native";
+import {  View, Text, Image, TouchableOpacity, StatusBar } from "react-native";
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 
 // screens
@@ -26,17 +26,12 @@ import * as ICONS from '@expo/vector-icons'
 import PostUpload from "./components/PostUpload";
 
 //views
-// import SearchScreen from "./screens/views/Search";
 import ProfileScreen from "./screens/views/Profile";
-// import EditProfileScreen from "./screens/views/EditProfile";
 import PostsScreen from "./screens/views/Posts/Posts";
-// import SavedScreen from "./screens/views/Saved";
-// import NotificationsScreen from "./screens/views/Notifications";
-// import ChatScreen from "./screens/views/Chat";
+
 import EventsScreen from "./screens/views/Events/Events";
 import EventDetailsScreen from "./screens/views/Events/EventDetails";
-// import OrganizationsScreen from "./screens/views/Organizations";
-// import OrganizationDetailScreen from "./screens/views/OrganizationDetail";
+import OrganizationsScreen from "./screens/views/Organizations";
 
 import ImageDetails from "./components/ImageDetails";
 import Images from "./components/Images";
@@ -46,7 +41,7 @@ import Images from "./components/Images";
 import TreeIdentify from "./screens/views/Identify/TreeIdentify";
 
 // constants
-import { COLORS, icons } from "./constants";
+import { COLORS, icons } from "./constants/index";
 
 import { clearData, fetchUser, fetchAllDefaultData } from "./modules/data";
 
@@ -58,11 +53,20 @@ import { setMyLocation, setLocation } from "./modules/campings";
 
 import * as Location from 'expo-location';
 
+
+const TestScreen = () => {
+    return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Test Screen</Text>
+        </View>
+    )
+}
+
 const Drawer = createDrawerNavigator();
 export default function Main() {  
 
     const user = useSelector(state => state?.data?.currentUser)
-    const organizations = useSelector(state => state?.data?.events)
+    const organizations = useSelector(state => state?.data?.organizations)
 
     const dispatch = useDispatch();
 
@@ -71,6 +75,8 @@ export default function Main() {
         const user = await AsyncStorage.getItem('user');
         if(user){
             dispatch(fetchUser(JSON.parse(user)?._id));
+        } else {
+            dispatch(fetchAllDefaultData());
         }
       })()
     }, [])
@@ -218,7 +224,7 @@ export default function Main() {
                         {organizations?.map((item, index) => (
                             <DrawerItem
                                 key={index}
-                                label={item?.title}
+                                label={item?.name}
                                 labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                                 onPress={() => props.navigation.navigate('OrganizationDetail', { organization: item })}
                                 icon={() => <Image source={{ uri: item?.images[0] }} style={{ width: 40, height: 40, borderRadius: 20 }} />}
@@ -292,7 +298,7 @@ export default function Main() {
 
 
     return (
-       <View style={{ flex: 1 }}>
+       <View style={{ flex: 1, marginTop: StatusBar.currentHeight }}>
             <Drawer.Navigator
                 screenOptions={{
                     headerShown: false,
@@ -312,6 +318,7 @@ export default function Main() {
                 drawerContent={props => <CustomDrawerContent {...props} />}
                 initialRouteName={'Main'}
             >
+
                 {/* Tabs */}
                 <Drawer.Screen name="Main" component={Tabs} options={{
                    drawerLabel : ({ focused }) => <Text style={{
@@ -395,27 +402,9 @@ export default function Main() {
                 <Drawer.Screen name="Posts" component={PostsScreen} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
-                {/* <Drawer.Screen name="Search" component={SearchScreen} options={{
+                <Drawer.Screen name="Organizations" component={OrganizationsScreen} options={{
                     drawerItemStyle: { height: 0 }
-                }}/> */}
-                {/* <Drawer.Screen name="EditProfile" component={EditProfileScreen} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/> */}
-                {/* <Drawer.Screen name="Saved" component={SavedScreen} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/> */}
-                {/* <Drawer.Screen name="Notifications" component={NotificationsScreen} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/> */}
-                {/* <Drawer.Screen name="Chat" component={ChatScreen} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/> */}
-                {/* <Drawer.Screen name="Organizations" component={OrganizationsScreen} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/> */}
-                {/* <Drawer.Screen name="OrganizationDetail" component={OrganizationDetailScreen} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/> */}
+                }}/>
                 <Drawer.Screen name="Images" component={Images} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>

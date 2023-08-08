@@ -10,25 +10,17 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ScrollView, TextInput, Alert } from 'react-native';
 
 
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 import * as ImagePicker from "expo-image-picker";
 
 import { useSelector } from 'react-redux';
 
 
-const BottomSheet = ({ navigation }) => {
-  const [visible, setVisible] = React.useState(true);
-  const sheetRef = React.useRef(null);
+const BottomSheet = ({ navigation, sheetRef }) => {
   const snapPoints = React.useMemo(() => ['25%', '50%'], []);
-
   const user = useSelector(state => state?.data?.currentUser);
 
-
-
-  useEffect(() => {
-    sheetRef.current?.present();
-    }, [visible]);
 
     useEffect(() => {
       (async () => {
@@ -54,6 +46,7 @@ const BottomSheet = ({ navigation }) => {
 
       if (!result.canceled) {
         navigation.navigate("PostUpload", { images: result.assets });
+        sheetRef.current?.close();
       }
     };
 
@@ -71,30 +64,20 @@ const BottomSheet = ({ navigation }) => {
 
       if (!result.canceled) {
         navigation.navigate("PostUpload", { images: result.assets });
+        sheetRef.current?.close();
       }
     };
 
     const onSheetChanges = React.useCallback((index) => {
       console.log('handleSheetChanges', index);
-      setVisible(index === -1 ? false : true);
-      console.log('visible', visible);
     }, []);
 
 
 
- 
 
-  if(!visible) {
-    return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <TouchableOpacity onPress={() => { setVisible(!visible) }} style={{backgroundColor: COLORS.primary, padding: 20, borderRadius: 10}}>
-        <Text style={{color: COLORS.white}}>Create Event</Text>
-      </TouchableOpacity>
-    </View>
-  }
 
   
   return (
-    <BottomSheetModalProvider>
       <BottomSheetModal
         ref={sheetRef}
         snapPoints={snapPoints}
@@ -109,9 +92,23 @@ const BottomSheet = ({ navigation }) => {
         enableTouchThrough={true}
         animationDuration={500}
         animationEasing="ease-in-out"
-        handleIndicatorStyle={{backgroundColor: COLORS.primary}}
-        handleStyle={{backgroundColor: COLORS.primary}}
-        style={{backgroundColor: COLORS.white}}
+        handleIndicatorStyle={{
+          backgroundColor: COLORS.gray,
+          width: 40,
+          height: 4,
+          borderRadius: 4,
+        }}
+        handleStyle={{
+          backgroundColor: COLORS.primary,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        }}
+        style={{
+          backgroundColor: COLORS.white,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          
+        }}
         backdropStyle={{backgroundColor: COLORS.black}}
         onChange={onSheetChanges}
 
@@ -125,8 +122,9 @@ const BottomSheet = ({ navigation }) => {
           <View style={styles.panel}>
             <View style={{alignItems: 'center'}}>
               {/* Tree plantation event creation */}
-              <Text style={styles.panelTitle}>Create Event</Text>
-              <Text style={styles.panelSubtitle}>Create a new event</Text>
+              <Text style={styles.panelTitle}>Upload Photo</Text>
+              <Text style={styles.panelSubtitle}>Which one do you want to upload?</Text>
+              <Text style={{color: COLORS.gray, fontSize: 12, marginBottom: 10}}>You can upload multiple photos</Text>
             </View>
             <TouchableOpacity style={styles.panelButton} onPress={takePhotoFromCamera}>
               <Text style={styles.panelButtonTitle}>Take Photo</Text>
@@ -143,7 +141,6 @@ const BottomSheet = ({ navigation }) => {
           </View>
         </View>
       </BottomSheetModal>
-    </BottomSheetModalProvider>
   );
 };
 
@@ -158,10 +155,9 @@ const styles = StyleSheet.create({
   },
   panelHeader: {
     alignItems: 'center',
+
   },
   panelHandle: {
-    width: 40,
-    height: 2,
     borderRadius: 4,
     backgroundColor: COLORS.gray,
     marginBottom: 10,
@@ -169,11 +165,11 @@ const styles = StyleSheet.create({
   panel: {
     padding: 20,
     backgroundColor: COLORS.white,
-    paddingTop: 20,
+    paddingTop: 0,
   },
   panelTitle: {
     fontSize: 27,
-    height: 35,
+    height: 40,
   },
   panelSubtitle: {
     fontSize: 14,

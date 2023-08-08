@@ -13,9 +13,9 @@ const eventSchema = new Schema({
     attendees: [String],
     images: [String],
     requirements:{
-        trees: Number,
-        volunteers: Number,
-        funds: Number
+        trees: String,
+        volunteers: String,
+        funds: String
     },
     landsDescription: String,
     status: {

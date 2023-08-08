@@ -149,18 +149,55 @@ router.get('/recommend', async (req, res) => {
     const limit = 10;
     const skip = (parseInt(page) - 1) * limit;
 
+    if(!user) {
+        if(location) {
+            User.aggregate([
+                {
+                    $geoNear: {
+                        near: {
+                            type: 'Point',
+                            coordinates: [parseFloat(location.longitude), parseFloat(location.latitude)]
+                        },
+                        distanceField: 'distance',
+                        spherical: true
+                    }
+                },
+                {
+                    $skip: skip
+                },
+                {
+                    $limit: limit
+                }
+            ])
+            .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+            .catch(err => {
+                console.error('Error fetching users:', err);
+                res.status(400).json({ success: false, message: 'Unable to fetch users', error: err });
+            }
+            );
+        } else {
+            User.find()
+                .skip(skip)
+                .limit(limit)
+                .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+        }
+    } else {
+
     User.findOne({ _id: user })
         .then(user => {
             if (!user) {
                 return res.status(400).json({ success: false, message: 'User does not exist' });
             }
+            //find friends if user array friends contains user id
             User.find({ _id: { $in: user.friends } })
                 .then(friends => {
                     const friendsOfFriends = friends.map(friend => friend.friends);
                     const flattenedFriendsOfFriends = [].concat.apply([], friendsOfFriends);
                     const uniqueFriendsOfFriends = [...new Set(flattenedFriendsOfFriends)];
                     const recommendedUsers = uniqueFriendsOfFriends.filter(friend => !user.friends.includes(friend) && friend !== user._id);
-                    if (location) {
+                    console.log(recommendedUsers);
+                    if (recommendedUsers.length === 0) {
                         User.aggregate([
                             {
                               $geoNear: {
@@ -174,8 +211,8 @@ router.get('/recommend', async (req, res) => {
                             },
                             {
                               $match: {
-                                $or: [
-                                  { _id: { $in: recommendedUsers } },
+                                $and: [
+                                  { $and: [{ _id: { $nin: user.friends } }, { _id: { $ne: user._id } }] },
                                   { location: { $geoWithin: { $centerSphere: [[parseFloat(location.longitude), parseFloat(location.latitude)], 100000 / 6371] } } }
                                 ]
                               }
@@ -204,6 +241,7 @@ router.get('/recommend', async (req, res) => {
                 .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
         })
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
+    }
 });
 
 
@@ -226,13 +264,13 @@ router.put('/follow', async (req, res) => {
                         return res.status(400).json({ success: false, message: 'Friend does not exist' });
                     }
 
-                    if (friend.friends.includes(user._id)) {
+                    if (user.friends.includes(friend._id)) {
                         return res.status(400).json({ success: false, message: 'Already following this user' });
                     }
 
-                    friend.friends.push(user._id);
-                    friend.save()
-                        .then(friend => res.status(200).json({ success: true, user: friend, message: 'User followed successfully' }))
+                    user.friends.push(friend._id);
+                    user.save()
+                        .then(user => res.status(200).json({ success: true, user, message: 'User followed successfully' }))
                         .catch(err => res.status(400).json({ success: false, message: 'Unable to follow user', error: err }));
                    
                 })
@@ -261,13 +299,13 @@ router.put('/unfollow', async (req, res) => {
                         return res.status(400).json({ success: false, message: 'Friend does not exist' });
                     }
 
-                    if (!friend.friends.includes(user._id)) {
+                    if (!user.friends.includes(friend._id)) {
                         return res.status(400).json({ success: false, message: 'Not following this user' });
                     }
-                    console.log(friend.friends, user._id);
-                    friend.friends.pull(user._id);
-                    friend.save()
-                        .then(friend => res.status(200).json({ success: true, user: friend, message: 'User unfollowed successfully' }))
+                    // console.log(friend.friends, user._id);
+                    user.friends.pull(friend._id);
+                    user.save()
+                        .then(user => res.status(200).json({ success: true, user, message: 'User unfollowed successfully' }))
                         .catch(err => res.status(400).json({ success: false, message: 'Unable to unfollow user', error: err }));
 
                     
@@ -275,6 +313,21 @@ router.put('/unfollow', async (req, res) => {
                 .catch(err => res.status(400).json({ success: false, message: 'Unable to unfollow user', error: err }));
         })
         .catch(err => res.status(400).json({ success: false, message: 'Unable to unfollow user', error: err }));
+});
+
+
+router.delete('/test', async (req, res) => {
+    User.find()
+        .then(users => {
+            users.forEach(user => {
+                user.friends = [];
+                user.save()
+                    .then(user => console.log(user))
+                    .catch(err => console.log(err));
+            });
+            res.status(200).json({ success: true, message: 'Users updated successfully' });
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to update users', error: err }));
 });
 
 

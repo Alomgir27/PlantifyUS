@@ -5,17 +5,19 @@ import { Button } from "react-native-paper";
 
 import Swiper from 'react-native-swiper';
 import * as Icon from "@expo/vector-icons";
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 import { TextInput } from "react-native-paper";
 import * as Location from 'expo-location';
 
-import { API_URL } from "../constants";
+import { API_URL } from "../constants/index";
 
 import { db, auth, storage } from "../config/firebase";
 
 import { useSelector, useDispatch } from "react-redux";
 
 import axios from "axios";
+
+
 
 import { fetchEventsSearch } from "../modules/data";
 
@@ -93,9 +95,13 @@ export default function PostUpload({ navigation, route }) {
     const [errorMsg, setErrorMsg] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const events = useSelector(state => state?.data?.events)
     const user = useSelector(state => state?.data?.currentUser)
     const eventsSearch = useSelector(state => state?.data?.eventsSearch);
+    const mylocation = useSelector(state => state?.campings?.mylocation);
+
+    const [isExisted, setIsExisted] = useState(false);
+
+
     const [eventTitle, setEventTitle] = useState("");
     const [inputValue, setInputValue] = useState('');
 
@@ -142,11 +148,100 @@ export default function PostUpload({ navigation, route }) {
         }
     }, [images, type]);
 
+    useEffect(() => {
+        if(type === "newOrganization"){
+            axios.get(`${API_URL}/organizations/exist/${newOrganizationForm.name}`)
+            .then((response) => {
+                console.log(response?.data?.message)
+                setIsExisted(true);
+            })
+            .catch((error) => {
+                console.log(error);
+                setIsExisted(false);
+            })
+        }
+    }, [newOrganizationForm.name])
+
+    useEffect(() => {
+        clearValues();
+        setIsExisted(false);
+        setLoading(false);
+    }, [type])
+
+
+
+    const clearValues = () => {
+        setEventForm({
+            title: '',
+            description: '',
+            author: '',
+            location: {
+              type: 'Point',
+              coordinates: [0, 0],
+            },
+            organizer: '',
+            attendees: [],
+            images: [],
+            requirements: {
+              trees: "",
+              volunteers: "",
+              funds: "",
+            },
+            landsDescription: '',
+            status: '',
+        });
+        
+        setNewPostForm({
+            author: '',
+            text: '',
+            images: [],
+            likes: [],
+            comments: [],
+            event: '',
+            tags: []
+        });
+
+        setNewOrganizationForm({
+            name: '',
+            volunteers: [],
+            events: [],
+            admin: '',
+            moderators: [],
+            images: [],
+            bio: '',
+            location: {
+                type: 'Point',
+                coordinates: [0, 0],
+            },
+            badges: [],
+            notifications: [],
+            isVerified: false,
+            type: '',
+        });
+
+        setNewTreeForm({
+            name: '',
+            scientificName: '',
+            description: '',
+            images: [],
+            benefits: '',
+            requirements: {
+                sun: '',
+                soil: '',
+                water: '',
+                temperature: '',
+                fertilizer: '',
+            },
+        });
+    }
+
+   
+        
 
 
   
 
-
+ // this function too much messy, need to refactor
 
     const handleSubmit = async () => {
 
@@ -203,8 +298,7 @@ export default function PostUpload({ navigation, route }) {
 
         setLoading(true);
 
-        if(location.coordinates[0] === 0 && location.coordinates[1] === 0){
-
+        if(!mylocation){
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
@@ -215,8 +309,8 @@ export default function PostUpload({ navigation, route }) {
             setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
         }
         else {
-            setEventForm({ ...newEventForm, location: location });
-            setNewOrganizationForm({...newOrganizationForm, location: location});
+            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
+            setNewOrganizationForm({...newOrganizationForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
         }
 
 
@@ -254,29 +348,11 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
-                        setEventForm({
-                            title: '',
-                            description: '',
-                            author: '',
-                            location: {
-                              type: 'Point',
-                              coordinates: [0, 0],
-                            },
-                            organizer: '',
-                            attendees: [],
-                            images: [],
-                            requirements: {
-                              trees: "",
-                              volunteers: "",
-                              funds: "",
-                            },
-                            landsDescription: '',
-                            status: '',
-                        });
+                        clearValues();
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
-                                onPress: () => navigation.navigate('Camera')
+                                onPress: () => navigation.navigate('Home')
                             },
                         ])
                     })
@@ -297,19 +373,11 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
-                        setNewPostForm({
-                            author: '',
-                            text: '',
-                            images: [],
-                            likes: [],
-                            comments: [],
-                            event: '',
-                            tags: []
-                        });
+                        clearValues();
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
-                                onPress: () => navigation.navigate('Camera')
+                                onPress: () => navigation.navigate('Home')
                             },
                         ])
                     })
@@ -329,27 +397,11 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
-                        setNewOrganizationForm({
-                            name: '',
-                            volunteers: [],
-                            events: [],
-                            admin: '',
-                            moderators: [],
-                            images: [],
-                            bio: '',
-                            location: {
-                                type: 'Point',
-                                coordinates: [0, 0],
-                            },
-                            badges: [],
-                            notifications: [],
-                            isVerified: false,
-                            type: '',
-                        });
-                        Alert.alert('Success', response?.data?.message, [
+                        clearValues();
+                        Alert.alert('Success', response?.data?.message + " Please wait for the admin to verify your organization", [
                             {
                                 text: 'Ok',
-                                onPress: () => navigation.navigate('Camera')
+                                onPress: () => navigation.navigate('Home')
                             },
                         ])
                     })
@@ -368,24 +420,11 @@ export default function PostUpload({ navigation, route }) {
                         setCurrentStep(0)
                         setType("");
                         setImages([]);
-                        setNewTreeForm({
-                            name: '',
-                            scientificName: '',
-                            description: '',
-                            images: [],
-                            benefits: '',
-                            requirements: {
-                                sun: '',
-                                soil: '',
-                                water: '',
-                                temperature: '',
-                                fertilizer: '',
-                            },
-                        });
+                        clearValues();
                         Alert.alert('Success', response?.data?.message, [
                             {
                                 text: 'Ok',
-                                onPress: () => navigation.navigate('Camera')
+                                onPress: () => navigation.navigate('Home')
                             },
                         ])
                     })
@@ -441,7 +480,6 @@ export default function PostUpload({ navigation, route }) {
                     height: 10,
                     borderRadius: 10,
                 }}
-
             >
                 {images.map((image, index) => (
                     <View key={index} style={styles.slide}>
@@ -642,6 +680,9 @@ export default function PostUpload({ navigation, route }) {
                         onChangeText={(text) => setNewOrganizationForm({ ...newOrganizationForm, name: text })}
                         required
                     />
+                    {isExisted && (
+                        <Text style={{ color: 'red' }}>This organization already exists</Text>
+                    )}
                 </View>
                 <View style={styles.formItem}>
                     <Text style={styles.formLabel}>Description</Text>
@@ -903,7 +944,7 @@ export default function PostUpload({ navigation, route }) {
                 <ScrollView keyboardShouldPersistTaps="always">
                     {renderForm()}
                     <Button style={[styles.submitButton, { backgroundColor : loading ? COLORS.secondary : COLORS.darkGreen, color: loading ? COLORS.darkgray : COLORS.white }]}
-                    onPress={handleSubmit} disabled={loading} loading={loading}>
+                    onPress={handleSubmit} disabled={loading || isExisted} loading={loading}>
                         <Text style={styles.submitButtonText}>Submit</Text>
                     </Button>
                 </ScrollView>

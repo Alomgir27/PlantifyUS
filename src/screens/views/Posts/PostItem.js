@@ -18,7 +18,7 @@ import {
 } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from '../../../constants';
+import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
@@ -30,7 +30,7 @@ import moment from 'moment';
 
 import { handlePostDownvote, handlePostUpvote, handleAddToFavorite, handleRemoveFromFavorite, handleEventsMerge } from '../../../modules/data';
 
-import { API_URL } from "../../../constants";
+import { API_URL } from "../../../constants/index";
 import { connect } from 'react-redux';
 import Comments from '../../../components/Comments';
 
@@ -295,15 +295,15 @@ export class PostItem extends React.Component {
                         <MapView
                             style={styles.map}
                             initialRegion={{
-                                latitude: item?.event?.location?.coordinates[0],
-                                longitude: item?.event?.location?.coordinates[1],
+                                latitude: item?.event?.location?.coordinates[1],
+                                longitude: item?.event?.location?.coordinates[0],
                                 latitudeDelta: 0.0922,
                                 longitudeDelta: 0.0421,
                             }}
                             initialCamera={{
                                 center: {
-                                    latitude: item?.event?.location?.coordinates[0],
-                                    longitude: item?.event?.location?.coordinates[1],
+                                    latitude: item?.event?.location?.coordinates[1],
+                                    longitude: item?.event?.location?.coordinates[0],
                                 },
                                 pitch: 0,
                                 heading: 0,
@@ -313,8 +313,8 @@ export class PostItem extends React.Component {
                         >
                             <Marker
                                 coordinate={{
-                                    latitude: item?.event?.location?.coordinates[0],
-                                    longitude: item?.event?.location?.coordinates[1],
+                                    latitude: item?.event?.location?.coordinates[1],
+                                    longitude: item?.event?.location?.coordinates[0],
                                 }}
                                 title={item?.title}
                                 description={item?.description}

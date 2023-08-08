@@ -4,10 +4,10 @@ import { Button, Text, TextInput, Banner, Colors } from "react-native-paper";
 import { auth } from "../config/firebase";
 import styles from "./styles";
 
-import { API_URL as baseURL } from "../constants";
+import { API_URL as baseURL } from "../constants/index";
 import axios from "axios";
 
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 import LottieView from "lottie-react-native";
 

@@ -15,7 +15,7 @@ import { connect } from "react-redux";
 import MapView, { Marker } from 'react-native-maps';
 import * as Icon from "@expo/vector-icons";
 
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 
 import { setLocation, setFilters, setCampings } from "../modules/campings";
@@ -290,7 +290,7 @@ class Campings extends React.Component {
                   size={12}
                 />
                 <Text style={{ marginLeft: 4, color: "#FF7657" }}>
-                  {calculateDistance(this.props.mylocation.latitude, this.props.mylocation.longitude, camping.location.coordinates[0], camping.location.coordinates[1])}
+                  {calculateDistance(this.props.mylocation.latitude, this.props.mylocation.longitude, camping.location.coordinates[1], camping.location.coordinates[0])}
                 </Text>
               </View>
               <View style={styles.campingInfo}>

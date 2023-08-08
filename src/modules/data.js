@@ -1,4 +1,4 @@
-import { API_URL } from "../constants"
+import { API_URL } from "../constants/index"
 import axios from "axios"
 import { fetchTrees } from "./trees"
 import  AsyncStorage  from '@react-native-async-storage/async-storage';
@@ -40,6 +40,7 @@ const HANDLE_EVENT_ADD = 'HANDLE_EVENT_ADD'
 
 
 const CLEAR_DATA = 'CLEAR_DATA'
+const CLEAR_USER = 'CLEAR_USER'
 const HANDLE_EVENTS_DATA_RESET = 'HANDLE_EVENTS_DATA_RESET'
 const HANDLE_POSTS_DATA_RESET = 'HANDLE_POSTS_DATA_RESET'
 const HANDLE_ORGANIZATIONS_DATA_RESET = 'HANDLE_ORGANIZATIONS_DATA_RESET'
@@ -276,6 +277,12 @@ export default  data = (state = INITIAL_STATE, action) => {
                 treesSearch: [],
                 usersSearch: []
             }
+        case CLEAR_USER:
+            return {
+                ...state,
+                users: [],
+                usersLoaded: 0
+            }
         case HANDLE_EVENTS_DATA_RESET:
             return {
                 ...state,
@@ -313,6 +320,12 @@ export default  data = (state = INITIAL_STATE, action) => {
 export const clearData = () => {
     return ((dispatch) => {
         dispatch({ type: CLEAR_DATA })
+    })
+}
+
+export const clearUsers = () => {
+    return ((dispatch) => {
+        dispatch({ type: CLEAR_USER })
     })
 }
 
@@ -1014,3 +1027,4 @@ export const fetchAllDefaultData = () => {
         
     })
 }
+

@@ -67,7 +67,10 @@ router.post('/new', async (req, res) => {
 
     newEvent.save()
         .then(event => res.status(200).json({ success: true, event, message: 'Event added successfully' }))
-        .catch(err => res.status(400).json({ success: false, message: 'Unable to add this event', error: err }));
+        .catch(err => {
+            console.log(err);
+            res.status(400).json({ success: false, message: 'Unable to add event', error: err })
+        });
     
 })
 

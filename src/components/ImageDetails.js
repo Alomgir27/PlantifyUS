@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image , StyleSheet } from 'react-native';
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 import * as ICONS from "@expo/vector-icons";
 

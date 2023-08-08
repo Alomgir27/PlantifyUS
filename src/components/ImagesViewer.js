@@ -1,6 +1,6 @@
 import React , { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 import Swiper from 'react-native-swiper';
 
 

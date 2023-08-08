@@ -6,7 +6,7 @@ import {
     Image
 } from 'react-native';
 
-import { icons, images, COLORS, SIZES, FONTS } from '../constants';
+import { icons, images, COLORS, SIZES, FONTS } from '../constants/index';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const RequirementBar = ({ icon, barPercentage }) => {

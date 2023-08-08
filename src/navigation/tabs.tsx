@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Image } from 'react-native';
+import React, { useRef } from "react";
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import Campings from "../screens/Campings";
@@ -8,7 +8,7 @@ import { Home, SearchScreen } from "../screens";
 
 import BottomSheet from "../components/BottomSheet";
 
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 const Tab = createBottomTabNavigator();
 
@@ -20,7 +20,9 @@ const tabOptions = {
 };
 
 
-const Tabs = ({ navigation }) => {
+const Tabs = ({ navigation}) => {
+
+    const sheetRef = useRef(null);
 
 
 
@@ -48,11 +50,21 @@ const Tabs = ({ navigation }) => {
             </View>
         );
     };
+
+    const EmptyScreen = () => (
+        <View />
+    )
     
+
+    const handlaCameraTabPress = () => {
+        sheetRef.current?.present();
+        return false;
+    };
 
 
 
     return (
+        <>
         <Tab.Navigator
             tabBarOptions={tabOptions}
             screenOptions={({ route }) => ({
@@ -130,8 +142,15 @@ const Tabs = ({ navigation }) => {
             />
             <Tab.Screen
                 name="Camera"
-                component={BottomSheet}
-            />
+                options={{
+                    tabBarButton: (props) => (
+                        <TouchableOpacity {...props} onPress={handlaCameraTabPress} >
+                            {props.children}
+                        </TouchableOpacity>
+                    )
+                }}
+                component={EmptyScreen}
+             />
             <Tab.Screen
                 name="Search"
                 component={SearchScreen}
@@ -141,6 +160,8 @@ const Tabs = ({ navigation }) => {
                 component={Home}
             />
         </Tab.Navigator>
+       <BottomSheet sheetRef={sheetRef} navigation={navigation} />
+       </>
     );
 };
 

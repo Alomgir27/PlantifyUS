@@ -19,7 +19,7 @@ import {
 import { auth, db,  storage } from "../config/firebase";
 import styles from "./styles";
 
-import { API_URL as baseURL } from "../constants";
+import { API_URL as baseURL } from "../constants/index";
 import axios from "axios";
 
 import * as Location from 'expo-location';
@@ -27,7 +27,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import LottieView from "lottie-react-native";
 
-import { COLORS } from "../constants";
+import { COLORS } from "../constants/index";
 
 import { fetchUser } from "../modules/data";
 

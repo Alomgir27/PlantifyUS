@@ -5,9 +5,13 @@ import Constants from 'expo-constants';
 import {useTheme, useTranslation} from '../hooks/';
 import {Block, Button, Text} from '../components/';
 
-const About = () => {
+import * as ICONS from '@expo/vector-icons';
+
+
+
+const About = ({ navigation }) => {
   const {t} = useTranslation();
-  const {gradients, sizes} = useTheme();
+  const {gradients, sizes, colors} = useTheme();
 
   const handleWebLink = useCallback((url) => Linking.openURL(url), []);
 
@@ -16,33 +20,37 @@ const About = () => {
       scroll
       padding={sizes.padding}
       contentContainerStyle={{paddingBottom: sizes.padding * 1.5}}>
+        <Block row align="center" justify="space-between" marginBottom={sizes.m}>
+          <ICONS.Ionicons name="ios-arrow-back" size={24} color={colors.primary} onPress={() => navigation.navigate('Settings')} />
+          <Text>Plant Trees, Save Earth 🌱</Text>
+        </Block>
       <Block card flex={0} padding={sizes.sm} marginBottom={sizes.sm}>
         <Text p semibold marginBottom={sizes.sm}>
           {t('common.about')} {t('app.fullname')}
         </Text>
         <Text align="justify" marginBottom={sizes.s}>
-          Are you looking for a modern mobile template to help you speed up your
-          development? Take a look at{' '}
+         Hello! Welcome to{' '} 
           <Text primary semibold>
             {t('app.name')} {t('app.native')}
           </Text>
-          , a gorgeous and innovative free template that will help you create
-          powerful mobile applications.
+          , It is a platform that allows you to plant trees and save the earth.
+          Our mission is to make the world a better place by planting trees.
         </Text>
         <Text align="justify" marginBottom={sizes.s}>
-          The product is loaded with a big number of components (like buttons,
-          icons, cards, sections, example pages, and many more) that will save
-          you tons of time and money.
+          Intially we started with a small team of 2 people and our goal was to 
+          plant 100 trees in a year. But now we have a team of 10 people and we
+          have planted 1000 trees in a year. We are growing day by day and we
+          are trying to make the world a better place.
         </Text>
         <Text align="justify" marginBottom={sizes.sm}>
-          This product is the result of Creative Tim’s work, the popular creator
-          of both free and paid UI Kits and Dashboards, helping over 1.5 million
-          creatives from all over the world.
+         So, what are you waiting for? Join us and help us to make the world a
+          better place.
+
         </Text>
         <Button
           gradient={gradients.primary}
           onPress={() =>
-            handleWebLink('https://www.creative-tim.com/templates/react-native')
+            handleWebLink('https://www.github.com/Alomgir27')
           }>
           <Text white semibold>
             {t('common.visit')} {t('app.link')}

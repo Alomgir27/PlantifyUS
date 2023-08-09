@@ -79,8 +79,8 @@ const Posts = ({ route,  navigation }) => {
         return (
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <ICONS.MaterialCommunityIcons name="format-list-bulleted" size={24} color={COLORS.primary} onPress={() => navigation.openDrawer()} />
-                    <Text style={styles.headerText}>Posts</Text>
+                    <ICONS.Ionicons name="ios-arrow-back" size={24} color={COLORS.primary} onPress={() => navigation.goBack()} />
+                    <Text style={[styles.headerText, { color: COLORS.gray }]}>Posts</Text>
                 </View>
                 <View style={styles.headerRight}>
                     <Text style={{ ...FONTS.body3, color: COLORS.primary }}>Sort by: </Text>
@@ -123,7 +123,6 @@ const Posts = ({ route,  navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white
     },
     header: {
         flexDirection: 'row',

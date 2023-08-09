@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
     View,
-    Text,
+    // Text,
     TouchableOpacity,
     Image,
     StyleSheet,
@@ -22,6 +22,9 @@ import { TextInput, FlatList, RefreshControl} from "react-native-gesture-handler
 import { API_URL } from "../constants/index";
 
 import moment from "moment";
+
+import { Text  } from "../components/index";
+import { Text as Text2} from 'react-native-elements';
 
 
 
@@ -206,7 +209,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
                     </View>
                     <View style={styles.recommendUserDetailsBottom}>
                         <TouchableOpacity onPress={() => handleFollow(item)} disabled={currentUser?.friends.includes(item?._id)}>
-                            <Text style={[styles.recommendUserFollow, { color: currentUser?.friends.includes(item?._id) ? COLORS.gray : COLORS.primary }]}>{currentUser?.friends.includes(item?._id) ? 'Following' : 'Follow'}</Text>
+                            <Text2 style={[styles.recommendUserFollow, { color: currentUser?.friends.includes(item?._id) ? COLORS.gray : COLORS.primary }]}>{currentUser?.friends.includes(item?._id) ? 'Following' : 'Follow'}</Text2>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -239,7 +242,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
 
                     <View style={styles.recommendUserDetailsBottom}>
                         <TouchableOpacity onPress={() => handleUnfollow(item)} disabled={!currentUser?.friends.includes(item?._id)}>
-                            <Text style={[styles.recommendUserFollow, { color: !currentUser?.friends.includes(item?._id) ? COLORS.gray : COLORS.primary }]}>{!currentUser?.friends.includes(item?._id) ? 'Not Following' : 'Unfollow'}</Text>
+                            <Text2 style={[styles.recommendUserFollow, { color: !currentUser?.friends.includes(item?._id) ? COLORS.gray : COLORS.primary }]}>{!currentUser?.friends.includes(item?._id) ? 'Not Following' : 'Unfollow'}</Text2>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -264,17 +267,6 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
                         <ICONS.Ionicons name={tab === 'recommend' ? "git-compare" : "git-compare-outline"} size={24} color={COLORS.white} />
                     </TouchableOpacity>
                 </View>
-            </View>
-            <View style={styles.action}>
-                <TextInput
-                    placeholder={tab === 'recommend' ? "Search for users" : "Search for friends"}
-                    placeholderTextColor={COLORS.primary}
-                    style={styles.textInput}
-                    autoCapitalize="none"
-                    onChangeText={(val) => setSearch(val)}
-                    onSubmitEditing={() => handleSearch(search)}
-                    ref={inputRef}
-                />
             </View>
             <View style={styles.body}>
                 {tab === 'recommend' ? (
@@ -318,7 +310,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        // backgroundColor: COLORS.white,
     },
     headerContainer: {
         backgroundColor: COLORS.primary,

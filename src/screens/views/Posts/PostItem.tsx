@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     StyleSheet,
     View,
-    Text,
     TouchableOpacity,
     Image,
     Alert,
@@ -22,6 +21,9 @@ import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
+
+import { Text } from '../../../components';
+import { Text as Text2 } from 'react-native-elements';
 
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -149,9 +151,9 @@ export class PostItem extends React.Component {
                         </TouchableOpacity>
                         <View style={styles.postHeaderLeftText}>
                             <TouchableOpacity onPress={() => navigation.navigate('Profile', {user: item?.author})}>
-                                <Text style={styles.name}>{item?.author?.name}</Text>
+                                <Text2 style={[styles.name, { color: COLORS.primary}]}>{item?.author?.name}</Text2>
                             </TouchableOpacity>
-                            <Text style={styles.date}>{moment(item?.createdAt).fromNow()}</Text>
+                            <Text2 style={styles.date}>{moment(item?.createdAt).fromNow()}</Text2>
                         </View>
                     </View>                    
                     <View style={styles.postHeaderRight}>
@@ -167,7 +169,7 @@ export class PostItem extends React.Component {
                 </View>
                 <View style={styles.postBody}>
                    <TouchableOpacity onPress={() => this.toggleExpanded()}>
-                      <Text style={styles.postText} numberOfLines={collapsed ? 3 : null}>{item.text}</Text>
+                      <Text2 style={[styles.postText, {color: COLORS.gray}]} numberOfLines={collapsed ? 3 : null}>{item.text}</Text2>
                    </TouchableOpacity>
                     {item.images.length > 0 && (
                         <View style={styles.postImages}>
@@ -258,7 +260,7 @@ export class PostItem extends React.Component {
                         <View style={styles.postTags}>
                             {item.tags.map((tag, index) => (
                                 <TouchableOpacity key={index} onPress={() => navigation.navigate('Tag', {tag})}>
-                                    <Text style={styles.postTag}>#{tag}</Text>
+                                    <Text2 style={styles.postTag}>#{tag}</Text2>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -340,7 +342,7 @@ export class PostItem extends React.Component {
                                     </TouchableOpacity>
                                 )}
                                 <View style={styles.eventFooterLeftText}>
-                                    <Text style={styles.eventTitle}>{item?.event?.title}</Text>
+                                    <Text2 style={[styles.eventTitle, { color: COLORS.primary}]}>{item?.event?.title}</Text2>
                                     <Text style={styles.eventDate}>{moment(item?.event?.createdAt).format('DD MMM YYYY')}</Text>
                                 </View>
                             </View>
@@ -397,16 +399,10 @@ export class PostItem extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: COLORS.white,
+        flex: 1,
         borderRadius: 10,
         padding: 10,
-        marginVertical: 10,
-        elevation: 5,
-        shadowColor: COLORS.gray,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 5
-
+        marginVertical: 10
     },
     postHeader: {
         flexDirection: 'row',

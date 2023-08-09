@@ -430,7 +430,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        // backgroundColor: COLORS.white,
     },
     header: {
         flex: 1,

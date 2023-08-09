@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from "react";
-import { View, Text, StyleSheet, Image, FlatList, Alert, TouchableOpacity, Dimensions } from "react-native";
+import { View, StyleSheet, Image, FlatList, Alert, TouchableOpacity, Dimensions } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
@@ -13,40 +13,11 @@ import * as ICONS from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get('window');
 
-// const eventSchema = new Schema({
-//     title: String,
-//     description: String,
-//     location: {
-//         type: { type: String, default: 'Point'},
-//         coordinates: { type: [Number], default: [0, 0] }
-//     },
-//     organizer: String,
-//     attendees: [String],
-//     images: [String],
-//     requirements:{
-//         trees: Number,
-//         volunteers: Number,
-//         funds: Number
-//     },
-//     landsDescription: String,
-//     status: {
-//         type: String,
-//         enum: ['pending', 'approved', 'rejected', 'completed'],
-//         default: 'pending'
-//     },
-//     author: {
-//         type: Schema.Types.ObjectId,
-//         ref: 'User'
-//     },
-//     collectedFunds: Number,
-//     upvotes: [String],
-//     downvotes: [String],
-//     comments: [{
-//             type: Schema.Types.ObjectId,
-//             ref: 'Comment'
-//         }]
+import { Text as Text } from '../../../components/';
+import { Text as Text2 } from 'react-native-elements';
 
-// }, { timestamps: true });
+// const eventSchema = new Schema({
+
 
 
 const EventDetails = ({ route }) => {
@@ -74,14 +45,14 @@ const EventDetails = ({ route }) => {
                     <TouchableOpacity onPress={() => navigation.navigate('Events')}>
                         <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Event Details</Text>
+                    <Text  style={styles.headerTitle}>Event Details</Text>
                 </View>
                 <View style={styles.eventContainer}>
                     <View style={styles.eventHeader}>
                         <View style={styles.eventHeaderLeft}>
                             <Image source={{uri: item.author.image}} style={styles.avatar} />
                             <View style={styles.eventHeaderLeftText}>
-                                <Text style={styles.eventHeaderLeftTextTitle}>{item.title}</Text>
+                                <Text2 style={[styles.eventHeaderLeftTextTitle, { color: COLORS.primary}]}>{item.title}</Text2>
                                 <Text style={styles.eventHeaderLeftTextAuthor}>by {item.author.name}</Text>
                             </View>
                         </View>
@@ -180,7 +151,6 @@ const EventDetails = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
         paddingHorizontal: 20,
         paddingVertical: 20,
     },
@@ -196,7 +166,6 @@ const styles = StyleSheet.create({
     },
     eventContainer: {
         flex: 1,
-        backgroundColor: COLORS.white,
         paddingHorizontal: 20,
         paddingVertical: 20,
     },
@@ -278,7 +247,7 @@ const styles = StyleSheet.create({
     },
     eventBodyDetailsItemRequirementsItem: {
         width: '30%',
-        backgroundColor: COLORS.lightGray,
+        // backgroundColor: COLORS.lightGray,
         borderRadius: 5,
         padding: 10,
     },

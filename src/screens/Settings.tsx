@@ -1,11 +1,11 @@
-// import {useNavigation} from '@react-navigation/core';
 import React from 'react';
 
 import {useData, useTheme, useTranslation} from '../hooks/';
 import {Block, Button, Image, Switch, Text} from '../components/';
 
-const Settings = () => {
-  // const navigation = useNavigation();
+import * as ICONS from '@expo/vector-icons';
+
+const Settings = ({ navigation}) => {
   const {isDark, handleIsDark} = useData();
   const {t, locale, setLocale} = useTranslation();
   const {assets, colors, gradients, sizes} = useTheme();
@@ -18,6 +18,11 @@ const Settings = () => {
       padding={sizes.padding}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{paddingBottom: sizes.xxl}}>
+      {/* header */}
+      <Block row align="center" justify="space-between" marginBottom={sizes.m}>
+         <ICONS.Ionicons name="ios-arrow-back" size={24} color={colors.primary} onPress={() => navigation.goBack()} />
+      </Block>
+        
       {/* settings */}
       <Block card padding={sizes.sm} marginBottom={sizes.sm}>
         <Block row align="center" marginBottom={sizes.m}>

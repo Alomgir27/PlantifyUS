@@ -5,7 +5,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
   Dimensions,
@@ -16,7 +15,8 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Icon from "@expo/vector-icons";
 
 import { COLORS } from "../constants/index";
-
+import { Text } from "../components";
+import { Text as Text2 } from "react-native-elements";
 
 import { setLocation, setFilters, setCampings } from "../modules/campings";
 import * as mock from "../mock/campings";
@@ -172,7 +172,7 @@ class Campings extends React.Component {
         <View
           style={[styles.tab, filters.type === "pending" ? styles.activeTab : null]}
         >
-          <Text
+          <Text2
             style={[
               styles.tabTitle,
               filters.type === "pending" ? styles.activeTabTitle : null
@@ -180,7 +180,7 @@ class Campings extends React.Component {
             onPress={() => this.handleTab("pending")}
           >
             Requested Events
-          </Text>
+          </Text2>
         </View>
         <View
           style={[
@@ -188,7 +188,7 @@ class Campings extends React.Component {
             filters.type === "approved" ? styles.activeTab : null
           ]}
         >
-          <Text
+          <Text2
             style={[
               styles.tabTitle,
               filters.type === "approved" ? styles.activeTabTitle : null
@@ -196,12 +196,12 @@ class Campings extends React.Component {
             onPress={() => this.handleTab("approved")}
           >
             Ongoing Events
-          </Text>
+          </Text2>
         </View>
         <View
           style={[styles.tab, filters.type === "completed" ? styles.activeTab : null]}
         >
-          <Text
+          <Text2
             style={[
               styles.tabTitle,
               filters.type === "completed" ? styles.activeTabTitle : null
@@ -209,12 +209,12 @@ class Campings extends React.Component {
             onPress={() => this.handleTab("completed")}
           >
             Past Events
-          </Text>
+          </Text2>
         </View>
         <View
           style={[styles.tab, filters.type === "rejected" ? styles.activeTab : null]}
         >
-          <Text
+          <Text2
             style={[
               styles.tabTitle,
               filters.type === "rejected" ? styles.activeTabTitle : null
@@ -222,7 +222,7 @@ class Campings extends React.Component {
             onPress={() => this.handleTab("rejected")}
           >
             Draft Events
-          </Text>
+          </Text2>
         </View>
       </ScrollView>
     );
@@ -269,9 +269,9 @@ class Campings extends React.Component {
                 justifyContent: "center"
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+              <Text2 style={{ fontSize: 14, fontWeight: "bold", color: COLORS.primary }}>
                 {camping.title}
-              </Text>
+              </Text2>
               <Text style={{ fontSize: 12, color: "#A5A5A5", paddingTop: 5 }} multiline={true}>
                 {camping.description ? camping.description : camping.landDesription}
               </Text>
@@ -343,7 +343,6 @@ export default connect(moduleState, moduleActions)(Campings);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
   },
   headerContainer: {
     top: 0,
@@ -357,7 +356,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: height * 0.15,
     paddingHorizontal: 14,
-    backgroundColor: COLORS.white,
+    // backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: "#A5A5A5"
 
@@ -403,7 +402,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     paddingHorizontal: 14,
-    backgroundColor: COLORS.white,
   },
   tab: {
     marginRight: 14,

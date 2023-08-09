@@ -77,14 +77,14 @@ export const COLORS: ThemeColors = {
 };
 
 export const GRADIENTS: ThemeGradients = {
-  primary: ['#FF0080', '#7928CA'],
+  primary:  ["#00996D", "#606d87"] , //['#FF0080', '#7928CA'],
   secondary: ['#A8B8D8', '#627594'],
   info: ['#21D4FD', '#2152FF'],
   success: ['#98EC2D', '#17AD37'],
   warning: ['#FBCF33', '#F53939'],
   danger: ['#FF667C', '#EA0606'],
 
-  light: ['#EBEFF4', '#CED4DA'],
+  light:  ['#EBEFF4', '#CED4DA'],
   dark: ['#3A416F', '#141727'],
 
   white: [String(COLORS.white), '#EBEFF4'],

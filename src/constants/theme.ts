@@ -240,6 +240,6 @@ export const COLORS = {
 };
 
 
-const appTheme = { COLORS, SIZES, FONTS };
+exports = { COLORS, SIZES, FONTS };
 
-export default appTheme;
+

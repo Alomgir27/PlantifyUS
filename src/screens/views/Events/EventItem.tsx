@@ -21,6 +21,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
 
+
 import * as ICONS from "@expo/vector-icons";
 
 import { useSelector } from 'react-redux';
@@ -387,21 +388,20 @@ export class EventItem extends React.PureComponent {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
     },
     card: {
         marginHorizontal: 10,
         marginVertical: 10,
-        backgroundColor: COLORS.white,
+        // backgroundColor: COLORS.white,
         borderRadius: 10,
-        shadowColor: COLORS.shadow,
+        shadowColor: '#000',
         shadowOffset: {
             width: 0,
             height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        elevation: 5,
+        // elevation: 5,
     },
     cardImgWrapper: {
         flex: 1,

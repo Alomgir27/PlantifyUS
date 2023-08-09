@@ -145,12 +145,12 @@ const Events = ({ route, navigation }) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: COLORS.white,
+            // backgroundColor: COLORS.white,
         },
         card: {
             marginHorizontal: 20,
             marginVertical: 10,
-            backgroundColor: COLORS.white,
+            // backgroundColor: COLORS.white,
             borderRadius: 10,
             shadowColor: COLORS.shadow,
             shadowOffset: {
@@ -182,7 +182,7 @@ const Events = ({ route, navigation }) => {
             padding: 10,
             borderBottomLeftRadius: 8,
             borderBottomRightRadius: 8,
-            backgroundColor: COLORS.white,
+            // backgroundColor: COLORS.white,
             opacity: 0.9,
             width: '100%',
         },

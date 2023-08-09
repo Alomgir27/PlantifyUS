@@ -49,10 +49,10 @@
     }
   },
   "app": {
-    "name": "Soft UI",
-    "fullname": "Soft UI Kit",
+    "name": "PlantifyUS",
+    "fullname": "PlantifyUS - Plant Identification",
     "native": "React Native",
-    "link": "creative-tim.com"
+    "link": "https://plantifyus.com",
   },
   "darkMode": "Dark Mode",
   "screens": {
@@ -66,10 +66,10 @@
     "extra": "Extra - Automotive"
   },
   "navigation": {
-    "home": "Soft UI",
+    "home": "Welcome to PlantifyUS",
     "components": "Components",
-    "articles": "Soft UI",
-    "rentals": "Soft UI",
+    "articles": "Articles",
+    "rentals": "Rentals",
     "rental": "Best Deal",
     "booking": "Booking",
     "chat": "Chat",
@@ -89,7 +89,7 @@
     "documentation": "Documentation"
   },
   "home": {
-    "title": "Soft UI",
+    "title": "Welcome to PlantifyUS",
     "following": "Following",
     "trending": "Trending"
   },
@@ -147,7 +147,7 @@
     }
   },
   "rentals": {
-    "title": "Soft UI",
+    "title": "Rentals",
     "flight": "Flight",
     "hotel": "Hotel",
     "train": "Train",

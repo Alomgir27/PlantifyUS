@@ -91,7 +91,7 @@ const Typography = (props: ITextProps) => {
     : undefined;
 
   const textStyles = StyleSheet.flatten([
-    style,
+    style && style,
     {
       color: colors.text,
       fontSize: sizes.text,

@@ -12,7 +12,7 @@ import {
 import { ScrollView , RefreshControl} from 'react-native-gesture-handler';
 import { TextInput } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from '../constants/index';
+import { images, icons, FONTS, SIZES } from '../constants/index';
 
 import * as ICONS from "@expo/vector-icons";
 
@@ -24,6 +24,7 @@ import moment from 'moment';
 import { fetchAllDefaultData, clearData } from '../modules/data';
 import RecommendUsers from '../components/RecommendUsers';
 
+import { COLORS } from "../constants/index";
 
 
 
@@ -40,9 +41,12 @@ const Home = ({ navigation }) => {
     const user = useSelector(state => state?.data?.currentUser);
     const friends = useSelector(state => state?.data?.users);
 
+
     const [mounted, setMounted] = useState(false);
 
     const dispatch = useDispatch();
+
+
     
 
     useEffect(() => {
@@ -676,11 +680,11 @@ const Home = ({ navigation }) => {
                 <View style={{
                     position: 'absolute',
                     bottom: 0,
-                    width: SIZES.width * 0.85,
+                    width: SIZES.width * 0.80,
                     backgroundColor: COLORS.white,
                     opacity: 0.9,
                     borderRadius: SIZES.radius,
-                    marginHorizontal: SIZES.padding,
+                    justifyContent: 'center',
                     ...styles.shadow
                 }}>
                     {/* Post Tag */}
@@ -692,13 +696,20 @@ const Home = ({ navigation }) => {
                         paddingHorizontal: SIZES.padding,
                         paddingVertical: SIZES.base,
                         borderTopLeftRadius: SIZES.radius,
-                        borderBottomRightRadius: SIZES.radius
+                        borderBottomRightRadius: SIZES.radius,
+                        marginBottom: SIZES.padding,
+
                     }}>
-                        <Text style={{ color: COLORS.white, ...FONTS.H4 }}>{item?.tags?.slice(0, 3).map((tag) => "#" +tag + " ")} {item?.tags.length > 3 ? "..." : ""} </Text>
+                        <Text style={{ color: COLORS.white, ...FONTS.H4 }} numberOfLines={1}>{item?.tags?.map((tag) => "#" +tag + " ")} </Text>
                     </View>
 
                     {/* Post caption */}
-                    <Text style={{ color: COLORS.secondary, ...FONTS.body3, marginTop: 15, paddingTop: SIZES.padding, paddingLeft: SIZES.padding, paddingBottom: SIZES.padding - 10 }}>{item?.text?.length > 50 ? item?.text.slice(0, 50) + "..." : item?.text }</Text>
+                    <Text 
+                      style={{ color: COLORS.secondary, ...FONTS.body3, marginTop: 15, paddingTop: SIZES.padding, paddingLeft: SIZES.padding, paddingBottom: SIZES.padding - 10 }}
+                        numberOfLines={1}
+                     >
+                        {item?.text }
+                    </Text>
 
                     {/* Event details */}
                     <View style={{ flexDirection: 'row', marginLeft: SIZES.padding }}>
@@ -757,8 +768,9 @@ const Home = ({ navigation }) => {
                     alignItems: 'center',
                     marginVertical: SIZES.base,
                     borderRadius: 20,
-                    backgroundColor: COLORS.white,
-                    ...styles.shadow
+                    marginHorizontal: SIZES.base * 2,
+                    // backgroundColor: COLORS.white,
+                    // ...styles.shadow
                 }}
                 onPress={() => navigation.navigate(routeName)}
                 >
@@ -772,8 +784,8 @@ const Home = ({ navigation }) => {
                     marginLeft: 20,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginHorizontal: SIZES.base,
-                    ...styles.shadow
+                    marginHorizontal: SIZES.base * 2,
+                    // ...styles.shadow
                 }}
 
                 >
@@ -919,7 +931,7 @@ const Home = ({ navigation }) => {
            style={styles.container}
         >
             {/* New Plants */}
-            <View style={{ flex: 1, backgroundColor: COLORS.white }}>
+            <View style={{ flex: 1 }}>
                 {/* notification & signup */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',  backgroundColor: COLORS.primary, paddingTop: 10 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1001,11 +1013,11 @@ const Home = ({ navigation }) => {
                     flex: 1,
                     borderBottomLeftRadius: 50,
                     borderBottomRightRadius: 50,
-                    backgroundColor: COLORS.white
+                    // backgroundColor: COLORS.white
                 }}>
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>New Events</Text>
+                            <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>New Events</Text>
 
                             <TouchableOpacity
                                 onPress={() => navigation.navigate("Events")}
@@ -1023,13 +1035,13 @@ const Home = ({ navigation }) => {
 
 
             {/* New Posts */}
-            <View style={{ flex: 1, backgroundColor: COLORS.lightGray }}>
+            <View style={{ flex: 1 }}>
                 <View style={{
                     flex: 1,
                     marginTop: SIZES.padding,
                     borderBottomLeftRadius: 50,
                     borderBottomRightRadius: 50,
-                    backgroundColor: COLORS.white
+                    // backgroundColor: COLORS.white
                 }}>
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1055,10 +1067,10 @@ const Home = ({ navigation }) => {
 
 
             {/* Added Friend */}
-            <View style={{ paddingVertical: SIZES.padding, backgroundColor: COLORS.lightGray }}>
+            <View style={{ paddingVertical: SIZES.padding }}>
                 <View style={{
                     flex: 1,
-                    backgroundColor: COLORS.lightGray
+                    // backgroundColor: COLORS.lightGray
                 }}>
                     <View style={{ marginTop: SIZES.radius, marginHorizontal: SIZES.padding }}>
                         <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>Added Friends</Text>
@@ -1110,7 +1122,7 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.lightGray,
+        // backgroundColor: COLORS.lightGray,
         flexDirection: 'column'
     },
     shadow: {

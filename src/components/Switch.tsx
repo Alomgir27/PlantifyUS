@@ -27,7 +27,7 @@ const Switch = ({
 }: ISwitchProps) => {
   const [isChecked, setChecked] = useState(checked);
   const {colors, sizes} = useTheme();
-  const activeColor = activeFillColor || colors.switchOn;
+  const activeColor = '#00996D' || colors.switchOn;
   const inactiveColor = inactiveFillColor || colors.switchOff;
 
   const animation = useRef(new Animated.Value(isChecked ? 28 : 2)).current;

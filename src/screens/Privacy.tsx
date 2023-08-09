@@ -3,8 +3,10 @@ import React from 'react';
 import {Block, Text} from '../components/';
 import {useTheme} from '../hooks/';
 
-const Privacy = () => {
-  const {sizes} = useTheme();
+import * as ICONS from '@expo/vector-icons';
+
+const Privacy = ({ navigation }) => {
+  const {sizes, colors} = useTheme();
 
   return (
     <Block padding={sizes.padding} marginBottom={sizes.sm}>
@@ -14,34 +16,23 @@ const Privacy = () => {
         paddingHorizontal={sizes.sm}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingVertical: sizes.padding}}>
+          <Block row align="center" justify="space-between" marginBottom={sizes.m}>
+           <ICONS.Ionicons name="ios-arrow-back" size={24} color={colors.primary} onPress={() => navigation.navigate('Settings')} />
+            <Text>Plant Trees, Save Earth 🌱</Text>
+         </Block>
         <Text p marginBottom={sizes.sm} semibold align="justify">
-          “Pelosi is nothing if not purposeful. The following day, rallying with
-          Democratic candidates in a San Francisco park, she would wear an
-          orange pantsuit, explaining to crowds that orage was “the color of
-          gun-violence pretection.”
+         "I'm not for impeachment. This is news. I'm going to give you some news right now because I haven't said this to any press person before. But since you asked, and I've been thinking about this: Impeachment is so divisive to the country that unless there's something so compelling and overwhelming and bipartisan, I don't think we should go down that path, because it divides the country. And he's just not worth it."
+         Our mission is to make the world a better place by planting trees.
         </Text>
         <Text p marginBottom={sizes.sm} align="justify">
-          This afternoon she had booked a table at Delancey Street, a restaurant
-          that was famous, she said, for employing ex-convicts: “Redemption”,
-          she added emphatically, in case I might have missed the point.
+          "You know, it's not about that. It's about what we can do for the people to lower health-care costs, bigger paychecks, cleaner government. It's about cleaner government. And by the way, our bill, H.R. 1, For the People Act, is very important to us. It's about reducing the role of big, dark special-interest money in politics, it's about empowering small donors, it's about ending voter suppression, it's about making redistricting fair. It's really a source of joy to me that the public is so embracing of it. We're very proud of it. And it's one of the reasons we won the election, because people saw the contrast between the two parties on that subject alone."
         </Text>
         <Text p marginBottom={sizes.sm} align="justify">
-          Pelosi told me that she and the House Democrats had every intention of
-          working with President Trump on things like lowering
-          prescription-drugs costs, rebuilding America’s infrastructure and
-          pretecting the young undocumented immigrants know as Dreamers from
-          deportation. She reminded me of her long stints on the House
-          Appropriations and Intelligence Committes — panels on which, “left to
-          our own devices, we could always find our way in a bipartisan manner.”
+          "So, Our mission is to make the world a better place by planting trees. We're not going to be able to do that if we're going to be spending time on things that aren't going to happen in the Senate."
+
         </Text>
         <Text p marginBottom={sizes.sm} align="justify">
-          There were a lot of Democrats, I suggested, who believed that
-          bipartisanship had been rendered antique in the Trump era. “Yeah,”
-          Pelosi replied, smirking, “and I have those who want to be for
-          impeachment and for abolishing ICE” — Immigrations and Customs
-          Enforcement, the federal law-enforcement agency spearheading Trump’s
-          crackdown on immigration. “Two really winning issues for us, rigght?
-          In the districts we have to win?”
+          "What's are mission? Our mission is to make the world a better place by planting trees. We're not going to be able to do that if we're going to be spending time on things that aren't going to happen in the Senate."
         </Text>
       </Block>
     </Block>

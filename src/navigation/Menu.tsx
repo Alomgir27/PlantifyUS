@@ -1,29 +1,8 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React from 'react';
 
+import {Block} from '../components';
+import {useData, useTheme} from '../hooks';
 
-import {Block, Text, Switch, Button, Image} from '../components';
-import {useData, useTheme, useTranslation} from '../hooks';
-
-import {
-  About,
-  Agreement,
-  Articles,
-  Chat,
-  Components,
-  Extras,
-  Home,
-  Notifications,
-  Privacy,
-  Profile,
-  Register,
-  Login,
-  Rental,
-  Rentals,
-  Booking,
-  Settings,
-  Shopping,
-  NotificationsSettings,
-} from '../screens';
 
 import Main from '../Main';
 
@@ -34,25 +13,7 @@ export default () => {
 
   return (
     <Block gradient={gradients[isDark ? 'dark' : 'light']}>
-      {/* <About />
-      <Agreement /> */}
-      {/* <Articles /> */}
-      {/* <Chat /> */}
-      {/* <Components />   */}
-      {/* <Extras /> */}
       <Main />
-      {/* <Notifications /> */}
-      {/* <Privacy /> */}
-      {/* <Profile /> */}
-      {/* <Register /> */}
-      {/* <Login /> */}
-      {/* <Rental /> */}
-      {/* <Rentals /> */}
-      {/* <Booking /> */}
-      {/* <Settings /> */}
-      {/* <Shopping /> */}
-      {/* <NotificationsSettings /> */}
-      
     </Block>
   );
 };

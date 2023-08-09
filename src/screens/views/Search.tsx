@@ -3,7 +3,7 @@ import { TextInput, ScrollView , FlatList, RefreshControl } from "react-native-g
 import { images, icons, COLORS, FONTS, SIZES } from '../../constants/index';
 import { Keyboard } from 'react-native';
 import * as ICONS from "@expo/vector-icons";
-import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, Button, Alert } from "react-native";
+import { View,  StyleSheet, TouchableOpacity, Image, SafeAreaView, Button, Alert } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { API_URL } from "../../constants/index";
@@ -20,6 +20,9 @@ import {
     handleEventsMerge,
 } from '../../modules/data';
 
+import { Text } from "../../components";
+import { useTheme } from "../../hooks";
+
 const SearchScreen = ({ navigation }) => {
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState({});
@@ -34,6 +37,9 @@ const SearchScreen = ({ navigation }) => {
     const treesSearch = useSelector(state => state.data.treesSearch);
     const usersSearch = useSelector(state => state.data.usersSearch);
     const postsSearch = useSelector(state => state.data.postsSearch);
+
+    const { colors, gradients } = useTheme();
+
 
     const inputRef = useRef(null);
 
@@ -281,7 +287,7 @@ const SearchScreen = ({ navigation }) => {
                                   <Text style={styles.searchResultText}>posted by {item?.author?.name}</Text>
                                   {item?.tags?.length > 0 && <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                     {item?.tags?.slice(0, 5)?.map((tag) => (
-                                        <View style={{backgroundColor: COLORS.lightGray, borderRadius: 10, padding: 5, marginRight: 5}} key={tag}>
+                                        <View style={{backgroundColor: colors.primary, borderRadius: 10, padding: 5, marginRight: 5}} key={tag}>
                                             <Text style={{color: COLORS.black, fontSize: 16}}>{tag}</Text>
                                         </View>
                                     ))}
@@ -393,22 +399,22 @@ const SearchScreen = ({ navigation }) => {
                     />
                 </View>
                 <View style={styles.searchType}>
-                    <TouchableOpacity style={styles.searchTypeButton} onPress={() => handleSearchType('All')}>
+                    <TouchableOpacity style={[styles.searchTypeButton, { backgroundColor: colors.secondary }]} onPress={() => handleSearchType('All')}>
                         <Text style={styles.searchTypeButtonText}>All</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.searchTypeButton} onPress={() => handleSearchType('Events')}>
+                    <TouchableOpacity style={[styles.searchTypeButton, { backgroundColor: colors.secondary}]} onPress={() => handleSearchType('Events')}>
                         <Text style={styles.searchTypeButtonText}>Events</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.searchTypeButton} onPress={() => handleSearchType('Organizations')}>
+                    <TouchableOpacity style={[styles.searchTypeButton, { backgroundColor: colors.secondary}]} onPress={() => handleSearchType('Organizations')}>
                         <Text style={styles.searchTypeButtonText}>Organizations</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.searchTypeButton} onPress={() => handleSearchType('Trees')}>
+                    <TouchableOpacity style={[styles.searchTypeButton, { backgroundColor: colors.secondary}]} onPress={() => handleSearchType('Trees')}>
                         <Text style={styles.searchTypeButtonText}>Trees</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.searchTypeButton} onPress={() => handleSearchType('Users')}>
+                    <TouchableOpacity style={[styles.searchTypeButton, { backgroundColor: colors.secondary}]} onPress={() => handleSearchType('Users')}>
                         <Text style={styles.searchTypeButtonText}>Users</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.searchTypeButton} onPress={() => handleSearchType('Posts')}>
+                    <TouchableOpacity style={[styles.searchTypeButton, { backgroundColor: colors.secondary}]} onPress={() => handleSearchType('Posts')}>
                         <Text style={styles.searchTypeButtonText}>Posts</Text>
                     </TouchableOpacity>
                 </View>
@@ -425,10 +431,9 @@ const SearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
     },
     searchContainer: {
-        backgroundColor: COLORS.white,
+        // backgroundColor: COLORS.white,
         borderBottomColor: COLORS.lightGray,
         borderBottomWidth: 1,
         padding: 10,
@@ -436,7 +441,7 @@ const styles = StyleSheet.create({
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.lightGray,
+        // backgroundColor: COLORS.lightGray,
         borderRadius: 10,
         padding: 5,
     },
@@ -462,7 +467,7 @@ const styles = StyleSheet.create({
     },
     searchResultsContainer: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        // backgroundColor: COLORS.white,
         padding: 10,
     },
     searchResultsText: {
@@ -498,7 +503,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     searchResultsHeaderButton: {
-        backgroundColor: COLORS.lightGray,
+        // backgroundColor: COLORS.lightGray,
         borderRadius: 10,
         padding: 5,
     },

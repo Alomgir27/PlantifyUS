@@ -90,10 +90,10 @@
     "today": "Aujourd'hui"
   },
   "app": {
-    "name": "Soft UI",
-    "fullname": "Soft UI Kit",
+    "name": "PlantifyUS - Application de vente de plantes",
+    "fullname": "PlantifyUS - Application de vente de plantes",
     "native": "React Native",
-    "link": "creative-tim.com"
+    "link": "https://plantifyus.com"
   },
   "darkMode": "Dark Mode",
   "screens": {
@@ -107,10 +107,10 @@
     "extra": "Extra - Automobile"
   },
   "navigation": {
-    "home": "Soft UI",
+    "home": "Accueil",
     "components": "Composants",
-    "articles": "Soft UI",
-    "rentals": "Soft UI",
+    "articles": "Articles",
+    "rentals": "Locations",
     "rental": "Best Deal",
     "booking": "Réservation",
     "chat": "Conversation",
@@ -188,7 +188,7 @@
     }
   },
   "rentals": {
-    "title": "Soft UI",
+    "title": "Location",
     "flight": "Vol",
     "hotel": "Hôtel",
     "train": "Train",

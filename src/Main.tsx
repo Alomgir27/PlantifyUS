@@ -23,10 +23,8 @@ import {
     TreeIdentify,
     About,
     Agreement,
-    Articles,
     Chat,
     Components,
-    Extras,
     Notifications,
     NotificationsSettings,
     Privacy,
@@ -34,7 +32,6 @@ import {
     Register,
     Rental,
     Rentals,
-    Booking,
     Shopping,
 } from "./screens";
 
@@ -116,29 +113,10 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
-                            label="Search"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Search')}
-                            icon={() => <ICONS.Ionicons name="search" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Identify"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('TreeIdentify')}
-                            icon={() => <ICONS.Ionicons name="leaf" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
                             label="Campings"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('Campings')}
                             icon={() => <ICONS.Ionicons name="map" size={24} color={COLORS.white} />}
-                        />
-                        
-                        <DrawerItem
-                            label="Post"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Post')}
-                            icon={() => <ICONS.Ionicons name="add-circle" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
                             label="Events"
@@ -170,59 +148,20 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Saved')}
                             icon={() => <ICONS.Ionicons name="bookmark" size={24} color={COLORS.white} />}
                         />
-                        <DrawerItem
-                            label="Post Upload"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Camera')}
-                            icon={() => <ICONS.Ionicons name="cloud-upload" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="About"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('About')}
-                            icon={() => <ICONS.Ionicons name="information-circle" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Agreement"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Agreement')}
-                            icon={() => <ICONS.Ionicons name="document-text" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Articles"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Articles')}
-                            icon={() => <ICONS.Ionicons name="newspaper" size={24} color={COLORS.white} />}
-                        />
+                        
+                        
                         <DrawerItem
                             label="Components"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('Components')}
                             icon={() => <ICONS.Ionicons name="construct" size={24} color={COLORS.white} />}
                         />
-                        <DrawerItem
-                            label="Extras"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Extras')}
-                            icon={() => <ICONS.Ionicons name="add-circle" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Privacy"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Privacy')}
-                            icon={() => <ICONS.Ionicons name="lock-closed" size={24} color={COLORS.white} />}
-                        />
+                        
                         <DrawerItem
                             label="Profile"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('Profile')}
                             icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Register"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Register')}
-                            icon={() => <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
                             label="Rental"
@@ -236,12 +175,7 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Rentals')}
                             icon={() => <ICONS.Ionicons name="car-sport" size={24} color={COLORS.white} />}
                         />
-                        <DrawerItem
-                            label="Booking"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Booking')}
-                            icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
-                        />
+                        
                         <DrawerItem
                             label="Shopping"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
@@ -465,16 +399,10 @@ export default function Main() {
                 <Drawer.Screen name="Agreement" component={Agreement} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
-                <Drawer.Screen name="Articles" component={Articles} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/>
                 <Drawer.Screen name="Chat" component={Chat} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="Components" component={Components} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/>
-                <Drawer.Screen name="Extras" component={Extras} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="Notifications" component={Notifications} options={{
@@ -493,9 +421,6 @@ export default function Main() {
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="Rentals" component={Rentals} options={{
-                    drawerItemStyle: { height: 0 }
-                }}/>
-                <Drawer.Screen name="Booking" component={Booking} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="Shopping" component={Shopping} options={{

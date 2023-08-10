@@ -32,6 +32,7 @@ import { COLORS } from "../constants/index";
 import { fetchUser } from "../modules/data";
 
 import { useDispatch } from "react-redux";
+import { ToastAndroid, Platform } from "react-native";
 
 export default function Signup({ navigation }) {
 
@@ -168,6 +169,9 @@ export default function Signup({ navigation }) {
               console.log(response);
               dispatch(fetchUser(response?.data?.user?._id));
               setLoading(false)
+              if(Platform.OS === "android"){
+                ToastAndroid.show("Account Created Successfully", ToastAndroid.SHORT);
+              }
               navigation.navigate("Login");
             })
             .catch((error) => {

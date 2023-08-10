@@ -100,6 +100,11 @@ const Posts = ({ route,  navigation }) => {
                 renderItem={({ item }) => <PostItem item={item} navigation={navigation} />}
                 keyExtractor={item => `${item._id}`}
                 showsVerticalScrollIndicator={false}
+                ItemSeparatorComponent={() => {
+                    return (
+                        <View style={{ width: width, height: 1, backgroundColor: COLORS.lightGray }}></View>
+                    )
+                }}
                 onEndReached={fetchMore}
                 onEndReachedThreshold={0.5}
                 refreshControl={

@@ -9,7 +9,8 @@ import {
     Animated,
     Easing,
     Dimensions,
-    Share
+    Share,
+    TouchableWithoutFeedback,
 } from 'react-native';
 
 import { 
@@ -162,9 +163,10 @@ export class EventItem extends React.PureComponent {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.cardImgWrapper}
+                <TouchableWithoutFeedback style={styles.cardImgWrapper}
                     onPress={() => navigation.navigate("Event", { item })}
                 >
+                  <View>
                     {item?.images?.length === 1 && (
                         <Image
                             source={{ uri: item?.images[0] }}
@@ -243,7 +245,8 @@ export class EventItem extends React.PureComponent {
                         )}
 
                     </View>
-                </TouchableOpacity>
+                  </View>
+                </TouchableWithoutFeedback>
                 <View style={styles.MapView}>
                     <MapView
                         style={styles.map}
@@ -418,8 +421,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         padding: 10,
-        borderBottomLeftRadius: 8,
-        borderBottomRightRadius: 8,
+        // borderBottomLeftRadius: 8,
+        // borderBottomRightRadius: 8,
         backgroundColor: COLORS.white,
         opacity: 0.9,
         width: '100%',

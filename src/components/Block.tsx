@@ -104,7 +104,7 @@ const Block = (props: IBlockProps) => {
     : undefined;
 
   const blockStyles = StyleSheet.flatten([
-    style,
+    style && style,
     {
       ...(shadow && {
         shadowColor: colors.shadow,

@@ -8,7 +8,8 @@ import {
     Animated,
     Easing,
     Dimensions,
-    Share
+    Share,
+    TouchableWithoutFeedback
 } from 'react-native';
 
 import { 
@@ -174,83 +175,83 @@ export class PostItem extends React.Component {
                     {item.images.length > 0 && (
                         <View style={styles.postImages}>
                             {item.images.length === 1 && (
-                                <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
                                     <Image
                                         source={{uri: item.images[0]}}
                                         style={{width: width - 20, height: height / 2, borderRadius: 10}}
                                     />
-                                </TouchableOpacity>
+                                </TouchableWithoutFeedback>
                             )}
                             {item.images.length === 2 && (
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
                                         <Image
                                             source={{uri: item.images[0]}}
                                             style={{width: width / 2 - 15, height: height / 2, borderRadius: 10}}
                                         />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
+                                    </TouchableWithoutFeedback>
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
                                         <Image
                                             source={{uri: item.images[1]}}
                                             style={{width: width / 2 - 15, height: height / 2, borderRadius: 10}}
                                         />
-                                    </TouchableOpacity>
+                                    </TouchableWithoutFeedback>
                                 </View>
                             )}
                             {item.images.length === 3 && (
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
                                         <Image
                                             source={{uri: item.images[0]}}
                                             style={{width: width / 2 - 15, height: height / 2, borderRadius: 10}}
                                         />
-                                    </TouchableOpacity>
+                                    </TouchableWithoutFeedback>
                                     <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
                                             <Image
                                                 source={{uri: item.images[1]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 2})}>
+                                        </TouchableWithoutFeedback>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 2})}>
                                             <Image
                                                 source={{uri: item.images[2]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
-                                        </TouchableOpacity>
+                                        </TouchableWithoutFeedback>
                                     </View>
                                 </View>
                             )}
                             {item.images.length >= 4 && (
                                 <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
                                             <Image
                                                 source={{uri: item.images[0]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
+                                        </TouchableWithoutFeedback>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
                                             <Image
                                                 source={{uri: item.images[1]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
-                                        </TouchableOpacity>
+                                        </TouchableWithoutFeedback>
                                     </View>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 2})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 2})}>
                                             <Image
                                                 source={{uri: item.images[2]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item.images, index: 3})}>
+                                        </TouchableWithoutFeedback>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 3})}>
                                             <Image
                                                 source={{uri: item.images[3]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
                                             <Text style={{color: COLORS.white, position: 'absolute', bottom: 10, right: 10, fontSize: 16}}>+{item.images.length - 4}</Text>
-                                        </TouchableOpacity>
+                                        </TouchableWithoutFeedback>
                                     </View>
                                 </View>
                             )}
@@ -320,7 +321,6 @@ export class PostItem extends React.Component {
                                 }}
                                 title={item?.title}
                                 description={item?.description}
-                                zoomEnabled={true}
                                 zoomControlEnabled={true}
                                 zoomTapEnabled={true}
                                 draggable={true}

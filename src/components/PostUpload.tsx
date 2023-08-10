@@ -16,6 +16,7 @@ import { db, auth, storage } from "../config/firebase";
 import { useSelector, useDispatch } from "react-redux";
 
 import axios from "axios";
+import { ToastAndroid, Platform } from "react-native";
 
 
 
@@ -107,7 +108,24 @@ export default function PostUpload({ navigation, route }) {
 
     const dispatch = useDispatch();
 
-
+    useEffect(() => {
+        (async () => {
+            if(!mylocation){
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setErrorMsg('Permission to access location was denied');
+                }
+    
+                let location = await Location.getCurrentPositionAsync({});
+                setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
+                setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
+            }
+            else {
+                setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
+                setNewOrganizationForm({...newOrganizationForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
+            }
+        })();
+    }, [mylocation]);
 
     useEffect(() => {
         (async () => {
@@ -120,7 +138,6 @@ export default function PostUpload({ navigation, route }) {
              setLocation({ type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] });
         })();
     }, []);
-
 
 
     useEffect(() => {
@@ -136,17 +153,7 @@ export default function PostUpload({ navigation, route }) {
         }
     }, [eventTitle])
 
-    useEffect(() => {
-        if (type === "newEvent") {
-            setNewPostForm({ ...newPostForm, images: images });
-        } else if (type === "newPost") {
-            setNewPostForm({ ...newPostForm, images: images });
-        } else if (type === "newOrganization") {
-            setNewOrganizationForm({ ...newOrganizationForm, images: images });
-        } else if (type === "newTree") {
-            setNewTreeForm({ ...newTreeForm, images: images });
-        }
-    }, [images, type]);
+
 
     useEffect(() => {
         if(type === "newOrganization"){
@@ -175,10 +182,6 @@ export default function PostUpload({ navigation, route }) {
             title: '',
             description: '',
             author: '',
-            location: {
-              type: 'Point',
-              coordinates: [0, 0],
-            },
             organizer: '',
             attendees: [],
             images: [],
@@ -209,10 +212,6 @@ export default function PostUpload({ navigation, route }) {
             moderators: [],
             images: [],
             bio: '',
-            location: {
-                type: 'Point',
-                coordinates: [0, 0],
-            },
             badges: [],
             notifications: [],
             isVerified: false,
@@ -237,9 +236,6 @@ export default function PostUpload({ navigation, route }) {
 
    
         
-
-
-  
 
  // this function too much messy, need to refactor
 
@@ -291,28 +287,7 @@ export default function PostUpload({ navigation, route }) {
             }
         }
 
-        
-
-
-
-
         setLoading(true);
-
-        if(!mylocation){
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-            }
-
-            let location = await Location.getCurrentPositionAsync({});
-            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
-            setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
-        }
-        else {
-            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
-            setNewOrganizationForm({...newOrganizationForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
-        }
-
 
         let imagesURL = [];
         images.forEach(async (image, index) => {
@@ -333,9 +308,13 @@ export default function PostUpload({ navigation, route }) {
             })
             .catch((error) => {
                 console.log(error);
+                setLoading(false);
+                if(Platform.OS === "android"){
+                    ToastAndroid.show("Error", ToastAndroid.SHORT);
+                }
+                return;
             })
-
-            if(index === images.length - 1){
+            .finally(async () => {
                 if(type === "newEvent"){
                     await axios.post(`${API_URL}/events/new`, {
                         ...newEventForm,
@@ -349,16 +328,18 @@ export default function PostUpload({ navigation, route }) {
                         setType("");
                         setImages([]);
                         clearValues();
-                        Alert.alert('Success', response?.data?.message, [
-                            {
-                                text: 'Ok',
-                                onPress: () => navigation.navigate('Home')
-                            },
-                        ])
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Event created successfully", ToastAndroid.SHORT);
+                        }
+                        navigation.navigate('Home')
+                        
                     })
                     .catch((error) => {
                         console.log(error);
                         setLoading(false);
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Error", ToastAndroid.SHORT);
+                        }
                     });
 
                 } else if(type === "newPost"){
@@ -374,16 +355,18 @@ export default function PostUpload({ navigation, route }) {
                         setType("");
                         setImages([]);
                         clearValues();
-                        Alert.alert('Success', response?.data?.message, [
-                            {
-                                text: 'Ok',
-                                onPress: () => navigation.navigate('Home')
-                            },
-                        ])
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Post created successfully", ToastAndroid.SHORT);
+                        }
+                        navigation.navigate('Home')
+                       
                     })
                     .catch((error) => {
                         console.log(error);
                         setLoading(false);
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Error", ToastAndroid.SHORT);
+                        }
                     });
                 } else if(type === "newOrganization"){
                     await axios.post(`${API_URL}/organizations/new`,  {
@@ -398,16 +381,17 @@ export default function PostUpload({ navigation, route }) {
                         setType("");
                         setImages([]);
                         clearValues();
-                        Alert.alert('Success', response?.data?.message + " Please wait for the admin to verify your organization", [
-                            {
-                                text: 'Ok',
-                                onPress: () => navigation.navigate('Home')
-                            },
-                        ])
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Organization created successfully, Please wait for the admin to verify your organization", ToastAndroid.SHORT);
+                        }
+                        navigation.navigate('Home')
                     })
                     .catch((error) => {
                         console.log(error);
                         setLoading(false);
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Error", ToastAndroid.SHORT);
+                        }
                     })
                 } else if(type === "newTree"){
                     await axios.post(`${API_URL}/plants/new`, {
@@ -421,23 +405,22 @@ export default function PostUpload({ navigation, route }) {
                         setType("");
                         setImages([]);
                         clearValues();
-                        Alert.alert('Success', response?.data?.message, [
-                            {
-                                text: 'Ok',
-                                onPress: () => navigation.navigate('Home')
-                            },
-                        ])
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Tree created successfully", ToastAndroid.SHORT);
+                        }
+                        navigation.navigate('Home')
                     })
                     .catch((error) => {
                         console.log(error);
                         setLoading(false);
+                        if(Platform.OS === "android"){
+                            ToastAndroid.show("Error", ToastAndroid.SHORT);
+                        }
                     })
                 }
             }
-           
-        });
-
-       
+            )
+        })
     }
 
 
@@ -452,11 +435,6 @@ export default function PostUpload({ navigation, route }) {
         setNewPostForm({ ...newPostForm, tags: newPostForm.tags.filter((t) => t !== tag) });
       };
             
-
-
-
-
-        
 
 
 
@@ -495,7 +473,6 @@ export default function PostUpload({ navigation, route }) {
     };
 
    
-    
 
     const eventForm = () => {
         return (
@@ -886,7 +863,17 @@ export default function PostUpload({ navigation, route }) {
                         <Text style={[styles.typeButtonText, type === "newPost" ? styles.activeTypeButtonText : null]}>Create Post</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.typeButton, type === "newOrganization" ? styles.activeTypeButton : null]}
-                    onPress={() => setType("newOrganization")}
+                    onPress={() => {
+                        if(images.length > 1) {
+                            if(Platform.OS === "android") {
+                                ToastAndroid.show("Only one image allowed for organization", ToastAndroid.SHORT);
+                            } else {
+                                Alert.alert("Only one image allowed");
+                            }
+                        } else {
+                            setType("newOrganization");
+                        }
+                    }}
                     >
                         <Text style={[styles.typeButtonText, type === "newOrganization" ? styles.activeChooseButtonText : null]}>Create Organization</Text>
                     </TouchableOpacity>

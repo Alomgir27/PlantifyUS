@@ -54,8 +54,8 @@ export default () => {
     <TranslationProvider>
       <ThemeProvider theme={theme} setTheme={setTheme}>
         <NavigationContainer theme={navigationTheme}>
-          <StatusBar barStyle={isDark ? 'dark-content' : 'light-content'}  backgroundColor={theme.colors.primary} />
-          <Menu />
+          <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={isDark ? COLORS.black : COLORS.white} />
+           <Menu />
         </NavigationContainer>
       </ThemeProvider>
     </TranslationProvider>

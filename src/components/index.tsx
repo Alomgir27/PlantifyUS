@@ -6,7 +6,7 @@ import Modal from './Modal';
 import Switch from './Switch';
 import Checkbox from './Checkbox';
 import Image from './Image';
-import Article from './Article';
+import OrganizationCard from './OrganizationCard';
 import Product from './Product';
 import Calendar from './Calendar';
 
@@ -18,7 +18,7 @@ export {
   Switch,
   Checkbox,
   Image,
-  Article,
+  OrganizationCard,
   Product,
   Modal,
   Calendar,

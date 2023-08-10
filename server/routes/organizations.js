@@ -32,6 +32,7 @@ const { Organizations } = require('../models');
 router.post('/new', async (req, res) => {
     const { name, admin, bio, type, location, images } = req.body;
 
+    console.log(req.body, 'req.body');
     const newOrganization = new Organizations({
         name,
         admin,
@@ -39,7 +40,7 @@ router.post('/new', async (req, res) => {
         type,
         location,
         images,
-        volunteers: [],
+        volunteers: [admin],
         events: [],
         moderators: [],
         badges: [],
@@ -54,22 +55,6 @@ router.post('/new', async (req, res) => {
 });
 
 
-//@route GET api/organizations
-//@desc Get all organizations but maximum 20
-//@access Public
-router.get('/', async (req, res) => {
-    const { page } = req.query;
-    const limit = 20
-    const skip = (parseInt(page) - 1) * limit;
-
-    Organizations.find()
-        .skip(skip)
-        .limit(limit)
-        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
-        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
-});
-
-
 
 //@route GET api/organizations/search
 //@desc Search for organizations by name or bio and do regex search
@@ -78,7 +63,7 @@ router.get('/search', async (req, res) => {
     const { search, limit } = req.query;
 
 
-    Organizations.find({ $or: [{ name: { $regex: search, $options: 'i' } }, { bio: { $regex: search, $options: 'i' } }] })
+    Organizations.find({ $or: [{ name: { $regex: search, $options: 'i' } }, { bio: { $regex: search, $options: 'i' } }], isVerified: true })
         .limit(parseInt(limit) || 10)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
@@ -91,10 +76,15 @@ router.get('/search', async (req, res) => {
 router.get('/exist/:name', async (req, res) => {
     const { name } = req.params;
     console.log(name, 'name');
+    //if last character is a space, remove it
+    if (name[name.length - 1] === ' ') {
+        name = name.slice(0, name.length - 1);
+    }
    
-    // name and find name should be same length and name should be same as find name
-    Organizations.find({ $and: [{ name: { $regex: name, $options: 'i' } }, { name: { $regex: `^${name}$`, $options: 'i' } }] })
+    // name and find name should be same length and name should be same as find name and should be isVerified true
+    Organizations.find({ name: { $regex: name, $options: 'i', $eq: name }, isVerified: true })
         .then(organizations => {
+            console.log(organizations, 'organizations');
             if (organizations.length > 0) {
                 res.status(200).json({ success: true, message: 'Organization name exists' });
             } else {
@@ -104,8 +94,69 @@ router.get('/exist/:name', async (req, res) => {
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
   
 });
+
+
+
+//@route POST api/organizations/getAll
+//@desc POST all organizations except the ones in the ids array and isVerified is true
+//@access Public
+router.post('/getAll', async (req, res) => {
+    const { ids } = req.body;
+    console.log(ids, 'ids get all');
+    Organizations.find({ _id: { $nin: ids }, isVerified: true })
+        .populate('admin', '_id name image')
+        .limit(10)
+        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+});
+
    
+//@route GET api/organizations/getMy/${user?._id}
+//@desc Get all organizations that the user is a part of only check if id has inside volunteers array
+//@access Public
+router.get('/getMy/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log(id, 'id');
+    Organizations.find({ volunteers: id, isVerified: true })
+        .populate('admin', '_id name image')
+        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+});
+
+//@route GET api/organizations/getPending
+//@desc Get all organizations that the user is a part of not in ids array and isVerified is false
+//@access Public
+router.post('/getPending', async (req, res) => {
+    const { ids } = req.body;
+    console.log(ids, 'ids get pending');
+    Organizations.find({ _id: { $nin: ids }, isVerified: false })
+        .populate('admin', '_id name image')
+        .limit(10)
+        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+});
 
 
+//@route GET api/organizations/getRequested/${user?._id}
+//@desc Get all organizations that the user is a part only check volunteers array
+//@access Public
+router.get('/getRequested/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log(id, 'id');
+    Organizations.find({ volunteers: id, isVerified: false })
+        .populate('admin', '_id name image')
+        .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
+});
+
+
+router.put('/test', async (req, res) => {
+    Organizations.find()
+        .then(organizations => {
+            
+            res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' });
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to update organizations', error: err }));
+});
 
 module.exports = router;

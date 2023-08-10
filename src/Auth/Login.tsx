@@ -17,6 +17,8 @@ import { useDispatch } from "react-redux";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { ToastAndroid, Platform } from "react-native";
+
 export default function Login({ navigation }) {
 
   const [label, setLabel] = React.useState("");
@@ -49,13 +51,12 @@ export default function Login({ navigation }) {
           console.log(res);
           setEmail("");
           setPassword("");
-          Alert.alert("Success", "Logged in successfully", [
-            {
-              text: "Ok",
-              onPress: () => navigation.navigate("Home"),
-            },
-          ]);
-
+          if(Platform.OS === "android"){
+            ToastAndroid.show("Login Successful", ToastAndroid.SHORT);
+          }
+          navigation.navigate("Home"),
+          setVisible(false);
+          setLabel("");
         })
         .catch((err) => {
           setLoading(false);

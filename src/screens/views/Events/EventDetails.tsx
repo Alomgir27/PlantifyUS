@@ -20,13 +20,12 @@ import { Text as Text2 } from 'react-native-elements';
 
 
 
-const EventDetails = ({ route }) => {
+const EventDetails = ({ route , navigation}) => {
     const { item } = route.params;
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
     
     const user = useSelector((state) => state.data.currentUser);
-    const navigation = useNavigation();
     const [visible, setVisible] = useState(false);
 
     const showModal = () => setVisible(true);
@@ -42,7 +41,7 @@ const EventDetails = ({ route }) => {
         <ScrollView>
            <View style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBack}>
                         <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                     </TouchableOpacity>
                     <Text  style={styles.headerTitle}>Event Details</Text>
@@ -59,7 +58,6 @@ const EventDetails = ({ route }) => {
                         <View style={[styles.eventHeaderRight, {
                             backgroundColor: item.status === 'pending' ? COLORS.gray : item.status === 'approved' ? COLORS.primary : item.status === 'rejected' ? COLORS.red : COLORS.green
                         }]}>
-                             {console.log(item.status)}
                             <Text style={styles.eventHeaderRightText}>{item.status}</Text>
                         </View>
                     </View>

@@ -123,8 +123,7 @@ const BottomSheet = ({ navigation, sheetRef }) => {
             <View style={{alignItems: 'center'}}>
               {/* Tree plantation event creation */}
               <Text style={styles.panelTitle}>Upload Photo</Text>
-              <Text style={styles.panelSubtitle}>Which one do you want to upload?</Text>
-              <Text style={{color: COLORS.gray, fontSize: 12, marginBottom: 10}}>You can upload multiple photos</Text>
+              <Text style={{color: COLORS.gray, fontSize: 12, marginBottom: 10}}>Multiple photos can be uploaded except for organization</Text>
             </View>
             <TouchableOpacity style={styles.panelButton} onPress={takePhotoFromCamera}>
               <Text style={styles.panelButtonTitle}>Take Photo</Text>

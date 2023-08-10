@@ -37,34 +37,35 @@ import {
 
 import Tabs from "./navigation/tabs";
 
-
 // constants
 import { COLORS } from "./constants/index";
-import { clearData, fetchUser, fetchAllDefaultData } from "./modules/data";
+import { fetchUser, fetchAllDefaultData, clearData } from "./modules/data";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { setMyLocation, setLocation } from "./modules/campings";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
 import * as ICONS from '@expo/vector-icons'
+import { Text as Text2 } from './components';
 
 
 const Drawer = createDrawerNavigator();
 export default function Main() {  
 
+    const [loading, setLoading] = useState<boolean>(false);
     const user = useSelector(state => state?.data?.currentUser)
     const organizations = useSelector(state => state?.data?.organizations)
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-      (async () => {
-        const user = await AsyncStorage.getItem('user');
-        if(user){
-            dispatch(fetchUser(JSON.parse(user)?._id));
-        } else {
-            dispatch(fetchAllDefaultData());
-        }
-      })()
+        (async () => {
+            const user = await AsyncStorage.getItem('user');
+            let _id: any = null;
+            if(user) {
+                _id = JSON.parse(user)?._id
+            }
+            dispatch(fetchUser(_id, setLoading))
+        })();
     }, [])
 
     useEffect(() => {
@@ -81,6 +82,13 @@ export default function Main() {
         })()
     }, [])
 
+    useEffect(() => {
+        if(loading){
+            dispatch(clearData())
+            dispatch(fetchAllDefaultData());
+            setLoading(false);
+        }
+    }, [loading])
 
 
     const CustomDrawerContent = (props) => {
@@ -220,7 +228,11 @@ export default function Main() {
                         {organizations?.map((item, index) => (
                             <DrawerItem
                                 key={index}
-                                label={item?.name}
+                                label={() => <View>
+                                    <Text2 numberOfLines={1}> {item?.name}</Text2>
+                                    <Text numberOfLines={1} style={{ color: COLORS.gray }}> {item?.bio}</Text>
+                                </View>}
+
                                 labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                                 onPress={() => props.navigation.navigate('OrganizationDetail', { organization: item })}
                                 icon={() => <Image source={{ uri: item?.images[0] }} style={{ width: 40, height: 40, borderRadius: 20 }} />}
@@ -269,7 +281,6 @@ export default function Main() {
                                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5 }} onPress={() => {
                                     AsyncStorage.removeItem('user');
                                     dispatch(clearData());
-                                    dispatch(fetchAllDefaultData());
                                     props.navigation.closeDrawer();
                                 }}>
                                     <ICONS.Ionicons name="log-out" size={24} color={COLORS.primary} />
@@ -282,10 +293,6 @@ export default function Main() {
 
                         <View style={{ height: 50 }}></View>
                     </View>
-
-                   
-
-
                 </View>
             </DrawerContentScrollView>
         )

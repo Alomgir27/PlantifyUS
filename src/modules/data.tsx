@@ -48,7 +48,6 @@ const LOGOUT = 'LOGOUT'
 
 const LOADING_STATE_CHANGE = 'LOADING_STATE_CHANGE'
 
-
 //Initial State
 const INITIAL_STATE = {
     currentUser: null,
@@ -81,8 +80,8 @@ export default  data = (state = INITIAL_STATE, action) => {
                 ...state,
                 currentUser: action.currentUser
             }
-       
-       
+        
+    
         case ORGANIZATIONS_STATE_CHANGE:
             return {
                 ...state,
@@ -316,6 +315,7 @@ export default  data = (state = INITIAL_STATE, action) => {
 }
 
 
+
 //Actions data reset
 export const clearData = () => {
     return ((dispatch) => {
@@ -363,9 +363,8 @@ export const handleLoading = (loading) => {
 }
 
 //Actions
-export const fetchUser = ( _id) => {
+export const fetchUser = (_id, callback) => {
     return (async (dispatch, getState) => {
-        if(!_id) return
         await axios.get(`${API_URL}/users/get/${_id}`)
         .then((res) => {
             console.log(res?.data?.message, 'USER STATE CHANGE')
@@ -381,9 +380,9 @@ export const fetchUser = ( _id) => {
             })
         })
         .finally(() => {
-            dispatch(handleLoading(false))
-            dispatch(fetchAllDefaultData())
+            if(callback) callback(true);
         })
+        
     })
 }
 
@@ -445,10 +444,8 @@ export const fetchOrganizations =  () => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
-        await axios.get(`${API_URL}/organizations`, {
-            params: {
-                page: getState().data.organizationsLoaded + 1
-            }
+        await axios.post(`${API_URL}/organizations/getAll`, {
+            ids: getState().data.organizations.map((organization) => organization._id),
         })
         .then((res) => {
             console.log(res?.data?.message)

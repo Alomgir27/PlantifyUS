@@ -308,7 +308,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                     <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />
                 )}
                 backgroundComponent={({ style }) => (
-                    <View style={[style, { backgroundColor: COLORS.white }]} />
+                    <View style={[...style, { backgroundColor: COLORS.white }]} />
                 )}
                 handleComponent={() => null}
                 handleIndicatorComponent={() => null}

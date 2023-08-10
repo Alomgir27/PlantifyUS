@@ -10,7 +10,7 @@ const AuthLandingPage = ({ navigation }) => {
       <Swiper style={styles.swiperContainer} loop={false} autoplay={false} dotColor={COLORS.primary} activeDotColor={COLORS.secondary}>
         <View style={styles.slide}>
           <Image
-            source={require('../../assets/images/slide1.jpg')}
+            source={require('../../assets/logo.png')}
             style={styles.slideImage}
           />
           <Text style={styles.slideText}>Welcome to our app!</Text>

@@ -37,7 +37,7 @@ router.post('/new', async (req, res) => {
         name,
         admin,
         bio,
-        type,
+        type: type || 'pending',
         location,
         images,
         volunteers: [admin],
@@ -45,7 +45,8 @@ router.post('/new', async (req, res) => {
         moderators: [],
         badges: [],
         notifications: [],
-        isVerified: false
+        isVerified: false,
+        joinRequests: []
     });
 
     newOrganization.save()
@@ -105,6 +106,7 @@ router.post('/getAll', async (req, res) => {
     console.log(ids, 'ids get all');
     Organizations.find({ _id: { $nin: ids }, isVerified: true })
         .populate('admin', '_id name image')
+        .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .limit(10)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
@@ -119,6 +121,7 @@ router.get('/getMy/:id', async (req, res) => {
     console.log(id, 'id');
     Organizations.find({ volunteers: id, isVerified: true })
         .populate('admin', '_id name image')
+        .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
 });
@@ -131,6 +134,7 @@ router.post('/getPending', async (req, res) => {
     console.log(ids, 'ids get pending');
     Organizations.find({ _id: { $nin: ids }, isVerified: false })
         .populate('admin', '_id name image')
+        .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .limit(10)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
@@ -138,22 +142,77 @@ router.post('/getPending', async (req, res) => {
 
 
 //@route GET api/organizations/getRequested/${user?._id}
-//@desc Get all organizations that the user is a part only check volunteers array
+//@desc Get all organizations that the user is a part only check joinRequests array
 //@access Public
 router.get('/getRequested/:id', async (req, res) => {
     const { id } = req.params;
     console.log(id, 'id');
-    Organizations.find({ volunteers: id, isVerified: false })
+    Organizations.find({ joinRequests: id, isVerified: true })
         .populate('admin', '_id name image')
+        .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
 });
 
 
+//@route POST api/organizations/joinRequest
+//@desc Add user to joinRequests array of organization
+//@access Public
+router.post('/joinRequest', async (req, res) => {
+    const { userId, organizationId } = req.body;
+    console.log(req.body, 'req.body');
+
+    Organizations.findById(organizationId)
+        .then(organization => {
+            if(organization.joinRequests.includes(userId)) {
+                organization.joinRequests.pull(userId);
+            } else {
+                organization.joinRequests.push(userId);
+            }
+            organization.save()
+                .then(organization => res.status(200).json({ success: true, organization, message: 'Organization updated successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
+});
+
+
+
+//@route POST api/organizations/approveRequest
+//@desc Add user to volunteers array of organization and remove user from joinRequests array
+//@access Public
+router.post('/approveRequest', async (req, res) => {
+    const { userId, organizationId } = req.body;
+    console.log(req.body, 'req.body');
+
+    Organizations.findById(organizationId)
+        .then(organization => {
+            if(organization.joinRequests.includes(userId)) {
+                organization.joinRequests.pull(userId);
+            }
+            if(!organization.volunteers.includes(userId)) {
+               organization.volunteers.push(userId);
+            }
+            console.log(organization, 'organization');
+            organization.isVerified = true;
+            organization.save()
+                .then(organization => res.status(200).json({ success: true, organization, message: 'Organization updated successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
+});
+
+
+
 router.put('/test', async (req, res) => {
     Organizations.find()
+        .populate('admin', '_id name image')
+        .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .then(organizations => {
-            
+            organizations.forEach(organization => {
+                organization.joinRequests = [];
+                organization.save();
+            });
             res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' });
         })
         .catch(err => res.status(400).json({ success: false, message: 'Unable to update organizations', error: err }));

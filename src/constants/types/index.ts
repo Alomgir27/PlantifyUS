@@ -120,6 +120,7 @@ export interface IOrganization {
   moderators?: IUser[];
   badges?: IBadge[];
   notifications?: INotification[];
+  joinRequests?: IUser[];
   isVerified?: boolean;
   type?: string;
   createdAt?: Date;

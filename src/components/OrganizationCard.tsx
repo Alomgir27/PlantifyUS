@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import {TouchableWithoutFeedback} from 'react-native';
+import {Alert, TouchableWithoutFeedback} from 'react-native';
 
 import Text from './Text';
 import Block from './Block';
@@ -10,15 +10,40 @@ import Button from './Button';
 import { useSelector } from 'react-redux';
 
 
-
-const OrganizationsGallery = ({item, onPress}: any) => {
-  const {assets, sizes,  gradients} = useTheme();
+const OrganizationsGallery = ({item, onPress, type, navigation}: any) => {
+  const {assets, sizes, colors, gradients} = useTheme();
+  const user = useSelector((state: any) => state.data.currentUser);
   const IMAGE_SIZE = (sizes.width - (sizes.padding + sizes.sm) * 2) / 3;
   const IMAGE_VERTICAL_SIZE =
     (sizes.width - (sizes.padding + sizes.sm) * 2) / 2;
-  const IMAGE_MARGIN = (sizes.width - IMAGE_SIZE * 3 - sizes.padding * 2) / 2;
-  const IMAGE_VERTICAL_MARGIN =
-    (sizes.width - (IMAGE_VERTICAL_SIZE + sizes.sm) * 2) / 2;
+ 
+  const handlePress = (_id: string) => {
+    if(item?.joinRequests?.includes(user?._id)) {
+      Alert.alert(
+        'Request',
+        'You have already requested to join this organization',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {
+            text: 'Withdraw',
+            onPress: () => onPress('Join', _id),
+          }
+        ],
+        {cancelable: true},
+      );
+        
+    } else {
+      onPress('Join', _id);
+    }
+  };
+
+
+    
+
 
 
   return (
@@ -33,9 +58,27 @@ const OrganizationsGallery = ({item, onPress}: any) => {
           source={{uri: item?.images[0]}}
           height={sizes.height / 4}
         />
-        <Text p secondary marginTop={sizes.sm} primary>
-          {item?.type} • {item?.moderators?.length} moderators • {item?.volunteers?.length} members
-        </Text>
+        <Block row marginBottom={sizes.s}>
+            <Text  p secondary marginTop={sizes.sm} primary>
+               {item?.type} • {item?.moderators?.length} moderators • 
+            </Text>
+            <Block row marginTop={sizes.sm} marginLeft={sizes.s}>
+                {item?.volunteers?.map((volunteer: any) => (
+                  volunteer?.image &&
+                      <Image
+                        radius={10}
+                        width={20}
+                        height={20}
+                        source={{uri: volunteer?.image}}
+                        style={{backgroundColor: colors.white, marginRight: -5 , zIndex: 1, marginTop: 2}}
+                        overlay
+                      />
+                ))}
+                <Text p primary marginLeft={sizes.s}>
+                  {item?.volunteers?.length} members
+                </Text>
+            </Block>
+          </Block>
         <Text h4 gradient={gradients.primary}>
           {item.name}
         </Text>
@@ -45,19 +88,34 @@ const OrganizationsGallery = ({item, onPress}: any) => {
         <Block row marginTop={sizes.sm}>
           <Button
             primary
-            onPress={onPress}
+            onPress={() => navigation.navigate('Organization', { _id: item?._id})}
             marginRight={sizes.s}
             width={sizes.width / 3}
-
             >
             <Text bold>View</Text>
           </Button>
-          <Button
-           primary
-           width={sizes.width / 3}
-          >
-            <Text bold>Join</Text>
-          </Button>
+          {type !== 'pending' && (
+            <Button
+            primary
+            width={sizes.width / 3}
+            onPress={() => handlePress(item?._id)}
+            >
+              <Text bold>
+                {item?.joinRequests?.includes(user?._id) ? 'Requested' : 'Join'}
+              </Text>
+            </Button>
+          )}
+          {type === 'pending' && !(user?.type === 'admin' || user?.type === 'moderator') && !item?.isVerified && (
+            <Button
+              primary
+              width={sizes.width / 3}
+              onPress={() => onPress('Approve', item?._id)}
+            >
+              <Text bold>
+                Approve
+              </Text>
+            </Button>
+          )}
         </Block>
         <Block row marginTop={sizes.sm}>
           <Text p semibold marginRight={sizes.s} secondary>
@@ -72,21 +130,15 @@ const OrganizationsGallery = ({item, onPress}: any) => {
   );
 }
 
-const OrganizationCard = ({item, type, onPress}: any) => {
+const OrganizationCard = ({item, type, onPress, navigation}: any) => {
   const {t} = useTranslation();
   const {colors, gradients, icons, sizes} = useTheme();
   const user = useSelector((state: any) => state.data.currentUser);
 
-  
 
-  // console.log("item: ", item);
-  // console.log("type: ", type);
-  // console.log("onPress: ", onPress);
-
-
-  if ((type === 'all' || type === 'my') && item?.volunteers?.includes(user?.id)) {
+  if ((type === 'all' && item?.volunteers?.map((item : any) => item?._id ? item?._id : item).includes(user?._id)) || type === 'my') {
       return (
-        <TouchableWithoutFeedback onPress={onPress}>
+        <TouchableWithoutFeedback onPress={() => navigation.navigate('Organization', { _id: item?._id})} key={item?._id} >
           <Block card white padding={0} marginTop={sizes.sm}>
             <Image
               background
@@ -94,7 +146,7 @@ const OrganizationCard = ({item, type, onPress}: any) => {
               radius={sizes.cardRadius}
               source={{uri: item?.images[0]}}>
               <Block color={colors.overlay} padding={sizes.padding}>
-                <Text h4 white marginBottom={sizes.sm}>
+                <Text h4 white marginBottom={sizes.sm} gradient={gradients.primary}>
                   {item?.name}
                 </Text>
                 <Text p white>
@@ -106,18 +158,42 @@ const OrganizationCard = ({item, type, onPress}: any) => {
                     radius={sizes.s}
                     width={sizes.xl}
                     height={sizes.xl}
-                    source={{uri: item?.images[0]}}
+                    source={{uri: item?.admin?.image}}
                     style={{backgroundColor: colors.white}}
                   />
-                  <Block justify="center" marginLeft={sizes.s}>
-                    <Text p white semibold>
-                      {item?.name}
-                    </Text>
-                    <Text p white>
-                      {item?.bio}
-                    </Text>
-                  </Block>
+                  <Block marginLeft={sizes.s} justify="center">
+                      <Text p white semibold>
+                        <Text bold primary onPress={() => navigation.navigate('Profile', { _id: item?.admin?._id})}> {item?.admin?.name}</Text> created this organization
+                      </Text>
+                      <Block row marginTop={sizes.s}>
+                        {item?.volunteers?.map((volunteer: any) => (
+                          volunteer?.image &&
+                              <Image
+                                radius={10}
+                                width={20}
+                                height={20}
+                                source={{uri: volunteer?.image}}
+                                style={{backgroundColor: colors.white, marginRight: -5 , zIndex: 1}}
+                                overlay
+                              />
+                        ))}
+                        <Text p  marginLeft={sizes.s}>
+                          You and {item?.volunteers?.length} others are members
+                        </Text>
+                      </Block>
+                    </Block>
                 </Block>
+                <Block marginTop={sizes.sm}>
+                    <Button
+                      gradient={gradients.primary}
+                      radius={sizes.sm}
+                      marginRight={sizes.s}
+                      onPress={() => navigation.navigate('ChatRoom', { _id: item?._id})}>
+                      <Text bold white>
+                        ChatRoom
+                      </Text>
+                    </Button>
+                  </Block>
               </Block>
              </Image>
           </Block>
@@ -126,8 +202,8 @@ const OrganizationCard = ({item, type, onPress}: any) => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={onPress}>
-       <OrganizationsGallery item={item} onPress={onPress} />
+    <TouchableWithoutFeedback onPress={() => navigation.navigate('Organization', { _id: item?._id})} key={item?._id} >
+       <OrganizationsGallery item={item} onPress={onPress} type={type} navigation={navigation} />
     </TouchableWithoutFeedback>
   );
 

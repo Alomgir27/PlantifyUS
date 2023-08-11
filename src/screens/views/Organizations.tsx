@@ -11,13 +11,11 @@ import { COLORS } from "../../constants/index";
 import { Button as Button2 } from 'react-native-elements';
 import { API_URL } from "../../constants/index";
 import axios from "axios";
+import { Platform, ToastAndroid } from 'react-native';
 
 
 const Organizations = ({ navigation}) => {
-    // const data = useData();
-    // const [selected, setSelected] = useState<ICategory>();
-    const [articles, setArticles] = useState([]);
-    // const [categories, setCategories] = useState<ICategory[]>([]);
+    const [articles, setArticles] = useState<IOrganization[]>([]);
     const {colors, gradients, sizes} = useTheme();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -32,6 +30,7 @@ const Organizations = ({ navigation}) => {
     });
 
     const [mounted, setMounted] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     const options = [
         {
@@ -43,13 +42,13 @@ const Organizations = ({ navigation}) => {
             value: 'my'
         },
         {
-            name: 'Pending',
-            value: 'pending'
+            name: 'My Requests',
+            value: 'requested'
         },
         {
-            name: 'Requested',
-            value: 'requested'
-        }
+            name: 'Waiting for Approval',
+            value: 'pending'
+        },
     ];
 
    
@@ -165,7 +164,6 @@ const Organizations = ({ navigation}) => {
                 requested: temp
             })
             setLoading(false);
-            // console.log(res);
         }
         )
         .catch((err) => {
@@ -186,7 +184,7 @@ const Organizations = ({ navigation}) => {
         }
     }, [mounted])
 
-    useEffect(() => {
+    function fetchMore() {
         if(type === 'all') {
             getAll();
         }
@@ -199,38 +197,95 @@ const Organizations = ({ navigation}) => {
         else if(type === 'requested') {
             getRequested();
         }
-    }, [type])
+    }
+
+
+    function wait(timeout) {
+        return new Promise(resolve => {
+            setTimeout(resolve, timeout);
+            }
+        );
+    }
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setData({
+            all: [],
+            my: [],
+            pending: [],
+            requested: []
+        });
+        setMounted(false);
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
+
 
 
   
 
-//   // init articles
   useEffect(() => {
-    // setArticles(data?.articles);
-    // setCategories(data?.categories);
-    // setSelected(data?.categories[0]);
     let temp = type === 'all' ? data?.all : type === 'my' ? data?.my : type === 'pending' ? data?.pending : data?.requested;
     setArticles(temp);
-  }, [type, data.all, data.my, data.pending, data.requested]);
-  // [data.articles, data.categories]);
+    console.log(temp, 'to be set articles');
+  }, [type, data])
+  
+  const onPress = async (type: String, _id: any) => {
+    if(type === 'Join') {
+        await axios.post(`${API_URL}/organizations/joinRequest`, {
+            userId: user?._id,
+            organizationId: _id
+        })
+        .then((res) => {
+            const temp = {
+                all: data?.all?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
+                my: data?.my?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
+                pending: data?.pending?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
+                requested: data?.requested?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item)
+            }
+            setData(temp);
+            if(Platform.OS === 'android'){
+                ToastAndroid.showWithGravityAndOffset(
+                    "Request sent successfully",
+                    ToastAndroid.LONG,
+                    ToastAndroid.BOTTOM,
+                    25,
+                    50
+                    );
+            }
 
-  // update articles on category change
-  // useEffect(() => {
-  //   const category = data?.categories?.find(
-  //     (category) => category?.id === selected?.id,
-  //   );
 
-  //   const newArticles = data?.articles?.filter(
-  //     (article) => article?.category?.id === category?.id,
-  //   );
-
-  //   setArticles(newArticles);
-  // }, [data, selected, setArticles]);
-
-  const navigate = (item: IOrganization) => {
-    navigation.navigate('Organization', {item});
-    };
-
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+   } else if(type === 'Approve') {
+         await axios.post(`${API_URL}/organizations/approveRequest`, {
+              userId: user?._id,
+              organizationId: _id
+         })
+         .then((res) => {
+              const temp = {
+                all: data?.all?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item),
+                my: data?.my?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item),
+                pending: data?.pending?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item),
+                requested: data?.requested?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item)
+          }
+          setData(temp);
+          if(Platform.OS === 'android'){
+                ToastAndroid.showWithGravityAndOffset(
+                 "Request approved successfully",
+                 ToastAndroid.LONG,
+                 ToastAndroid.BOTTOM,
+                 25,
+                 50
+                 );
+          }
+         })
+         .catch((err) => {
+              console.log(err);
+         })
+    }
+}
   return (
     <Block>
         <View style={styles.header}>
@@ -257,37 +312,6 @@ const Organizations = ({ navigation}) => {
                 ))}
             </ScrollView>
         </View>
-      {/* categories list */}
-      {/* <Block color={colors.card} row flex={0} paddingVertical={sizes.padding}>
-        <Block
-          scroll
-          horizontal
-          renderToHardwareTextureAndroid
-          showsHorizontalScrollIndicator={false}
-          contentOffset={{x: -sizes.padding, y: 0}}>
-          {categories?.map((category) => {
-            const isSelected = category?.id === selected?.id;
-            return (
-              <Button
-                radius={sizes.m}
-                marginHorizontal={sizes.s}
-                key={`category-${category?.id}}`}
-                onPress={() => setSelected(category)}
-                gradient={gradients?.[isSelected ? 'primary' : 'light']}>
-                <Text
-                  p
-                  bold={isSelected}
-                  white={isSelected}
-                  black={!isSelected}
-                  transform="capitalize"
-                  marginHorizontal={sizes.m}>
-                  {category?.name}
-                </Text>
-              </Button>
-            );
-          })}
-        </Block>
-      </Block> */}
 
       <FlatList
         data={articles}
@@ -295,7 +319,11 @@ const Organizations = ({ navigation}) => {
         keyExtractor={(item) => `${item?._id}`}
         style={{paddingHorizontal: sizes.padding}}
         contentContainerStyle={{paddingBottom: sizes.l}}
-        renderItem={({item}) => <OrganizationCard item={item} type={type} onPress={() => navigate(item)} />}
+        renderItem={({item}) => <OrganizationCard item={item} type={type} onPress={onPress} navigation={navigation} />}
+        onEndReached={fetchMore}
+        onEndReachedThreshold={0.5}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     </Block>
   );

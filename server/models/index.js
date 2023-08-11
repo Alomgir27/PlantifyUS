@@ -97,7 +97,10 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Notification'
     }],
-    type: String,
+    type: {
+        type: String,
+        enum: ['user', 'moderator', 'admin'],
+    },
     uuid: String
 }, { timestamps: true });
 
@@ -116,6 +119,10 @@ const organizationSchema = new Schema({
         ref: 'User'
     },
     moderators: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    joinRequests: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],

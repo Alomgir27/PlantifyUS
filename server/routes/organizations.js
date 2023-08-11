@@ -107,7 +107,7 @@ router.post('/getAll', async (req, res) => {
     Organizations.find({ _id: { $nin: ids }, isVerified: true })
         .populate('admin', '_id name image')
         .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
-        .limit(10)
+        .limit(5)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
 });
@@ -178,23 +178,17 @@ router.post('/joinRequest', async (req, res) => {
 
 
 
-//@route POST api/organizations/approveRequest
+//@route POST api/organizations/verifyRequest
 //@desc Add user to volunteers array of organization and remove user from joinRequests array
 //@access Public
-router.post('/approveRequest', async (req, res) => {
+router.post('/verifyRequest', async (req, res) => {
     const { userId, organizationId } = req.body;
     console.log(req.body, 'req.body');
 
     Organizations.findById(organizationId)
         .then(organization => {
-            if(organization.joinRequests.includes(userId)) {
-                organization.joinRequests.pull(userId);
-            }
-            if(!organization.volunteers.includes(userId)) {
-               organization.volunteers.push(userId);
-            }
-            console.log(organization, 'organization');
             organization.isVerified = true;
+            organization.type = 'approved';
             organization.save()
                 .then(organization => res.status(200).json({ success: true, organization, message: 'Organization updated successfully' }))
                 .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
@@ -209,10 +203,6 @@ router.put('/test', async (req, res) => {
         .populate('admin', '_id name image')
         .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .then(organizations => {
-            organizations.forEach(organization => {
-                organization.joinRequests = [];
-                organization.save();
-            });
             res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' });
         })
         .catch(err => res.status(400).json({ success: false, message: 'Unable to update organizations', error: err }));

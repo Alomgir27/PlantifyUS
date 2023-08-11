@@ -15,13 +15,10 @@ const { width, height } = Dimensions.get('window');
 
 import { Text as Text } from '../../../components/';
 import { Text as Text2 } from 'react-native-elements';
-
-// const eventSchema = new Schema({
-
+import { IEvent } from "../../../constants/types";
 
 
 const EventDetails = ({ route , navigation}) => {
-    const { item } = route.params;
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
     
@@ -34,6 +31,21 @@ const EventDetails = ({ route , navigation}) => {
     const [expanded, setExpanded] = useState(true);
 
     const handlePress = () => setExpanded(!expanded);
+    const [item, setItem] = useState<IEvent>({title: '', description: '', images: [], location: {coordinates: [0, 0]}, requirements: {trees: 0, volunteers: 0, funds: 0}, landsDescription: ''});
+
+    useEffect(() => {
+        if(route.params?._id) {
+            (async () => {
+                await axios.get(`${API_URL}/events/${route?.params?._id}`)
+                .then((res) => {
+                    setItem(res.data.event);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+            })();
+        }
+    }, [route.params?._id]);
 
    
     
@@ -41,7 +53,7 @@ const EventDetails = ({ route , navigation}) => {
         <ScrollView>
            <View style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBack}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Events', { _id: route?.params?._id })} style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                     </TouchableOpacity>
                     <Text  style={styles.headerTitle}>Event Details</Text>
@@ -49,22 +61,22 @@ const EventDetails = ({ route , navigation}) => {
                 <View style={styles.eventContainer}>
                     <View style={styles.eventHeader}>
                         <View style={styles.eventHeaderLeft}>
-                            <Image source={{uri: item.author.image}} style={styles.avatar} />
+                            <Image source={{uri: item?.author?.image}} style={styles.avatar} />
                             <View style={styles.eventHeaderLeftText}>
-                                <Text2 style={[styles.eventHeaderLeftTextTitle, { color: COLORS.primary}]}>{item.title}</Text2>
-                                <Text style={styles.eventHeaderLeftTextAuthor}>by {item.author.name}</Text>
+                                <Text2 style={[styles.eventHeaderLeftTextTitle, { color: COLORS.primary}]}>{item?.title}</Text2>
+                                <Text style={styles.eventHeaderLeftTextAuthor}>by {item?.author?.name}</Text>
                             </View>
                         </View>
                         <View style={[styles.eventHeaderRight, {
-                            backgroundColor: item.status === 'pending' ? COLORS.gray : item.status === 'approved' ? COLORS.primary : item.status === 'rejected' ? COLORS.red : COLORS.green
+                            backgroundColor: item?.status === 'pending' ? COLORS.gray : item?.status === 'approved' ? COLORS.primary : item?.status === 'rejected' ? COLORS.red : COLORS.green
                         }]}>
-                            <Text style={styles.eventHeaderRightText}>{item.status}</Text>
+                            <Text style={styles.eventHeaderRightText}>{item?.status}</Text>
                         </View>
                     </View>
                     <View style={styles.eventBody}>
                         <View style={styles.eventBodyImageContainer}>
                             <ImagesViewer
-                                images={item.images}
+                                images={item?.images ? item?.images : []}
                                 resizeMode={'cover'}
                                 imageStyle={styles.eventBodyImage}
                                 containerStyle={styles.eventBodyImageContainer}
@@ -74,7 +86,7 @@ const EventDetails = ({ route , navigation}) => {
                             />
                         </View>
                         <View style={styles.eventBodyDescription}>
-                            <Text style={styles.eventBodyDescriptionText}>{item.description}</Text>
+                            <Text style={styles.eventBodyDescriptionText}>{item?.description}</Text>
                         </View>
                         <View style={styles.eventBodyDetails}>
                             <View style={styles.eventBodyDetailsItem}>
@@ -135,7 +147,7 @@ const EventDetails = ({ route , navigation}) => {
                             </View>
                             <View style={styles.eventBodyDetailsItem}>
                                 <Text style={styles.eventBodyDetailsItemTitle}>Lands Description</Text>
-                                <Text style={styles.eventBodyDetailsItemText}>{item.landsDescription}</Text>
+                                <Text style={styles.eventBodyDetailsItemText}>{item?.landsDescription}</Text>
                             </View>
                         </View>
                     </View>

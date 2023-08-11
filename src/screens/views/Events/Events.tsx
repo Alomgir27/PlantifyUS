@@ -14,22 +14,22 @@ import {
 import { FlatList , RefreshControl} from 'react-native-gesture-handler';
 
 import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
-import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
 
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { ToastAndroid, Platform } from 'react-native';
 
-import moment from 'moment';
 
 import { fetchEvents, handleResetEventsData } from '../../../modules/data';
+import { handleEventDownvote, handleEventUpvote, handleAddToFavorite, handleRemoveFromFavorite } from '../../../modules/data';
 
 import { API_URL } from "../../../constants/index";
 
 import axios from "axios";
 
-import { useNavigation } from "@react-navigation/native";
+import { IEvent } from '../../../constants/types';
 
 
 import EventItem from './EventItem';
@@ -47,37 +47,66 @@ const Events = ({ route, navigation }) => {
     
         const dispatch = useDispatch();
 
-        const [selectedEvent, setSelectedEvent] = useState([]);
-
-       
-        const { events } = useSelector((state) => state?.data);
+        const [selectedEvent, setSelectedEvent] = useState<IEvent[]>([]);
+        const events = useSelector((state: any) => state.data.events);
 
 
         useEffect(() => {
-            setSelectedEvent([]);
-            if(route?.params?.item) {
-                if(route?.params?.item?.length > 0) {
-                    route?.params?.item?.map((item) => {
-                        setSelectedEvent((prev) => [...prev, item?._id])
-                    })
-                }
-                else {
-                    setSelectedEvent((prev) => [...prev, route?.params?.item?._id])
-                }
+            if(!route?.params?._id){
+                setSelectedEvent(events);
             }
-        }, [route?.params?.item])
+        }, [events, route?.params?._id]);
+
+
+        useEffect(() => {
+            if(route?.params?._id) {
+                (async () => {
+                    await axios.get(`${API_URL}/events/${route?.params?._id}`)
+                    .then((res) => {
+                        setSelectedEvent([res.data.event]);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    })
+                })();
+            }
+        }, [route?.params?._id]);
+
+        const handleMore = async () => {
+            let ids = selectedEvent?.map((item) => item?._id);
+            await axios.post(`${API_URL}/events/fetchMore`, {ids})
+            .then((res) => {
+                setSelectedEvent([...selectedEvent, ...res.data.events]);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
     
         const onRefresh = useCallback(() => {
             setRefreshing(true);
-            dispatch(handleResetEventsData());
-            dispatch(fetchEvents());
+            if(!route?.params?._id){
+              dispatch(handleResetEventsData());
+              dispatch(fetchEvents());
+            }
+            if(route?.params?._id) {
+                (async () => {
+                    await axios.get(`${API_URL}/api/events/${route?.params?._id}`)
+                    .then((res) => {
+                        setSelectedEvent([res.data.event]);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    })
+                })();
+            }
             wait(2000).then(() => setRefreshing(false));
         }, []);
 
+
         const fetchMore = () => {
-            setRefreshing(true);
-            dispatch(fetchEvents());
-            setRefreshing(false);
+            if(route?.params?._id) return;
+            handleMore();
         }
        
         const renderHeader = useCallback(() => {
@@ -108,13 +137,58 @@ const Events = ({ route, navigation }) => {
             )
         }, []);
 
+        const updateEvent = (event: IEvent) => {
+            let index = selectedEvent.findIndex((item) => item?._id === event?._id);
+            let newEvents = [...selectedEvent];
+            newEvents[index] = event;
+            setSelectedEvent(newEvents);
+        }
+
+        const handlePress = (type: String, _id: String) => {
+            console.log(type, _id);
+            if(type === 'upvote') {
+                dispatch(handleEventUpvote(_id, updateEvent));
+            } else if(type === 'downvote') {
+                dispatch(handleEventDownvote(_id, updateEvent));
+            } else if(type === 'favorite') {
+                dispatch(handleAddToFavorite('event', _id, updateEvent));
+            } else if(type === 'unfavorite') {
+                dispatch(handleRemoveFromFavorite('event', _id, updateEvent));
+            }
+    
+            if(Platform.OS === 'android') {
+                ToastAndroid.showWithGravityAndOffset(
+                    type === 'upvote' ? 'Upvoted' : type === 'downvote' ? 'Downvoted' : type === 'favorite' ? 'Added to favorites' : 'Removed from favorites',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.BOTTOM,
+                    25,
+                    50
+                );
+            }
+        }
+
+        const callBack = (_id : String) => {
+           (async () => {
+                await axios.get(`${API_URL}/events/${_id}`)
+                .then((res) => {
+                    let index = selectedEvent.findIndex((item) => item?._id === _id);
+                    let newEvents = [...selectedEvent];
+                    newEvents[index] = res.data.event;
+                    setSelectedEvent(newEvents);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+            })();
+        }
+
         const renderEvents = useCallback(() => {
             return (
                 <FlatList
                     ListHeaderComponent={renderHeader}
-                    data={selectedEvent.length > 0 ? events?.filter((item) => selectedEvent?.includes(item?._id)) : events}
-                    renderItem={({ item }) => <EventItem item={item} navigation={navigation} />}
-                    keyExtractor={(item) => item._id.toString()}
+                    data={selectedEvent}
+                    renderItem={({ item }) => <EventItem item={item} navigation={navigation} handlePress={handlePress} callBack={callBack} />}
+                    keyExtractor={(item) => item?._id.toString()}
                     refreshControl={
                         <RefreshControl
                             refreshing={refreshing}
@@ -131,7 +205,7 @@ const Events = ({ route, navigation }) => {
                     
                 />
             )
-        }, [events, selectedEvent, refreshing]);
+        }, [selectedEvent, refreshing]);
 
 
 
@@ -152,7 +226,7 @@ const Events = ({ route, navigation }) => {
             marginVertical: 10,
             // backgroundColor: COLORS.white,
             borderRadius: 10,
-            shadowColor: COLORS.shadow,
+            // shadowColor: COLORS.shadow,
             shadowOffset: {
                 width: 0,
                 height: 2,

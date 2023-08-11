@@ -21,7 +21,13 @@ export default function Images({ route, navigation }) {
             <View style={styles.header}>
                 <TouchableOpacity
                     style={{ position: 'absolute', top: 20, left: 20, zIndex: 1 }}
-                    onPress={() => navigation.navigate('Posts')}
+                    onPress={() => {
+                        if(route?.params?.type === 'all') {
+                            navigation.navigate('Posts');
+                        } else {
+                            navigation.navigate('Posts', { _id: route?.params?._id });
+                        }
+                    }}
                 >
                     <ICONS.Ionicons name="arrow-back" size={30} color={COLORS.white} />
                 </TouchableOpacity>

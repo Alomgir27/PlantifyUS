@@ -28,7 +28,7 @@ export default function PostUpload({ navigation, route }) {
     const [images, setImages] = useState([]);
     const [location, setLocation] = useState({
         type: 'Point',
-        coordinates: [0, 0],
+        coordinates: [],
       })
     const [currentStep, setCurrentStep] = useState(0);
     const [type, setType] = useState("");
@@ -39,7 +39,7 @@ export default function PostUpload({ navigation, route }) {
         description: '',
         location: {
           type: 'Point',
-          coordinates: [0, 0],
+          coordinates: [],
         },
         organizer: '',
         attendees: [],
@@ -71,7 +71,7 @@ export default function PostUpload({ navigation, route }) {
         bio: '',
         location: {
             type: 'Point',
-            coordinates: [0, 0],
+            coordinates: [],
         },
         badges: [],
         notifications: [],
@@ -108,9 +108,10 @@ export default function PostUpload({ navigation, route }) {
 
     const dispatch = useDispatch();
 
+
     useEffect(() => {
         (async () => {
-            if(!mylocation){
+            if(!mylocation.longitude && !mylocation.latitude){
                 let { status } = await Location.requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
                     setErrorMsg('Permission to access location was denied');
@@ -125,7 +126,7 @@ export default function PostUpload({ navigation, route }) {
                 setNewOrganizationForm({...newOrganizationForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
             }
         })();
-    }, [mylocation]);
+    }, [mylocation.longitude, mylocation.latitude]);
 
     useEffect(() => {
         (async () => {
@@ -138,6 +139,7 @@ export default function PostUpload({ navigation, route }) {
              setLocation({ type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] });
         })();
     }, []);
+
 
 
     useEffect(() => {
@@ -179,6 +181,7 @@ export default function PostUpload({ navigation, route }) {
 
     const clearValues = () => {
         setEventForm({
+            ...newEventForm,
             title: '',
             description: '',
             author: '',
@@ -192,9 +195,11 @@ export default function PostUpload({ navigation, route }) {
             },
             landsDescription: '',
             status: '',
+
         });
         
         setNewPostForm({
+            ...newPostForm,
             author: '',
             text: '',
             images: [],
@@ -205,6 +210,7 @@ export default function PostUpload({ navigation, route }) {
         });
 
         setNewOrganizationForm({
+            ...newOrganizationForm,
             name: '',
             volunteers: [],
             events: [],
@@ -219,6 +225,7 @@ export default function PostUpload({ navigation, route }) {
         });
 
         setNewTreeForm({
+            ...newTreeForm,
             name: '',
             scientificName: '',
             description: '',

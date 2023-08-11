@@ -30,7 +30,6 @@ import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
 
-import { handleEventDownvote, handleEventUpvote, handleAddToFavorite, handleRemoveFromFavorite } from '../../../modules/data';
 
 import { API_URL } from "../../../constants/index";
 import { connect } from 'react-redux';
@@ -73,17 +72,16 @@ export class EventItem extends React.PureComponent {
         if(!this.state.user) {
             return Alert.alert('You need to login first', 'Please login to upvote');
         }
-        const { dispatch } = this.props;
-        dispatch(handleEventUpvote(id, this.state.user?._id));
+        const { handlePress } = this.props;
+        handlePress('upvote', id);
     }
 
     handleDownVote = (id) => {
         if(!this.state.user) {
             return Alert.alert('You need to login first', 'Please login to downvote');
         }
-        const { dispatch } = this.props;
-        dispatch(handleEventDownvote(id, this.state.user?._id));
-
+        const { handlePress } = this.props;
+        handlePress('downvote', id);
     }
 
     handleToggleComments = () => {
@@ -101,14 +99,14 @@ export class EventItem extends React.PureComponent {
         if(!this.state.user) {
             return Alert.alert('You need to login first', 'Please login to add to favorite');
         }
-        console.log(this.props.item?.favourites?.includes(this.state.user?._id));
-        const { dispatch } = this.props;
+        const { handlePress } = this.props;
         if(this.props.item?.favourites?.includes(this.state.user?._id)) {
-            dispatch(handleRemoveFromFavorite('event', id));
+            handlePress('unfavorite', id);
         } else {
-            dispatch(handleAddToFavorite('event', id));
+            handlePress('favorite', id);
         }
     }
+
 
 
     handleShare = async () => {
@@ -151,7 +149,7 @@ export class EventItem extends React.PureComponent {
                             style={styles.authorImg}
                         />
                     </View>
-                    <TouchableOpacity style={styles.authorInfo} onPress={() => navigation.navigate("Profile", { user: item?.author })}>
+                    <TouchableOpacity style={styles.authorInfo} onPress={() => navigation.navigate("Profile", { userId: item?.author })}>
                         <Text style={styles.authorName}>{item?.author?.name} </Text>
                         <Text style={styles.time}>{moment(item?.createdAt).fromNow()}</Text>
                     </TouchableOpacity>
@@ -164,7 +162,7 @@ export class EventItem extends React.PureComponent {
                     </View>
                 </View>
                 <TouchableWithoutFeedback style={styles.cardImgWrapper}
-                    onPress={() => navigation.navigate("Event", { item })}
+                    onPress={() => navigation.navigate("Event", { _id: item?._id })}
                 >
                   <View>
                     {item?.images?.length === 1 && (
@@ -379,7 +377,7 @@ export class EventItem extends React.PureComponent {
             </View>
             {/* comments */}
             {this.state.isVisible && (
-               <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} type={'event'} />
+               <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} type={'event'} callBack={this.props.callBack} />
             )}
         </>
         )

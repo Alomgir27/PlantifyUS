@@ -55,7 +55,7 @@ import {
 
 import { Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import { Platform , ToastAndroid } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -63,7 +63,7 @@ const wait = (timeout) => {
     return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
-const Comments = ({  item, isVisible, handleToggleComments, type }) => {
+const Comments = ({  item, isVisible, handleToggleComments, type, callBack } : any) => {
     const comments = useSelector((state) => state?.data?.comments);
     const commentsShow = useSelector((state) => state?.data?.commentsShow);
     const currentUser = useSelector((state) => state?.data?.currentUser);
@@ -88,6 +88,12 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
     const sheetRef = useRef(null);
     const inputRef = useRef(null)
 
+    useEffect(() => {
+        if(callBack) {
+            callBack(item?._id);
+        }
+    }, [comments]);
+
     
 
     const onRefresh = () => {
@@ -106,10 +112,31 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
 
     const handleCommentUpvotePress = (commentId, commentIndex) => {
         dispatch(handleCommentUpvote(commentId, commentIndex));
+        if(Platform.OS === 'android') {
+            ToastAndroid.show("Upvoted", ToastAndroid.SHORT);
+        }
+
     }
 
     const handleCommentDownvotePress = (commentId, commentIndex) => {
         dispatch(handleCommentDownvote(commentId, commentIndex));
+        if(Platform.OS === 'android') {
+            ToastAndroid.show("Downvoted", ToastAndroid.SHORT);
+        }
+    }
+
+   
+
+    const handleCommentReplySubmit = () => {
+        if (comment) {
+            dispatch(handleCommentSubmit('replyTo', currentComment?._id, comment, setCurrentComment));
+            setComment("");
+            inputRef.current?.clear();
+            Keyboard.dismiss();
+            if(Platform.OS === 'android') {
+                ToastAndroid.show("Replied", ToastAndroid.SHORT);
+            }
+        }
     }
 
     
@@ -146,6 +173,9 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                 setComment("");
                 inputRef.current?.clear();
                 Keyboard.dismiss();
+                if(Platform.OS === 'android') {
+                    ToastAndroid.show("Commented", ToastAndroid.SHORT);
+                }
             }
         }
     }
@@ -165,14 +195,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
        
     }
 
-    const handleCommentReplySubmit = () => {
-        if (comment) {
-            dispatch(handleCommentSubmit('replyTo', currentComment?._id, comment, setCurrentComment));
-            setComment("");
-            inputRef.current?.clear();
-            Keyboard.dismiss();
-        }
-    }
+   
 
     const handleCommentDeleteConfirm = (Id) => {
         if (commentId !== "") {
@@ -181,8 +204,14 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                 setCommentId("");
                 setCurrentComment("");
             }
+            if(Platform.OS === 'android') {
+                ToastAndroid.show("Deleted", ToastAndroid.SHORT);
+            }
         } else {
             dispatch(handleCommentDelete(type, item?._id, Id));
+            if(Platform.OS === 'android') {
+                ToastAndroid.show("Deleted", ToastAndroid.SHORT);
+            }
         }
         setIsModalOpen(false);
         setCommentForDelete("");
@@ -203,7 +232,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                     </View>
                     <TouchableOpacity style={styles.commentHeaderRight} onPress={() => {
                         sheetRef.current?.close();
-                        navigation.navigate('Profile', { user: item?.author })
+                        navigation.navigate('Profile', { userId: item?.author })
                     }}>
                         <Text style={styles.commentHeaderLeftText}>{item?.author?.name}</Text>
                         <Text style={styles.commentHeaderLeftTextTime}>{moment(item?.createdAt).fromNow()}</Text>
@@ -300,7 +329,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
     }
 
     return (
-        <BottomSheetModal
+           <BottomSheetModal
                 ref={sheetRef}
                 index={1}
                 snapPoints={[height * 0.5, height * 0.9]}
@@ -308,7 +337,7 @@ const Comments = ({  item, isVisible, handleToggleComments, type }) => {
                     <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />
                 )}
                 backgroundComponent={({ style }) => (
-                    <View style={[...style, { backgroundColor: COLORS.white }]} />
+                    <View style={[style, { backgroundColor: COLORS.white }]} />
                 )}
                 handleComponent={() => null}
                 handleIndicatorComponent={() => null}

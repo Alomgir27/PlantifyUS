@@ -53,6 +53,7 @@ const Organizations = ({ navigation}) => {
 
    
     const getAll = async () => {
+        if(loading) return;
         setLoading(true);
         setError(null);
         console.log(data?.all?.map((item : IOrganization) => item?._id), 'ids');
@@ -70,6 +71,7 @@ const Organizations = ({ navigation}) => {
                 }
             }
             temp = [...map.keys()].map((item) => temp.find((t) => t._id === item));
+            // console.log([...map.keys()], 'keys')
             setData({
                 ...data,
                 all: temp
@@ -85,6 +87,7 @@ const Organizations = ({ navigation}) => {
     }
 
     const getMy = async () => {
+        if(loading) return;
         setLoading(true);
         setError(null);
         await axios.get(`${API_URL}/organizations/getMy/${user?._id}`)
@@ -114,6 +117,7 @@ const Organizations = ({ navigation}) => {
     }
 
     const getPending = async () => {
+        if(loading) return;
         setLoading(true);
         setError(null);
         let ids = data?.pending?.map((item : IOrganization) => item?._id);
@@ -146,6 +150,8 @@ const Organizations = ({ navigation}) => {
     }
 
     const getRequested = async () => {
+        if(!user?._id) return;
+        if(loading) return;
         setLoading(true);
         setError(null);
         await axios.get(`${API_URL}/organizations/getRequested/${user?._id}`)
@@ -221,13 +227,18 @@ const Organizations = ({ navigation}) => {
 
 
 
+
+   
+
+
   
 
   useEffect(() => {
     let temp = type === 'all' ? data?.all : type === 'my' ? data?.my : type === 'pending' ? data?.pending : data?.requested;
     setArticles(temp);
-    console.log(temp, 'to be set articles');
+    console.log('type changed', type);
   }, [type, data])
+ 
   
   const onPress = async (type: String, _id: any) => {
     if(type === 'Join') {
@@ -237,12 +248,11 @@ const Organizations = ({ navigation}) => {
         })
         .then((res) => {
             const temp = {
+                ...data,
                 all: data?.all?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
-                my: data?.my?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
-                pending: data?.pending?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
                 requested: data?.requested?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item)
             }
-            setData(temp);
+            setData(temp)
             if(Platform.OS === 'android'){
                 ToastAndroid.showWithGravityAndOffset(
                     "Request sent successfully",
@@ -258,22 +268,20 @@ const Organizations = ({ navigation}) => {
         .catch((err) => {
             console.log(err);
         })
-   } else if(type === 'Approve') {
-         await axios.post(`${API_URL}/organizations/approveRequest`, {
+   } else if(type === 'Verify') {
+         await axios.post(`${API_URL}/organizations/verifyRequest`, {
               userId: user?._id,
               organizationId: _id
          })
          .then((res) => {
-              const temp = {
-                all: data?.all?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item),
-                my: data?.my?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item),
-                pending: data?.pending?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item),
-                requested: data?.requested?.map((item : IOrganization) => item?._id === user?._id ? res?.data?.organization : item)
-          }
-          setData(temp);
+            const temp = {
+                ...data,
+                pending: data?.pending?.map((item : IOrganization) => item?._id === _id ? res?.data?.organization : item),
+             }
+            setData(temp);
           if(Platform.OS === 'android'){
                 ToastAndroid.showWithGravityAndOffset(
-                 "Request approved successfully",
+                 "Organization verified successfully",
                  ToastAndroid.LONG,
                  ToastAndroid.BOTTOM,
                  25,

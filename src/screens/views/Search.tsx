@@ -16,9 +16,8 @@ import {
     fetchUsersSearch,
     fetchPostsSearch,
     fetchAllSearchData,
-    handlePostsMerge,
-    handleEventsMerge,
 } from '../../modules/data';
+import { Block } from "../../components";
 
 import { Text } from "../../components";
 import { useTheme } from "../../hooks";
@@ -29,6 +28,7 @@ const SearchScreen = ({ navigation }) => {
     const [searchType, setSearchType] = useState('All');
     const [searchTypeText, setSearchTypeText] = useState('All');
     const [loading, setLoading] = useState(false);
+
     
     const dispatch = useDispatch();
 
@@ -38,7 +38,7 @@ const SearchScreen = ({ navigation }) => {
     const usersSearch = useSelector(state => state.data.usersSearch);
     const postsSearch = useSelector(state => state.data.postsSearch);
 
-    const { colors, gradients } = useTheme();
+    const { colors, gradients, sizes } = useTheme();
 
 
     const inputRef = useRef(null);
@@ -57,13 +57,13 @@ const SearchScreen = ({ navigation }) => {
     }, [navigation]);
 
 
-
+    const _keyboardDidShow = () => {
+        inputRef?.current?.focus();
+    }
    
     useEffect(() => {
-       if(inputRef?.current) {
-              inputRef?.current.focus();
-         }
-    }, [inputRef])
+        Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    }, [])
 
    
         
@@ -122,21 +122,19 @@ const SearchScreen = ({ navigation }) => {
 
     const handleSearchResult = (type, item) => {
         if(searchType === 'Events' || type === 'Events') {
-            handleEventsMerge([item]);
-            navigation.navigate('Events', {  item });
+            navigation.navigate('Events', {  _id: item?._id });  
         }
         else if(searchType === 'Organizations' || type === 'Organizations') {
-            navigation.navigate('Organizations', { item });
+            navigation.navigate('Organizations', { _id: item?._id });
         }
         else if(searchType === 'Trees' || type === 'Trees') {
-            navigation.navigate('Trees', { item });
+            navigation.navigate('Trees', { _id: item?._id });
         }
         else if(searchType === 'Users' || type === 'Users') {
-            navigation.navigate('Profile', { user: item });
+            navigation.navigate('Profile', { userId: item?._id });
         }
         else if(searchType === 'Posts' || type === 'Posts') {
-            handlePostsMerge([item]);
-            navigation.navigate('Posts', { item });
+            navigation.navigate('Posts', { _id: item?._id });
         }
        
     }
@@ -189,20 +187,14 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.events?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Events</Text>
-                        <TouchableOpacity onPress={() => {
-                            handleEventsMerge(searchResults.events);
-                            navigation.navigate('Events', { item: searchResults.events })
-                        }} >
-                            <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
-                        </TouchableOpacity>
                     </View>
                 )}
-                  {searchResults.events?.map((item) => (
+                  {searchResults?.events?.map((item) => (
                         <TouchableOpacity style={styles.searchResult} onPress={() => handleSearchResult('Events', item)} key={item._id.toString()}>
                              <Image source={{uri: item?.images[0]}} style={styles.searchResultImage} />
                              <View style={{flex: 1, flexDirection: 'column'}}>
                                 <Text numberOfLines={1} style={styles.searchResultText}>{item?.title}</Text>
-                                <Text multiline={true} numberOfLines={2} style={styles.searchResultText}>{item?.description}</Text>
+                                <Text numberOfLines={2} style={styles.searchResultText}>{item?.description}</Text>
                             </View>
                         </TouchableOpacity>
                     )
@@ -213,9 +205,6 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.organizations?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Organizations</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('SearchResults', { searchResults: searchResults.organizations, searchType: 'Organizations' })}>
-                            <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
-                        </TouchableOpacity>
                     </View>
                 )}
         
@@ -231,9 +220,6 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.trees?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Trees</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('SearchResults', { searchResults: searchResults.trees, searchType: 'Trees' })}>
-                            <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
-                        </TouchableOpacity>
                     </View>
                 )}
                   
@@ -249,9 +235,6 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.users?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Users</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('SearchResults', { searchResults: searchResults.users, searchType: 'Users' })}>
-                            <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
-                        </TouchableOpacity>
                     </View>
                 )}
                     
@@ -270,12 +253,6 @@ const SearchScreen = ({ navigation }) => {
                 {searchResults?.posts?.length > 0 && (
                     <View style={styles.searchResultsHeader}>
                         <Text style={styles.searchResultsHeaderText}>Posts</Text>
-                        <TouchableOpacity onPress={() => {
-                            handlePostsMerge(searchResults.posts);
-                            navigation.navigate('Posts', { item: searchResults.posts })
-                        }} >
-                            <Text style={styles.searchResultsHeaderSeeAll}>See All</Text>
-                        </TouchableOpacity>
                     </View> 
                     )}
 
@@ -390,7 +367,7 @@ const SearchScreen = ({ navigation }) => {
             <View style={styles.searchContainer}>
                 <View style={styles.searchBar}>
                     <ICONS.Ionicons name="search" size={20} color={COLORS.gray} />
-                    <TextInput
+                     <TextInput
                         ref={inputRef}
                         style={styles.searchInput}
                         placeholder="Search"

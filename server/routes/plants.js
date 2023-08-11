@@ -50,7 +50,7 @@ router.post('/new', async (req, res) => {
 //@access Public
 router.get('/', async (req, res) => {
     const { page } = req.query;
-    const limit = 20
+    const limit = 5;
     const skip = (parseInt(page) - 1) * limit;
 
     Tree.find()
@@ -68,7 +68,7 @@ router.get('/search', async (req, res) => {
     const { search, limit } = req.query;
 
     Tree.find({ $or: [{ name: { $regex: search, $options: 'i' } }, { scientificName: { $regex: search, $options: 'i' } }] })
-        .limit(parseInt(limit) || 10)
+        .limit(parseInt(limit) || 5)
         .then(trees => res.status(200).json({ success: true, trees, message: 'Trees fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch trees', error: err }));
 })

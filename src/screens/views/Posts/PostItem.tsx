@@ -26,12 +26,8 @@ import * as ICONS from "@expo/vector-icons";
 import { Text } from '../../../components';
 import { Text as Text2 } from 'react-native-elements';
 
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-
 import moment from 'moment';
 
-import { handlePostDownvote, handlePostUpvote, handleAddToFavorite, handleRemoveFromFavorite, handleEventsMerge } from '../../../modules/data';
 
 import { API_URL } from "../../../constants/index";
 import { connect } from 'react-redux';
@@ -71,10 +67,9 @@ export class PostItem extends React.Component {
             Alert.alert('Please login to upvote', 'Please login to upvote', [{text: 'OK'}]);
             return;
         }
-        const { dispatch } = this.props;
-        const { item } = this.props;
-        dispatch(handlePostUpvote(item?._id));
-        
+        const { handlePress } : any = this.props;
+        const { item } : any = this.props;
+        handlePress('upvote', item?._id);        
     }
 
     handleDownVote() {
@@ -82,9 +77,9 @@ export class PostItem extends React.Component {
             Alert.alert('Please login to downvote', 'Please login to downvote', [{text: 'OK'}]);
             return;
         }
-        const { dispatch } = this.props;
+        const { handlePress } = this.props;
         const { item } = this.props;
-        dispatch(handlePostDownvote(item?._id));
+        handlePress('downvote', item?._id);
     }
 
    
@@ -126,32 +121,34 @@ export class PostItem extends React.Component {
             Alert.alert('Please login to favorite', 'Please login to favorite', [{text: 'OK'}]);
             return;
         }
-        const { dispatch } = this.props;
         const { item } = this.props;
         if(item?.favourites?.includes(this.props.user?._id)) {
-            dispatch(handleRemoveFromFavorite('post', item?._id));
+            const { handlePress } = this.props;
+            handlePress('unfavorite', item?._id);
+
         }
         else {
-            dispatch(handleAddToFavorite('post', item?._id));
+            const { handlePress } = this.props;
+            handlePress('favorite', item?._id);
         }
     }
 
     render() {
         const { item, navigation } = this.props;
         const { collapsed, isVisible } = this.state;
-        const { user } = this.props;
+        const { user, type } = this.props;
         return (
             <View style={styles.container}>
                 <View style={styles.postHeader}>
                     <View style={styles.postHeaderLeft}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Profile', {user: item?.author})}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Profile', {userId: item?.author})}>
                             <Image
                                 source={{uri: item?.author?.image }}
                                 style={styles.avatar}
                             />
                         </TouchableOpacity>
                         <View style={styles.postHeaderLeftText}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Profile', {user: item?.author})}>
+                            <TouchableOpacity onPress={() => navigation.navigate('Profile', {userId: item?.author})}>
                                 <Text2 style={[styles.name, { color: COLORS.primary}]}>{item?.author?.name}</Text2>
                             </TouchableOpacity>
                             <Text2 style={styles.date}>{moment(item?.createdAt).fromNow()}</Text2>
@@ -175,7 +172,7 @@ export class PostItem extends React.Component {
                     {item.images.length > 0 && (
                         <View style={styles.postImages}>
                             {item.images.length === 1 && (
-                                <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0, _id: item?._id, type})}>
                                     <Image
                                         source={{uri: item.images[0]}}
                                         style={{width: width - 20, height: height / 2, borderRadius: 10}}
@@ -184,13 +181,13 @@ export class PostItem extends React.Component {
                             )}
                             {item.images.length === 2 && (
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0, _id: item?._id, type})}>
                                         <Image
                                             source={{uri: item.images[0]}}
                                             style={{width: width / 2 - 15, height: height / 2, borderRadius: 10}}
                                         />
                                     </TouchableWithoutFeedback>
-                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1, _id: item?._id, type})}>
                                         <Image
                                             source={{uri: item.images[1]}}
                                             style={{width: width / 2 - 15, height: height / 2, borderRadius: 10}}
@@ -200,20 +197,20 @@ export class PostItem extends React.Component {
                             )}
                             {item.images.length === 3 && (
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0, _id: item?._id, type})}>
                                         <Image
                                             source={{uri: item.images[0]}}
                                             style={{width: width / 2 - 15, height: height / 2, borderRadius: 10}}
                                         />
                                     </TouchableWithoutFeedback>
                                     <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1, _id: item?._id, type})}>
                                             <Image
                                                 source={{uri: item.images[1]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
                                         </TouchableWithoutFeedback>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 2})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 2, _id: item?._id, type})}>
                                             <Image
                                                 source={{uri: item.images[2]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
@@ -225,13 +222,13 @@ export class PostItem extends React.Component {
                             {item.images.length >= 4 && (
                                 <View style={{flexDirection: 'column', justifyContent: 'space-between'}}>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 0, _id: item?._id, type})}>
                                             <Image
                                                 source={{uri: item.images[0]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
                                         </TouchableWithoutFeedback>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 1, _id: item?._id, type})}>
                                             <Image
                                                 source={{uri: item.images[1]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
@@ -239,13 +236,13 @@ export class PostItem extends React.Component {
                                         </TouchableWithoutFeedback>
                                     </View>
                                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 2})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 2, _id: item?._id, type})}>
                                             <Image
                                                 source={{uri: item.images[2]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
                                             />
                                         </TouchableWithoutFeedback>
-                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 3})}>
+                                        <TouchableWithoutFeedback onPress={() => navigation.navigate('Images', {images: item.images, index: 3, _id: item?._id, type})}>
                                             <Image
                                                 source={{uri: item.images[3]}}
                                                 style={{width: width / 2 - 15, height: height / 4 - 10, borderRadius: 10}}
@@ -334,7 +331,7 @@ export class PostItem extends React.Component {
                         <View style={styles.eventFooter}>
                             <View style={styles.eventFooterLeft}>
                                 {item?.event?.images?.length > 0 && (
-                                    <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item?.event?.images})}>
+                                    <TouchableOpacity onPress={() => navigation.navigate('Images', {images: item?.event?.images, index: 0, _id: item?._id, type})}>
                                         <Image
                                             source={{uri: item?.event?.images[0]}}
                                             style={styles.eventImage}
@@ -347,8 +344,7 @@ export class PostItem extends React.Component {
                                 </View>
                             </View>
                             <TouchableOpacity onPress={() => {
-                                handleEventsMerge([item?.event]);
-                                navigation.navigate('Events', {item: [item?.event]});
+                                navigation.navigate('Events', { _id: item?.event?._id })
                             }}>
                                 <ICONS.AntDesign name="arrowright" size={24} color={COLORS.primary} />
                             </TouchableOpacity>
@@ -389,7 +385,7 @@ export class PostItem extends React.Component {
                     
                 {isVisible && (
                     <View style={styles.comments}>
-                        <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} type={'post'} />
+                        <Comments item={item} isVisible={this.state.isVisible} handleToggleComments={this.handleToggleComments} type={'post'} callBack={this.props.callBack} />
                     </View>
                 )}
             </View>

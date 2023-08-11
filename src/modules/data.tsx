@@ -365,6 +365,7 @@ export const handleLoading = (loading) => {
 //Actions
 export const fetchUser = (_id, callback) => {
     return (async (dispatch, getState) => {
+        dispatch(handleLoading(true))
         await axios.get(`${API_URL}/users/get/${_id}`)
         .then((res) => {
             console.log(res?.data?.message, 'USER STATE CHANGE')
@@ -381,6 +382,7 @@ export const fetchUser = (_id, callback) => {
         })
         .finally(() => {
             if(callback) callback(true);
+            dispatch(handleLoading(false))
         })
         
     })
@@ -390,9 +392,8 @@ export const fetchPosts = ( _id) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
-        await axios.get(`${API_URL}/posts`, {
+        await axios.get(`${API_URL}/posts/initial`, {
             params: {
-                page: getState().data.postsLoaded + 1,
                 user: _id
             }
         })
@@ -415,17 +416,12 @@ export const fetchEvents =  () => {
     return (async (dispatch, getState) => {
        if(getState().data.loading) return
          dispatch(handleLoading(true))
-        await axios.get(`${API_URL}/events`, {
-            params: {
-                page: getState().data.eventsLoaded + 1
-            }
-        })
+        await axios.get(`${API_URL}/events/initial`)
         .then((res) => {
             console.log(res?.data?.message)
             dispatch({
                 type: EVENTS_DATA_STATE_CHANGE, events: res.data.events
             })
-            
         })
         .catch((err) => {
             console.log(err?.data?.message);
@@ -598,19 +594,17 @@ export const fetchPostsSearch = (search, limit) => {
 
 
 
-export const handleEventUpvote = (event, user) => {
+export const handleEventUpvote = (event, callback) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
         await axios.put(`${API_URL}/events/upvote`, {
             eventId: event,
-            userId: user
+            userId: getState().data.currentUser._id
         })
         .then((res) => {
             console.log(res?.data?.message)
-            dispatch({
-                type: HANDLE_EVENT_EDITED, events: res.data.event
-            })
+            if(callback) callback(res.data.event)
         })
         .catch((err) => {
             console.log(err?.data?.message)
@@ -623,19 +617,17 @@ export const handleEventUpvote = (event, user) => {
     })
 }
 
-export const handleEventDownvote = (event, user) => {
+export const handleEventDownvote = (event, callback) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
         await axios.put(`${API_URL}/events/downvote`, {
             eventId: event,
-            userId: user
+            userId: getState().data.currentUser._id
         })
         .then((res) => {
             console.log(res?.data?.message)
-            dispatch({
-                type: HANDLE_EVENT_EDITED, events: res.data.event
-            })
+            if(callback) callback(res.data.event)
         })
         .catch((err) => {
             console.log(err?.data)
@@ -650,7 +642,7 @@ export const handleEventDownvote = (event, user) => {
 
 
 // Handle Posts
-export const handlePostUpvote = (post) => {
+export const handlePostUpvote = (post, callback) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
@@ -660,9 +652,7 @@ export const handlePostUpvote = (post) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
-            dispatch({
-                type: HANDLE_POST_EDITED, posts: res.data.post
-            })
+            if(callback) callback(res.data.post)
         })
         .catch((err) => {
             console.log(err?.data?.message)
@@ -674,7 +664,7 @@ export const handlePostUpvote = (post) => {
     })
 }
 
-export const handlePostDownvote = (post) => {
+export const handlePostDownvote = (post, callback) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
@@ -684,9 +674,7 @@ export const handlePostDownvote = (post) => {
         })
         .then((res) => {
             console.log(res?.data?.message)
-            dispatch({
-                type: HANDLE_POST_EDITED, posts: res.data.post
-            })
+           if(callback) callback(res.data.post)
         })
         .catch((err) => {
             console.log(err?.data)
@@ -905,7 +893,7 @@ export const handleCommentEdit = (type, id, newComment) => {
     })
 }
 
-export const handleAddToFavorite = (type, id) => {
+export const handleAddToFavorite = (type, id, callback) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
@@ -917,14 +905,10 @@ export const handleAddToFavorite = (type, id) => {
         .then((res) => {
             console.log(res?.data?.message)
             if(type === 'event') {
-                dispatch({
-                    type: HANDLE_EVENT_EDITED, events: res.data.event
-                })
+               if(callback) callback(res.data.event)
             }
             else if(type === 'post') {
-                dispatch({
-                    type: HANDLE_POST_EDITED, posts: res.data.post
-                })
+                if(callback) callback(res?.data?.post)
             }
         })
         .catch((err) => {
@@ -938,7 +922,7 @@ export const handleAddToFavorite = (type, id) => {
     })
 }
 
-export const handleRemoveFromFavorite = (type, id) => {
+export const handleRemoveFromFavorite = (type, id, callback) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return
         dispatch(handleLoading(true))
@@ -950,13 +934,9 @@ export const handleRemoveFromFavorite = (type, id) => {
         .then((res) => {
             console.log(res?.data?.message)
             if(type === 'event') {
-                dispatch({
-                    type: HANDLE_EVENT_EDITED, events: res.data.event
-                })
+                if(callback) callback(res.data.event)
             } else if(type === 'post') {
-                dispatch({
-                    type: HANDLE_POST_EDITED, posts: res.data.post
-                })
+                if(callback) callback(res?.data?.post)
             }
         }
         )
@@ -972,31 +952,9 @@ export const handleRemoveFromFavorite = (type, id) => {
     })
 }
 
-export const handlePostsMerge = (posts) => {
-    return ((dispatch, getState) => {
-       posts.forEach((post) => {
-              dispatch({
-                    type: HANDLE_POST_REMOVE, posts: post
-                })
-               dispatch({
-                    type: HANDLE_POST_ADD, posts: post
-                })
-        })
-    })
-}
 
-export const handleEventsMerge = (events) => {
-    return ((dispatch, getState) => {
-         events.forEach((event) => {
-                dispatch({
-                    type: HANDLE_EVENT_REMOVE, events: event
-                })
-                dispatch({
-                    type: HANDLE_EVENT_ADD, events: event
-                })
-        })
-    })
-}
+
+
 
 
 export const fetchAllSearchData = (search, limit) => {

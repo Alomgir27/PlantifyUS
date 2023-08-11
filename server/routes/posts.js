@@ -57,10 +57,9 @@ router.post('/new', async (req, res) => {
 //@route GET api/posts
 //@desc Get posts by page and _id
 //@access Public
-router.get('/', async (req, res) => {
-    const { page, user } = req.query;
-    const limit = 10;
-    const skip = (parseInt(page) - 1) * limit;
+router.get('/initial', async (req, res) => {
+    const { user } = req.query;
+    const limit = 5;
 
     //fetch all users posts if author _id is present in friends array and user is logged in
     if (user) {
@@ -71,18 +70,17 @@ router.get('/', async (req, res) => {
                 }
 
                 Post.find({ $or: [{ author: { $in: user.friends } }, { author: user._id }] })
-                    .skip(skip)
                     .limit(limit)
                     .populate({
                         path: 'author',
-                        select: 'name image type'
+                        select: '_id name image type'
                     })
                     .populate({
                         path: 'event',
-                        select: 'title images status location createdAt author requirements',
+                        select: '_id title images status location createdAt author requirements',
                         populate: {
                             path: 'author',
-                            select: 'name image type'
+                            select: '_id name image type'
                         }
                     })
                     .sort({ createdAt: -1 })
@@ -92,18 +90,17 @@ router.get('/', async (req, res) => {
             .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
     } else {
         Post.find()
-            .skip(skip)
             .limit(limit)
             .populate({
                 path: 'author',
-                select: 'name image type'
+                select: '_id name image type'
             })
             .populate({
                 path: 'event',
-                select: 'title images status location createdAt author requirements',
+                select: '_id title images status location createdAt author requirements',
                 populate: {
                     path: 'author',
-                    select: 'name image type'
+                    select: '_id name image type'
                 }
             })
             .sort({ createdAt: -1 })
@@ -120,17 +117,17 @@ router.get('/search', async (req, res) => {
     const { search , limit } = req.query;
 
     Post.find({ $or: [{ text: { $regex: search, $options: 'i' } }, { tags: { $regex: search, $options: 'i' } }] })
-        .limit(parseInt(limit) || 10)
+        .limit(parseInt(limit) || 5)
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: '_id name image type'
         })
         .populate({
             path: 'event',
-            select: 'title images status location createdAt author requirements',
+            select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: 'name image type'
+                select: '_id name image type'
             }
         })
         .sort({ createdAt: -1 })
@@ -149,14 +146,14 @@ router.put('/upvote', async (req, res) => {
     Post.findById(postId)
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: '_id name image type'
         })
         .populate({
             path: 'event',
-            select: 'title images status location createdAt author requirements',
+            select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: 'name image type'
+                select: '_id name image type'
             }
         })
         .then(post => {
@@ -191,14 +188,14 @@ router.put('/downvote', async (req, res) => {
     Post.findById(postId)
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: '_id name image type'
         })
         .populate({
             path: 'event',
-            select: 'title images status location createdAt author requirements',
+            select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: 'name image type'
+                select: '_id name image type'
             }
         })
         .then(post => {
@@ -222,7 +219,82 @@ router.put('/downvote', async (req, res) => {
         .catch(err => res.status(400).json({ success: false, message: 'Unable to downvote post', error: err }));
 })
 
-            
+
+//@route GET api/posts/:id
+//@desc Get post by id
+//@access Public
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    Post.findById(id)
+        .populate({
+            path: 'author',
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'event',
+            select: '_id title images status location createdAt author requirements',
+            populate: {
+                path: 'author',
+                select: '_id name image type'
+            }
+        })
+        .then(post => res.status(200).json({ success: true, post, message: 'Post fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch post', error: err }));
+})
+
+
+//@route POST api/posts/fetchMore
+//@desc Fetch more posts
+//@access Public
+router.post('/fetchMore', async (req, res) => {
+    const { ids, userId } = req.body;
+    if(userId) {
+        User.findById(userId)
+        .then(user => {
+            if(!user) {
+                return res.status(400).json({ success: false, message: 'User does not exist' });
+            }
+
+            Post.find({ $and: [{ _id: { $nin: ids } }, { $or: [{ author: { $in: user.friends } }, { author: user._id }] }] })
+                .populate({
+                    path: 'author',
+                    select: '_id name image type'
+                })
+                .populate({
+                    path: 'event',
+                    select: '_id title images status location createdAt author requirements',
+                    populate: {
+                        path: 'author',
+                        select: '_id name image type'
+                    }
+                })
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
+    } else {
+        Post.find({ _id: { $nin: ids } })
+            .populate({
+                path: 'author',
+                select: '_id name image type'
+            })
+            .populate({
+                path: 'event',
+                select: '_id title images status location createdAt author requirements',
+                populate: {
+                    path: 'author',
+                    select: '_id name image type'
+                }
+            })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
+            .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
+    }
+})
 
 
 

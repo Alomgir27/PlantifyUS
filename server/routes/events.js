@@ -75,23 +75,17 @@ router.post('/new', async (req, res) => {
 })
 
 
-//@route GET api/events
+//@route GET api/events/initial
 //@desc Get all events if number of events is below 20 or fetch maximum 20 events and give priority to events with more upvotes
 //@access Public
-router.get('/', async (req, res) => {
-    const { page } = req.query;
-    const limit = 10;
-    const skip = (parseInt(page) - 1) * limit;
-
+router.get('/initial', async (req, res) => {
     Event.find()
-        .sort({ upvotes: -1 })
-        .skip(skip)
-        .limit(limit)
         .populate({
             path: 'author',
             select: 'name image type'
         })
         .sort({ upvotes: -1 })
+        .limit(5)
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })
@@ -107,7 +101,7 @@ router.get('/search', async (req, res) => {
 
 
     Event.find({ $or: [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }] })
-        .limit(parseInt(limit) || 10)
+        .limit(parseInt(limit) || 5)
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })
@@ -162,8 +156,42 @@ router.put('/downvote', async (req, res) => {
 })
 
 
-   
 
+//@route GET api/events/:id
+//@desc Get event by id
+//@access Public
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    Event.findById(id)
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
+        .then(event => res.status(200).json({ success: true, event, message: 'Event fetched successfully' }))   
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch event', error: err }));
+})
+        
+
+
+//@route POST api/events/fetchMore
+//@desc Fetch more events
+//@access Public
+router.post('/fetchMore', async (req, res) => {
+    const { ids } = req.body;
+
+    console.log(ids);
+
+    Event.find({ _id: { $nin: ids } })
+        .populate({
+            path: 'author',
+            select: 'name image type'
+        })
+        .sort({ upvotes: -1 })
+        .limit(10)
+        .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
+})
 
 
 

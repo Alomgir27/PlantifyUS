@@ -175,7 +175,7 @@ const  RecommendUsers = ({ navigation, setShowRecommendUsers }) => {
     }
 
     const handleViewProfile = (user) => {
-        navigation.navigate('Profile', { user });
+        navigation.navigate('Profile', { userId: user?._id });
     }
 
    

@@ -27,12 +27,11 @@ import RecommendUsers from '../components/RecommendUsers';
 import { COLORS } from "../constants/index";
 import { Block, Button, Text as Text2, Image as Image2 } from "../components/";
 import { useTheme } from "../hooks/";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { ActivityIndicator } from "react-native-paper";
 
 const Home = ({ navigation}) => {
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<Boolean>(false);
     const [notification, setNotification] = useState([]);
 
     const [showRecommendUsers, setShowRecommendUsers] = useState(false);
@@ -43,6 +42,7 @@ const Home = ({ navigation}) => {
     const posts = useSelector(state => state?.data?.posts);
     const user = useSelector(state => state?.data?.currentUser);
     const friends = useSelector(state => state?.data?.users);
+    const loadingData = useSelector(state => state?.data?.loading);
 
 
 
@@ -231,7 +231,7 @@ const Home = ({ navigation}) => {
                         ...styles.shadow
                     }}
                     
-                    onPress={() => navigation.navigate('Events', { item })}
+                    onPress={() => navigation.navigate('Events', { _id: item?._id})}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -289,7 +289,7 @@ const Home = ({ navigation}) => {
                         backgroundColor: COLORS.white,
                         ...styles.shadow
                     }}
-                    onPress={() => navigation.navigate('Events', { item })}
+                    onPress={() => navigation.navigate('Events', { _id: item?._id})}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -348,7 +348,7 @@ const Home = ({ navigation}) => {
             return (
                 <TouchableWithoutFeedback
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
-                    onPress={() => navigation.navigate('Events', { item })}
+                    onPress={() => navigation.navigate('Events', { _id: item?._id})}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <Image
@@ -419,7 +419,7 @@ const Home = ({ navigation}) => {
             return (
                 <TouchableWithoutFeedback
                     style={{ flex: 1, marginRight: index == events.length - 1 ? 0 : SIZES.padding }}
-                    onPress={() => navigation.navigate('Events', { item })}
+                    onPress={() => navigation.navigate('Events', { _id: item?._id})}
                 >
                     <View style={{ marginBottom: SIZES.padding }}>
                         <View style={{ flexDirection: 'row' }}>
@@ -518,7 +518,7 @@ const Home = ({ navigation}) => {
         return (
             <TouchableWithoutFeedback
                 style={{ flex: 1, marginBottom: SIZES.padding * 2 , paddingRight: index == posts?.length - 1 ? SIZES.padding * 2 : 0 }}
-                onPress={() => navigation.navigate('Posts', { item })}
+                onPress={() => navigation.navigate('Posts', { _id: item?._id})}
             >
             <View>
                 <View style={{ flex: 1, marginBottom: SIZES.padding }}>
@@ -619,7 +619,7 @@ const Home = ({ navigation}) => {
                                         marginBottom: SIZES.radius,
                                     }}
                                 />
-                                <View style={{ position: 'absolute', top: '20%', right: '40%', backgroundColor: COLORS.transparentBlack1, width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' }}>
+                                <View style={{ position: 'absolute', top: '20%', right: '40%', backgroundColor: COLORS.transparent, width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: COLORS.white, ...FONTS.H3 }}>{item?.images?.length - 3}+</Text>
                                 </View>
                             </View>
@@ -897,7 +897,7 @@ const Home = ({ navigation}) => {
     const organizationItem = useCallback(({ item, index }) => {
         return (
             <TouchableWithoutFeedback
-                onPress={() => navigation.navigate('Organization', { item })}
+                onPress={() => navigation.navigate('Organization', { _id: item?._id})}
             >
             <Block column justify="space-between" wrap="wrap">
                 <Block center middle>
@@ -939,6 +939,7 @@ const Home = ({ navigation}) => {
         )
     }, [organizations])
 
+
         
 
     return (
@@ -959,7 +960,7 @@ const Home = ({ navigation}) => {
                   {!user ? (
                      <ICONS.Ionicons name="person-add" size={24} color={COLORS.white} onPress={() => navigation.navigate("AuthLanding")} />
                    ) : (
-                        <ICONS.Ionicons name="person" size={24} color={COLORS.white} onPress={() => navigation.navigate("Profile")} />
+                        <ICONS.Ionicons name="person" size={24} color={COLORS.white} onPress={() => navigation.navigate("Profile", { userId: user?._id })} />
                      )}
 
                     <ICONS.Ionicons name="notifications" size={24} color={COLORS.white} onPress={() => navigation.navigate("Notifications")}style={{
@@ -1023,6 +1024,14 @@ const Home = ({ navigation}) => {
                 </View>
             </View>
 
+            {loadingData && (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: SIZES.padding * 5 }}>
+                     <ActivityIndicator size="large" color={COLORS.primary} />
+                </View>
+            )}
+
+          {!loadingData && (
+            <>
             {/* New Events */}
             <View style={{ flex: 1 }}>
                 <View style={{
@@ -1048,8 +1057,8 @@ const Home = ({ navigation}) => {
                     </View>
                 </View>
             </View>
-
-            {/* New Posts */}
+           
+           
             <View style={{ flex: 1 }}>
                 <View style={{
                     flex: 1,
@@ -1134,6 +1143,8 @@ const Home = ({ navigation}) => {
                     </View>
                 </View>
             </View>
+           </>
+           )}
 
         </ScrollView>
             {showRecommendUsers && (

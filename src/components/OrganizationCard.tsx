@@ -8,14 +8,14 @@ import Image from './Image';
 import {useTheme, useTranslation} from '../hooks';
 import Button from './Button';
 import { useSelector } from 'react-redux';
+import * as ICONS from "@expo/vector-icons";
+import { COLORS } from '../constants';
 
 
 const OrganizationsGallery = ({item, onPress, type, navigation}: any) => {
   const {assets, sizes, colors, gradients} = useTheme();
   const user = useSelector((state: any) => state.data.currentUser);
-  const IMAGE_SIZE = (sizes.width - (sizes.padding + sizes.sm) * 2) / 3;
-  const IMAGE_VERTICAL_SIZE =
-    (sizes.width - (sizes.padding + sizes.sm) * 2) / 2;
+
  
   const handlePress = (_id: string) => {
     if(item?.joinRequests?.includes(user?._id)) {
@@ -42,12 +42,11 @@ const OrganizationsGallery = ({item, onPress, type, navigation}: any) => {
   };
 
 
-    
 
 
 
   return (
-    <Block marginTop={sizes.m} paddingHorizontal={sizes.padding}>
+    <Block marginTop={sizes.m} paddingHorizontal={sizes.padding} key={item?._id}>
       <Text p semibold marginBottom={sizes.s}>
         {dayjs(item.createdAt).format('DD MMMM YYYY')}
       </Text>
@@ -66,13 +65,14 @@ const OrganizationsGallery = ({item, onPress, type, navigation}: any) => {
                 {item?.volunteers?.map((volunteer: any) => (
                   volunteer?.image &&
                       <Image
-                        radius={10}
-                        width={20}
-                        height={20}
-                        source={{uri: volunteer?.image}}
-                        style={{backgroundColor: colors.white, marginRight: -5 , zIndex: 1, marginTop: 2}}
-                        overlay
-                      />
+                         radius={10}
+                         width={20}
+                         height={20}
+                         source={{uri: volunteer?.image}}
+                         style={{backgroundColor: colors.white, marginRight: -5 , zIndex: 1, marginTop: 2}}
+                         overlay
+                         key={volunteer?._id}
+                        />
                 ))}
                 <Text p primary marginLeft={sizes.s}>
                   {item?.volunteers?.length} members
@@ -80,7 +80,7 @@ const OrganizationsGallery = ({item, onPress, type, navigation}: any) => {
             </Block>
           </Block>
         <Text h4 gradient={gradients.primary}>
-          {item.name}
+          {item.name} {item?.isVerified && <ICONS.Ionicons name="checkmark-circle" size={20} color={colors.primary} />}
         </Text>
         <Text p lineHeight={26}>
           {item.bio}
@@ -105,14 +105,14 @@ const OrganizationsGallery = ({item, onPress, type, navigation}: any) => {
               </Text>
             </Button>
           )}
-          {type === 'pending' && !(user?.type === 'admin' || user?.type === 'moderator') && !item?.isVerified && (
+          {type === 'pending' && (user?.type === 'admin' || user?.type === 'moderator') && !item?.isVerified && (
             <Button
               primary
               width={sizes.width / 3}
-              onPress={() => onPress('Approve', item?._id)}
+              onPress={() => onPress('Verify', item?._id)}
             >
               <Text bold>
-                Approve
+                Verify
               </Text>
             </Button>
           )}
@@ -147,7 +147,7 @@ const OrganizationCard = ({item, type, onPress, navigation}: any) => {
               source={{uri: item?.images[0]}}>
               <Block color={colors.overlay} padding={sizes.padding}>
                 <Text h4 white marginBottom={sizes.sm} gradient={gradients.primary}>
-                  {item?.name}
+                  {item?.name} {item?.isVerified && <ICONS.Ionicons name="checkmark-circle" size={20} color={colors.primary} />}
                 </Text>
                 <Text p white>
                   {item?.bio}
@@ -163,7 +163,7 @@ const OrganizationCard = ({item, type, onPress, navigation}: any) => {
                   />
                   <Block marginLeft={sizes.s} justify="center">
                       <Text p white semibold>
-                        <Text bold primary onPress={() => navigation.navigate('Profile', { _id: item?.admin?._id})}> {item?.admin?.name}</Text> created this organization
+                        <Text bold primary onPress={() => navigation.navigate('Profile', { userId: item?.admin?._id})}> {item?.admin?.name}</Text> created this organization
                       </Text>
                       <Block row marginTop={sizes.s}>
                         {item?.volunteers?.map((volunteer: any) => (
@@ -175,6 +175,7 @@ const OrganizationCard = ({item, type, onPress, navigation}: any) => {
                                 source={{uri: volunteer?.image}}
                                 style={{backgroundColor: colors.white, marginRight: -5 , zIndex: 1}}
                                 overlay
+                                key={volunteer?._id}
                               />
                         ))}
                         <Text p  marginLeft={sizes.s}>
@@ -203,7 +204,7 @@ const OrganizationCard = ({item, type, onPress, navigation}: any) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => navigation.navigate('Organization', { _id: item?._id})} key={item?._id} >
-       <OrganizationsGallery item={item} onPress={onPress} type={type} navigation={navigation} />
+       <OrganizationsGallery item={item} onPress={onPress} type={type} navigation={navigation} key={item?._id}/>
     </TouchableWithoutFeedback>
   );
 

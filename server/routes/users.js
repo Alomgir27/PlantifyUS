@@ -96,7 +96,7 @@ router.get('/get/:id', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
     const { page, user } = req.query;
-    const limit = 10;
+    const limit = 5;
     const skip = (parseInt(page) - 1) * limit;
 
     console.log(req.query);
@@ -133,7 +133,7 @@ router.get('/search', async (req, res) => {
     const { search, limit } = req.query;
 
     User.find({ name: { $regex: search, $options: 'i' } })
-        .limit(parseInt(limit) || 10)
+        .limit(parseInt(limit) || 5)
         .then(users => res.status(200).json({ success: true, users, message: 'Users fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch users', error: err }));
 });
@@ -146,7 +146,7 @@ router.get('/recommend', async (req, res) => {
 
     console.log(req.query);
 
-    const limit = 10;
+    const limit = 5;
     const skip = (parseInt(page) - 1) * limit;
 
     if(!user) {

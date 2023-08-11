@@ -8,28 +8,27 @@ import {
     Alert,
     Animated,
     Easing,
-    Dimensions
+    Dimensions,
+    ActivityIndicator
 } from 'react-native';
 
 import { FlatList , RefreshControl} from 'react-native-gesture-handler';
-
 import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
-import MapView, { Marker } from 'react-native-maps';
 
 import * as ICONS from "@expo/vector-icons";
 
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-
-import moment from 'moment';
+import { ToastAndroid, Platform } from 'react-native';
 
 import { fetchPosts, handleResetPostsData } from '../../../modules/data';
 
 import { API_URL } from "../../../constants/index";
 
+import { IPost } from '../../../constants/types';
+
 import axios from "axios";
-
-
+import { handlePostDownvote, handlePostUpvote, handleAddToFavorite, handleRemoveFromFavorite } from '../../../modules/data';
 
 import PostItem from './PostItem';
 
@@ -45,41 +44,74 @@ const Posts = ({ route,  navigation }) => {
     const dispatch = useDispatch();
 
     const { posts } = useSelector((state) => state?.data);
+    const user = useSelector((state) => state?.data.currentUser);
 
-    const [selectedPost, setSelectedPost] = useState([]);
+    const [selectedPost, setSelectedPost] = useState<IPost[]>([]);
+
 
     useEffect(() => {
-        setSelectedPost([]);
-        if(route?.params?.item) {
-            if(route?.params?.item?.length > 0) {
-                route?.params?.item?.map((item) => {
-                    setSelectedPost((prev) => [...prev, item?._id])
-                })
-            }
-            else {
-                setSelectedPost((prev) => [...prev, route?.params?.item?._id])
-            }
+        if(!route?.params?._id) {
+            setSelectedPost(posts);
         }
-    }, [route?.params?.item])
+    }, [posts, route?.params?._id])
+
+    useEffect(() => {
+        if(route?.params?._id) {
+            (async () => {
+                await axios.get(`${API_URL}/posts/${route?.params?._id}`)
+                .then((res) => {
+                    setSelectedPost([res?.data?.post]);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+            })();
+        }
+    }, [route?.params?._id])
+
+    const handleFetchPosts = async () => {
+        let ids = selectedPost?.map((item) => item?._id);
+        await axios.post(`${API_URL}/posts/fetchMore`, { ids, userId: user?._id })
+        .then((res) => {
+            setSelectedPost([...selectedPost, ...res?.data?.posts]);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
 
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        dispatch(handleResetPostsData());
-        dispatch(fetchPosts());
+        if(route?.params?._id) {
+            (async () => {
+                await axios.get(`${API_URL}/posts/${route?.params?._id}`)
+                .then((res) => {
+                    setSelectedPost([res?.data?.post]);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+            })();
+        } else {
+            dispatch(handleResetPostsData());
+            dispatch(fetchPosts());
+        }
         wait(2000).then(() => setRefreshing(false));
     }
     , []);
 
     const fetchMore = () => {
-        dispatch(fetchPosts());
+       if(!route?.params?._id) {
+            handleFetchPosts();
+       }
     }
 
     const renderHeader = () => {
         return (
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <ICONS.Ionicons name="ios-arrow-back" size={24} color={COLORS.primary} onPress={() => navigation.goBack()} />
+                    <ICONS.Ionicons name="ios-arrow-back" size={24} color={COLORS.primary} onPress={() => navigation?.goBack()} />
                     <Text style={[styles.headerText, { color: COLORS.gray }]}>Posts</Text>
                 </View>
                 <View style={styles.headerRight}>
@@ -93,11 +125,57 @@ const Posts = ({ route,  navigation }) => {
         )
     }
 
+    const updatePost = (post: IPost) => {
+        let index = selectedPost.findIndex((item) => item?._id === post?._id);
+        let newPosts = [...selectedPost];
+        newPosts[index] = post;
+        setSelectedPost(newPosts);
+    }
+
+    const handlePress = (type: String, _id: String) => {
+        console.log(type, _id);
+        if(type === 'upvote') {
+            dispatch(handlePostUpvote(_id, updatePost));
+        } else if(type === 'downvote') {
+            dispatch(handlePostDownvote(_id, updatePost));
+        } else if(type === 'favorite') {
+            dispatch(handleAddToFavorite('post', _id, updatePost));
+        } else if(type === 'unfavorite') {
+            dispatch(handleRemoveFromFavorite('post', _id, updatePost));
+        }
+
+        if(Platform.OS === 'android') {
+            ToastAndroid.showWithGravityAndOffset(
+                type === 'upvote' ? 'Upvoted' : type === 'downvote' ? 'Downvoted' : type === 'favorite' ? 'Added to favorites' : 'Removed from favorites',
+                ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM,
+                25,
+                50
+            );
+        }
+
+    }
+
+    const callBack = (_id : String) => {
+        (async () => {
+             await axios.get(`${API_URL}/posts/${_id}`)
+             .then((res) => {
+                    let index = selectedPost.findIndex((item) => item?._id === _id);
+                    let newPosts = [...selectedPost];
+                    newPosts[index] = res?.data?.post;
+                    setSelectedPost(newPosts);
+             })
+             .catch((err) => {
+                 console.log(err);
+             })
+         })();
+     }
+
     const renderPosts = useCallback(() => {
         return (
             <FlatList
-                data={selectedPost?.length > 0 ? posts?.filter((item) => selectedPost?.includes(item?._id)) : posts}
-                renderItem={({ item }) => <PostItem item={item} navigation={navigation} />}
+                data={selectedPost}
+                renderItem={({ item }) => <PostItem item={item} navigation={navigation} type={route?.params?._id ? 'single' : 'all'} handlePress={handlePress} callback={callBack}/>}
                 keyExtractor={item => `${item._id}`}
                 showsVerticalScrollIndicator={false}
                 ItemSeparatorComponent={() => {

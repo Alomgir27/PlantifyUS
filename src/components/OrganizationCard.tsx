@@ -203,7 +203,7 @@ const OrganizationCard = ({item, type, onPress, navigation}: any) => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => navigation.navigate('Organization', { _id: item?._id})} key={item?._id} >
+    <TouchableWithoutFeedback key={item?._id} onPress={() => {} }>
        <OrganizationsGallery item={item} onPress={onPress} type={type} navigation={navigation} key={item?._id}/>
     </TouchableWithoutFeedback>
   );

@@ -21,13 +21,13 @@ const Organizations = ({ navigation}) => {
     const [error, setError] = useState(null);
     const [type, setType] = useState('all');
     const user  = useSelector(state => state.data.currentUser);
-    const dispatch = useDispatch();
     const [data, setData] = useState<any>({
         all: [],
         my: [],
         pending: [],
         requested: []
     });
+   
 
     const [mounted, setMounted] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -188,7 +188,7 @@ const Organizations = ({ navigation}) => {
             getRequested();
             setMounted(true);
         }
-    }, [mounted])
+    }, [])
 
     function fetchMore() {
         if(type === 'all') {
@@ -206,7 +206,7 @@ const Organizations = ({ navigation}) => {
     }
 
 
-    function wait(timeout) {
+    function wait(timeout: any) {
         return new Promise(resolve => {
             setTimeout(resolve, timeout);
             }
@@ -225,8 +225,8 @@ const Organizations = ({ navigation}) => {
         wait(2000).then(() => setRefreshing(false));
     }, []);
 
-
-
+  
+  
 
    
 
@@ -234,11 +234,9 @@ const Organizations = ({ navigation}) => {
   
 
   useEffect(() => {
-    let temp = type === 'all' ? data?.all : type === 'my' ? data?.my : type === 'pending' ? data?.pending : data?.requested;
-    setArticles(temp);
-    console.log('type changed', type);
+     let temp = type === 'all' ? data?.all : type === 'my' ? data?.my : type === 'pending' ? data?.pending : data?.requested;
+     setArticles(temp);
   }, [type, data])
- 
   
   const onPress = async (type: String, _id: any) => {
     if(type === 'Join') {
@@ -294,6 +292,10 @@ const Organizations = ({ navigation}) => {
          })
     }
 }
+
+
+
+  
   return (
     <Block>
         <View style={styles.header}>
@@ -320,6 +322,7 @@ const Organizations = ({ navigation}) => {
                 ))}
             </ScrollView>
         </View>
+        
 
       <FlatList
         data={articles}

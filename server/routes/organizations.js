@@ -197,11 +197,34 @@ router.post('/verifyRequest', async (req, res) => {
 });
 
 
+//@route GET api/organizations/getOne/${organization?._id}
+//@desc Get one organization by id
+//@access Public
+router.get('/getOne/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log(id, 'id');
+    Organizations.findById(id)
+        .populate('admin', '_id name image')
+        .populate({ path: 'volunteers', select: '_id name image' })
+        .populate({ path: 'joinRequests', select: '_id name image' })
+        .populate({ path: 'events', select: '_id title images' })
+        .then(organization => res.status(200).json({ success: true, organization, message: 'Organization fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organization', error: err }));
+});
+
+
+
+
+
+        
+
 
 router.put('/test', async (req, res) => {
     Organizations.find()
         .populate('admin', '_id name image')
-        .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
+        .populate({ path: 'volunteers', select: '_id name image' })
+        .populate({ path: 'joinRequests', select: '_id name image' })
+        .populate({ path: 'events', select: '_id title images' })
         .then(organizations => {
             res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' });
         })

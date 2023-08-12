@@ -33,6 +33,7 @@ import {
     Rental,
     Rentals,
     Shopping,
+    ViewOrganization,
 } from "./screens";
 
 import Tabs from "./navigation/tabs";
@@ -432,6 +433,11 @@ export default function Main() {
                 }}/>
                 <Drawer.Screen name="Shopping" component={Shopping} options={{
                     drawerItemStyle: { height: 0 }
+                }}/>
+                <Drawer.Screen name="Organization" component={ViewOrganization} options={{
+                    drawerItemStyle: { height: 0 },
+                    headerShown: true,
+                    headerTitle: 'Organization'
                 }}/>
                
                 

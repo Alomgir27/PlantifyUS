@@ -4,6 +4,7 @@ const router = express.Router();
 
 
 const { Event } = require('../models');
+const { Organizations } = require('../models');
 
 
 
@@ -49,7 +50,7 @@ const { Event } = require('../models');
 //@desc Create an event
 //@access Private
 router.post('/new', async (req, res) => {
-    const { title, description, location, organizer, attendees, images, requirements, landsDescription, author } = req.body;
+    const { title, description, location, organizer, attendees, images, requirements, landsDescription, author,  organization } = req.body;
     console.log(req.body);
 
     const newEvent = new Event({
@@ -62,7 +63,14 @@ router.post('/new', async (req, res) => {
         requirements,
         author,
         landsDescription,
-        status: 'pending'
+        organization,
+        status: 'pending',
+        collectedFunds: 0,
+        upvotes: [],
+        downvotes: [],
+        comments: [],
+        isVerified: false,
+        type: 'event'
     });
 
     newEvent.save()
@@ -192,6 +200,67 @@ router.post('/fetchMore', async (req, res) => {
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })
+
+
+
+//@route GET api/organizations/getRequestedEvents/${organization?._id}
+//@desc Get all events that the organization is a part of only check joinRequests array
+//@access Public
+router.get('/getRequestedEvents/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log(id, 'id');
+
+    Event.find({ organization: id, isVerified: false })
+        .populate({
+            path: 'author',
+            select: '_id name image type'
+        })
+        .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
+
+});
+
+
+//@route POST api/events/approve
+//@desc Approve an event
+//@access Private
+router.post('/approve', async (req, res) => {
+    const { eventId, organizationId } = req.body;
+
+    Organizations.findById(organizationId)
+        .then(organization => {
+            if (organization.events.includes(eventId)) {
+                return res.status(400).json({ success: false, message: 'Event already exists in organization' });
+            }
+            organization.events.push(eventId);
+            organization.save()
+                .then(organization => {
+                    Event.findById(eventId)
+                        .then(event => {
+                            event.isVerified = true;
+                            event.status = 'approved';
+                            event.save()
+                                .then(event => res.status(200).json({ success: true, event, message: 'Event approved successfully' }))
+                                .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
+                        })
+                        .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
+                })
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
+})
+
+
+//@route DELETE api/events/reject/:id
+//@desc Reject an event
+//@access Private
+router.delete('/reject/:id', async (req, res) => {
+    const { id } = req.params;
+    Event.findOneAndDelete({ _id: id })
+        .then(event => res.status(200).json({ success: true, event, message: 'Event rejected successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to reject event', error: err }));
+})
+
 
 
 

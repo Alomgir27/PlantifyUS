@@ -30,6 +30,7 @@ import { API_URL } from "../../../constants/index";
 import axios from "axios";
 
 import { IEvent } from '../../../constants/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import EventItem from './EventItem';
@@ -50,6 +51,8 @@ const Events = ({ route, navigation }) => {
         const [selectedEvent, setSelectedEvent] = useState<IEvent[]>([]);
         const events = useSelector((state: any) => state.data.events);
 
+        console.log('route', route)
+        console.log('navigation', navigation)
 
         useEffect(() => {
             if(!route?.params?._id){
@@ -125,7 +128,26 @@ const Events = ({ route, navigation }) => {
                     }}
                 >
                     <TouchableOpacity
-                        onPress={() => navigation.goBack()}
+                        onPress={() => {
+                            (async () => {
+                                await AsyncStorage.getItem('route')
+                                .then((res) => {
+                                    console.log(res);
+                                    if(res === "Organization") {
+                                        navigation.navigate('Organization', { _id: route?.params?.id });
+                                    } else {
+                                        navigation.navigate('Home');
+                                    }
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                })
+                                .finally(() => {
+                                    AsyncStorage.removeItem('route');
+                                    console.log('removed');
+                                })
+                            })();
+                        }}
                     >
                        <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                     </TouchableOpacity>

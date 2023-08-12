@@ -30,4 +30,5 @@ export {default as OrganizationsScreen} from './views/Organizations';
 export {default as ImageDetails} from '../components/ImageDetails';
 export {default as Images} from '../components/Images';
 export {default as TreeIdentify} from './views/Identify/TreeIdentify';
+export {default as ViewOrganization} from './views/ViewOrganization';
 

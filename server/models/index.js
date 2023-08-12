@@ -9,7 +9,6 @@ const eventSchema = new Schema({
         type: { type: String, default: 'Point'},
         coordinates: { type: [Number], default: [0, 0] }
     },
-    organizer: String,
     attendees: [String],
     images: [String],
     requirements:{
@@ -31,6 +30,10 @@ const eventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
+    organization: {
+        type: Schema.Types.ObjectId,
+        ref: 'Organization'
+    },
     collectedFunds: Number,
     upvotes: [String],
     downvotes: [String],

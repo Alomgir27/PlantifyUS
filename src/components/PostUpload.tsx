@@ -20,7 +20,10 @@ import { ToastAndroid, Platform } from "react-native";
 
 
 
-import { fetchEventsSearch } from "../modules/data";
+import { 
+    fetchEventsSearch,
+    fetchOrganizationsSearch,
+} from "../modules/data";
 
 
 export default function PostUpload({ navigation, route }) { 
@@ -51,6 +54,8 @@ export default function PostUpload({ navigation, route }) {
         },
         landsDescription: '',
         status: '',
+        organization: '',
+        organizationValue: '',
     });
     const [newPostForm, setNewPostForm] = useState({
         author: '',
@@ -98,6 +103,7 @@ export default function PostUpload({ navigation, route }) {
 
     const user = useSelector(state => state?.data?.currentUser)
     const eventsSearch = useSelector(state => state?.data?.eventsSearch);
+    const organizationsSearch = useSelector(state => state?.data?.organizationsSearch);
     const mylocation = useSelector(state => state?.campings?.mylocation);
 
     const [isExisted, setIsExisted] = useState(false);
@@ -108,25 +114,26 @@ export default function PostUpload({ navigation, route }) {
 
     const dispatch = useDispatch();
 
+    const handleLocation = async () => {
+        if(!mylocation.longitude && !mylocation.latitude){
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
+            setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
+        }
+        else {
+            setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
+            setNewOrganizationForm({...newOrganizationForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
+        }
+    }
 
     useEffect(() => {
-        (async () => {
-            if(!mylocation.longitude && !mylocation.latitude){
-                let { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    setErrorMsg('Permission to access location was denied');
-                }
-    
-                let location = await Location.getCurrentPositionAsync({});
-                setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
-                setNewOrganizationForm({ ...newOrganizationForm, location: { type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] } });
-            }
-            else {
-                setEventForm({ ...newEventForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
-                setNewOrganizationForm({...newOrganizationForm, location: { type: 'Point', coordinates: [mylocation.longitude, mylocation.latitude] } });
-            }
-        })();
-    }, [mylocation.longitude, mylocation.latitude]);
+        handleLocation();
+    }, []);
 
     useEffect(() => {
         (async () => {
@@ -150,10 +157,16 @@ export default function PostUpload({ navigation, route }) {
 
 
     useEffect(() => {
-        if(eventTitle !== ""){
+        if(eventTitle !== "" && showSuggestions){
             dispatch(fetchEventsSearch(eventTitle, 5));
         }
-    }, [eventTitle])
+    }, [eventTitle, showSuggestions])
+
+    useEffect(() => {
+        if(newEventForm.organizationValue !== "" && showSuggestions){
+            dispatch(fetchOrganizationsSearch(newEventForm.organizationValue, 5));
+        }
+    }, [newEventForm.organizationValue, showSuggestions])
 
 
 
@@ -185,7 +198,6 @@ export default function PostUpload({ navigation, route }) {
             title: '',
             description: '',
             author: '',
-            organizer: '',
             attendees: [],
             images: [],
             requirements: {
@@ -195,7 +207,8 @@ export default function PostUpload({ navigation, route }) {
             },
             landsDescription: '',
             status: '',
-
+            organization: '',
+            organizationValue: '',
         });
         
         setNewPostForm({
@@ -241,15 +254,20 @@ export default function PostUpload({ navigation, route }) {
         });
     }
 
+    console.log(newEventForm);
    
         
 
  // this function too much messy, need to refactor
 
     const handleSubmit = async () => {
+        if(loading){
+            return;
+        }
+
 
         if(type === "newEvent"){
-            if(newEventForm.title === "" || newEventForm.description === "" || newEventForm.landsDescription === "" || newEventForm.requirements.trees === "" || newEventForm.requirements.volunteers === "" || newEventForm.requirements.funds === ""){
+            if(newEventForm.title === "" || newEventForm.description === "" || newEventForm.landsDescription === "" || newEventForm.requirements.trees === "" || newEventForm.requirements.volunteers === "" || newEventForm.requirements.funds === "" || newEventForm.organization === ""){
                 Alert.alert('Error', 'Please fill in all the fields', [
                     {
                         text: 'Ok',
@@ -289,6 +307,45 @@ export default function PostUpload({ navigation, route }) {
                     {
                         text: 'Ok',
                     },
+                ])
+                return;
+            }
+        }
+
+        if(images.length === 0){
+            Alert.alert('Error', 'Please upload an image', [
+                {
+                    text: 'Ok',
+                },
+            ])
+            return;
+        }
+
+        if(type === "newEvent"){
+            if(newEventForm.location.coordinates.length === 0){
+                Alert.alert('Warning', 'We need your location to create an event', [
+                    {
+                        text: 'Cancel',
+                        
+                    },
+                    {
+                        text: 'Ok',
+                        onPress: () => handleLocation(),
+                    }
+                ])
+                return;
+            }
+        } else if(type === "newOrganization"){
+            if(newOrganizationForm.location.coordinates.length === 0){
+                Alert.alert('Warning', 'We need your location to create an organization', [
+                    {
+                        text: 'Cancel',
+                        
+                    },
+                    {
+                        text: 'Ok',
+                        onPress: () => handleLocation(),
+                    }
                 ])
                 return;
             }
@@ -491,22 +548,56 @@ export default function PostUpload({ navigation, route }) {
                         value={newEventForm.title}
                         textColor="#fff"
                         onChangeText={(text) => setEventForm({ ...newEventForm, title: text })}
-                        required
                     />
                 </View>
+                <View style={styles.formItem}>
+                    <Text style={styles.formLabel}>Organization Name</Text>
+                    <TextInput
+                        style={styles.formInput}
+                        value={newEventForm.organizationValue}
+                        textColor="#fff"
+                        onChangeText={(text) => setEventForm({ ...newEventForm, organizationValue: text })}
+                        onFocus={() => setShowSuggestions(true)}
+                        onBlur={() => setShowSuggestions(false)}
+                    />
+                </View>
+                {showSuggestions && (
+                    organizationsSearch?.map((organization, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={{
+                                padding: 10,
+                                backgroundColor: "#212121",
+                                borderRadius: 5,
+                                marginTop: 5,
+                            }}
+                            onPress={() => {
+                                setShowSuggestions(false);
+                                setEventForm({ ...newEventForm, organizationValue: organization.name, organization: organization._id });
+                            }}
+                        >
+                            <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
+                                <Image source={{ uri: organization.images[0] }} style={{ width: 50, height: 50, borderRadius: 5 }} />
+                                <View style={{ flexDirection: 'column'}}>
+                                    <Text style={{ color: COLORS.white, justifyContent: 'center', paddingLeft: 4 }}> {organization.name} </Text>
+                                    <Text style={{ color: COLORS.secondary, fontSize: 10, padding: 5}}> {organization?.bio} </Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    ))
+                )}
                 <View style={styles.formItem}>
                     <Text style={styles.formLabel}>Description</Text>
                     <TextInput
                         style={{
                             ...styles.formInput,
-                            height: 100,
                             textAlignVertical: "top"
                         }}
                         textColor="#fff"
                         value={newEventForm.description}
                         onChangeText={(text) => setEventForm({ ...newEventForm, description: text })}
                         multiline={true}
-                        required
+
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -519,7 +610,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newEventForm.requirements.trees}
                                 textColor="#fff"
                                 onChangeText={(text) => setEventForm({ ...newEventForm, requirements: { ...newEventForm.requirements, trees: text } })}
-                                required
                             />
                         </View>
                         <View style={{ flex: 1, marginLeft: 5 }}>
@@ -529,7 +619,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newEventForm.requirements.volunteers}
                                 textColor="#fff"
                                 onChangeText={(text) => setEventForm({ ...newEventForm, requirements: { ...newEventForm.requirements, volunteers: text } })}
-                                required
                             />
                         </View>
                     </View>
@@ -541,7 +630,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newEventForm.requirements.funds}
                                 textColor="#fff"
                                 onChangeText={(text) => setEventForm({ ...newEventForm, requirements: { ...newEventForm.requirements, funds: text } })}
-                                required
                             />
                         </View>
                     </View>
@@ -551,14 +639,12 @@ export default function PostUpload({ navigation, route }) {
                     <TextInput
                         style={{
                             ...styles.formInput,
-                            height: 100,
                             textAlignVertical: "top",
                         }}
                         value={newEventForm.landsDescription}
                         textColor="#fff"
                         onChangeText={(text) => setEventForm({ ...newEventForm, landsDescription: text })}
                         multiline={true}
-                        required
                     />
                 </View>
                </View>
@@ -573,14 +659,12 @@ export default function PostUpload({ navigation, route }) {
                     <TextInput
                         style={{
                             ...styles.formInput,
-                            height: 100,
                             textAlignVertical: "top",
                         }}
                         value={newPostForm.text}
                         textColor="#fff"
                         onChangeText={(text) => setNewPostForm({ ...newPostForm, text: text })}
                         multiline={true}
-                        required
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -619,9 +703,9 @@ export default function PostUpload({ navigation, route }) {
                         textColor="#fff"
                         onChangeText={(text) => setEventTitle(text)}
                         onFocus={() => setShowSuggestions(true)}
-                        required
+                        onBlur={() => setShowSuggestions(false)}
                     />
-                    {eventTitle.length > 0 && showSuggestions && (
+                    {showSuggestions && (
                         eventsSearch?.map((event, index) => (
                             <TouchableOpacity
                                 key={index}
@@ -662,7 +746,6 @@ export default function PostUpload({ navigation, route }) {
                         value={newOrganizationForm.name}
                         textColor="#fff"
                         onChangeText={(text) => setNewOrganizationForm({ ...newOrganizationForm, name: text })}
-                        required
                     />
                     {isExisted && (
                         <Text style={{ color: 'red' }}>This organization already exists</Text>
@@ -673,14 +756,12 @@ export default function PostUpload({ navigation, route }) {
                     <TextInput
                         style={{
                             ...styles.formInput,
-                            height: 100,
                             textAlignVertical: "top",
                         }}
                         value={newOrganizationForm.bio}
                         textColor="#fff"
                         onChangeText={(text) => setNewOrganizationForm({ ...newOrganizationForm, bio: text })}
                         multiline={true}
-                        required
                     />
                 </View>
             </View>
@@ -697,7 +778,6 @@ export default function PostUpload({ navigation, route }) {
                         value={newTreeForm.name}
                         textColor="#fff"
                         onChangeText={(text) => setNewTreeForm({ ...newTreeForm, name: text })}
-                        required
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -707,7 +787,6 @@ export default function PostUpload({ navigation, route }) {
                         value={newTreeForm.scientificName}
                         textColor="#fff"
                         onChangeText={(text) => setNewTreeForm({ ...newTreeForm, scientificName: text })}
-                        required
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -715,14 +794,12 @@ export default function PostUpload({ navigation, route }) {
                     <TextInput
                         style={{
                             ...styles.formInput,
-                            height: 100,
                             textAlignVertical: "top",
                         }}
                         value={newTreeForm.description}
                         textColor="#fff"
                         onChangeText={(text) => setNewTreeForm({ ...newTreeForm, description: text })}
                         multiline={true}
-                        required
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -732,7 +809,6 @@ export default function PostUpload({ navigation, route }) {
                         value={newTreeForm.benefits}
                         textColor="#fff"
                         onChangeText={(text) => setNewTreeForm({ ...newTreeForm, benefits: text })}
-                        required
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -745,7 +821,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newTreeForm.requirements.sun}
                                 textColor="#fff"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, sun: text } })}
-                                required
                             />
                         </View>
                         <View style={{ flex: 1, marginLeft: 5 }}>
@@ -755,7 +830,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newTreeForm.requirements.soil}
                                 textColor="#fff"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, soil: text } })}
-                                required    
                             />
                         </View>
                     </View>
@@ -767,7 +841,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newTreeForm.requirements.water}
                                 textColor="#fff"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, water: text } })}
-                                required
                             />
                         </View>
                         <View style={{ flex: 1, marginLeft: 5 }}>
@@ -777,7 +850,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newTreeForm.requirements.temperature}
                                 textColor="#fff"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, temperature: text } })}
-                                required
                             />
                         </View>
                     </View>
@@ -789,7 +861,6 @@ export default function PostUpload({ navigation, route }) {
                                 value={newTreeForm.requirements.fertilizer}
                                 textColor="#fff"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, fertilizer: text } })}
-                                required
                             />
                         </View>
                     </View>

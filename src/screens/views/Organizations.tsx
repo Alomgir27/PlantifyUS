@@ -188,7 +188,7 @@ const Organizations = ({ navigation}) => {
             getRequested();
             setMounted(true);
         }
-    }, [])
+    }, [mounted, type, user])
 
     function fetchMore() {
         if(type === 'all') {
@@ -228,15 +228,19 @@ const Organizations = ({ navigation}) => {
   
   
 
-   
-
-
-  
 
   useEffect(() => {
+    if(type === 'all' && data?.all?.length === 0) return;
+    if(type === 'my' && data?.my?.length === 0) return;
+    if(type === 'pending' && data?.pending?.length === 0) return;
+    if(type === 'requested' && data?.requested?.length === 0) return;
      let temp = type === 'all' ? data?.all : type === 'my' ? data?.my : type === 'pending' ? data?.pending : data?.requested;
      setArticles(temp);
   }, [type, data])
+  useEffect(() => {
+     let temp = type === 'all' ? data?.all : type === 'my' ? data?.my : type === 'pending' ? data?.pending : data?.requested;
+     setArticles(temp);
+  }, [type])
   
   const onPress = async (type: String, _id: any) => {
     if(type === 'Join') {

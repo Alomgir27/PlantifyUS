@@ -15,7 +15,7 @@ import { RefreshControl } from 'react-native';
 
 
 
-const DetailOrganizations = ({item, navigation}: any) => {
+const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
     const {assets, sizes, colors} = useTheme();
     const IMAGE_SIZE = (sizes.width - (sizes.padding + sizes.sm) * 2) / 3;
     const IMAGE_VERTICAL_SIZE =
@@ -28,7 +28,10 @@ const DetailOrganizations = ({item, navigation}: any) => {
     
     const [lengthMembers, setLengthMembers] = useState<number>(6);
     const [lengthEvents, setLengthEvents] = useState<number>(6);
+    const [lengthModerators, setLengthModerators] = useState<number>(6);
     const [requestedEvents, setRequestedEvents] = useState<any>([]);
+    const [showModal, setModal] = useState<boolean>(false);
+    const [showAchievements, setShowAchievements] = useState<boolean>(false);
 
     const handleApprove = async (eventId: string) => {
         await axios.post(`${API_URL}/events/approve`, { eventId, organizationId: id })
@@ -48,6 +51,18 @@ const DetailOrganizations = ({item, navigation}: any) => {
             console.log(res?.data);
             let newRequestedEvents = requestedEvents.filter((event: any) => event?._id !== eventId);
             setRequestedEvents(newRequestedEvents);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    };
+
+    const approveJoinRequest = async (userId: string) => {
+        await axios.post(`${API_URL}/organizations/approveJoinRequest`, { userId, organizationId: id })
+        .then((res) => {
+            console.log(res?.data);
+            let newItems = item?.joinRequests?.filter((user: any) => user?._id !== userId);
+            setOrganization({...item, joinRequests: newItems});
         })
         .catch((err) => {
             console.log(err);
@@ -153,6 +168,38 @@ const DetailOrganizations = ({item, navigation}: any) => {
           <Text p secondary marginTop={sizes.sm}>
             {item?.moderators?.length} moderators •{' '} <Text primary>{item?.volunteers?.length}</Text> Members
           </Text>
+
+          <Block row align="center" justify="center" marginTop={sizes.sm}>
+            <Button
+                row
+                onPress={() => setShowAchievements(!showAchievements)}
+            >
+                <Text p  marginRight={sizes.s} color={colors.link}>
+                    Our Achievements
+                </Text>
+                <Image source={assets.arrow} />
+            </Button>
+          </Block>
+            {showAchievements && item?.badges?.length > 0 && (
+                <Block row wrap="wrap" justify="center" align="center">
+                    {item?.badges?.map((badge: any) => (
+                        <Block key={badge?._id} justify="center" align="center" marginBottom={IMAGE_MARGIN}>
+                            <Image
+                                resizeMode="cover"
+                                source={{uri: badge?.image}}
+                                style={{
+                                    height: IMAGE_SIZE,
+                                    width: IMAGE_SIZE,
+                                }}
+                            />
+                            <Text p primary semibold center marginBottom={sizes.s}>
+                                {badge?.name}
+                            </Text>
+                        </Block>
+                    ))}
+                </Block>
+            )}
+        
           <Text h4 marginVertical={sizes.s}>
             {item?.name}
           </Text>
@@ -160,6 +207,98 @@ const DetailOrganizations = ({item, navigation}: any) => {
             {item?.bio}
           </Text>
         </Block>
+        <Block  justify="flex-start" marginBottom={sizes.s}>
+            <Text h5 semibold marginLeft={sizes.s}>
+                joinRequests {requestedEvents?.length > 0 && <Text primary>({requestedEvents?.length})</Text> }
+            </Text>
+            <Button onPress={() => setModal(true)} padding={sizes.s} primary width={sizes.width / 3} marginTop={sizes.s} marginLeft={sizes.s}>
+                <Text p white semibold>
+                    Waiting ({requestedEvents?.length})
+                </Text>
+            </Button>
+            
+            <Modal visible={showModal} onRequestClose={() => setModal(false)}>
+                <FlatList
+                    keyExtractor={(item) => item?._id}
+                    data={item?.joinRequests}
+                    renderItem={({item}) => (
+                        <Block
+                            align="center"
+                            justify="center"
+                            marginBottom={sizes.s}
+                            key={item?._id}
+                        >
+                            <Image
+                                resizeMode="cover"
+                                source={{uri: item?.image}}
+                                style={{
+                                    height: IMAGE_SIZE / 2,
+                                    width: IMAGE_SIZE / 2,
+                                    borderRadius: 100,
+                                }}
+                            />
+                            <Text p semibold>
+                                {item?.name}
+                            </Text>
+                         <Block row align="center" justify="space-between" width={sizes.padding * 8}>
+                            <Button onPress={() => navigation.navigate('Profile', { userId: item?._id})}>
+                                <Text p primary semibold>
+                                    View Profile
+                                </Text>
+                            </Button>
+                            {(item?.admin === user?._id || item?.moderators?.includes(user?._id)) ? (
+                                <Button onPress={() => approveJoinRequest(item?._id)}>
+                                    <Text p primary semibold>
+                                        Accept
+                                    </Text>
+                                </Button>
+                            ) : (
+                                <Text p primary semibold>
+                                    pending
+                                </Text>
+                            )}
+
+                          </Block>
+                        </Block>
+                    )}
+                />
+            </Modal>
+        </Block>
+
+        <Block row align="center" justify="space-between" marginBottom={sizes.s}>
+            <Text h5 semibold>
+                moderators {item?.moderators?.length > 0 && <Text primary>({item?.moderators?.length})</Text>}
+            </Text>
+            <Button onPress={() => setLengthModerators(lengthModerators === 6 ? item?.moderators?.length : 6)}>
+                <Text p primary semibold>
+                    {lengthModerators === 6 ? 'View More' : 'View Less'}
+                </Text>
+            </Button>
+        </Block>
+
+        <Block row wrap="wrap">
+            {item?.moderators?.slice(0, lengthModerators).map((moderator: any) => (
+                <Block key={moderator?._id} justify="center" align="center" marginBottom={IMAGE_MARGIN}>
+                    <Button onPress={() => navigation.navigate('Profile', { userId: moderator?._id})} >
+                        {moderator?.image &&
+                            <Image
+                                resizeMode="cover"
+                                source={{uri: moderator?.image}}
+                                style={{
+                                    height: IMAGE_SIZE,
+                                    width: IMAGE_SIZE,
+                                }}
+                            />
+                        }
+                        <Text p primary semibold center marginBottom={sizes.s}>
+                            {moderator?.name}
+                        </Text>
+                    </Button>
+                </Block>
+            ))}
+        </Block>
+
+
         {/* photo gallery */}
         <Block>
           <Block row align="center" justify="space-between" marginBottom={sizes.s}>
@@ -287,7 +426,7 @@ const DetailOrganizations = ({item, navigation}: any) => {
             <Block row>
                 <Button
                 marginRight={sizes?.s}
-                onPress={() => navigation.navigate('Chat')}>
+                onPress={() => navigation.navigate('ChatRoom', { _id: organization?._id })}>
                 <ICONS.Ionicons
                     name="chatbubble-ellipses-outline"
                     size={sizes?.base * 2.5}
@@ -306,7 +445,7 @@ const DetailOrganizations = ({item, navigation}: any) => {
             </Block>
         ),
       });
-    }, [navigation]);
+    }, [navigation, isDark, colors, sizes, organization]);
 
   
     return (
@@ -323,7 +462,7 @@ const DetailOrganizations = ({item, navigation}: any) => {
             }
           >
           <Block>
-            <DetailOrganizations item={organization} navigation={navigation} />
+            <DetailOrganizations item={organization} navigation={navigation} setOrganization={setOrganization} />
           </Block>
         </Block>
       </Block>

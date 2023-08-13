@@ -23,7 +23,7 @@ import {
     TreeIdentify,
     About,
     Agreement,
-    Chat,
+    ChatRoom,
     Components,
     Notifications,
     NotificationsSettings,
@@ -122,22 +122,10 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
-                            label="Campings"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Campings')}
-                            icon={() => <ICONS.Ionicons name="map" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
                             label="Events"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
                             onPress={() => props.navigation.navigate('Events')}
                             icon={() => <ICONS.Ionicons name="calendar" size={24} color={COLORS.white} />}
-                        />
-                        <DrawerItem
-                            label="Chat"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Chat')}
-                            icon={() => <ICONS.Ionicons name="chatbubbles" size={24} color={COLORS.white} />}
                         />
                         <DrawerItem
                             label="Organizations"
@@ -151,13 +139,6 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Notifications')}
                             icon={() => <ICONS.Ionicons name="notifications" size={24} color={COLORS.white} />}
                         />
-                        <DrawerItem
-                            label="Saved"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Saved')}
-                            icon={() => <ICONS.Ionicons name="bookmark" size={24} color={COLORS.white} />}
-                        />
-                        
                         
                         <DrawerItem
                             label="Components"
@@ -166,12 +147,6 @@ export default function Main() {
                             icon={() => <ICONS.Ionicons name="construct" size={24} color={COLORS.white} />}
                         />
                         
-                        <DrawerItem
-                            label="Profile"
-                            labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
-                            onPress={() => props.navigation.navigate('Profile')}
-                            icon={() => <ICONS.Ionicons name="person" size={24} color={COLORS.white} />}
-                        />
                         <DrawerItem
                             label="Rental"
                             labelStyle={{ color: COLORS.white, fontSize: 15, fontWeight: 'bold' }}
@@ -407,17 +382,23 @@ export default function Main() {
                 <Drawer.Screen name="Agreement" component={Agreement} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
-                <Drawer.Screen name="Chat" component={Chat} options={{
-                    drawerItemStyle: { height: 0 }
+                <Drawer.Screen name="ChatRoom" component={ChatRoom} options={{
+                    drawerItemStyle: { height: 0 },
+                    headerShown: true,
+                    headerTitle: 'Chat Room'
                 }}/>
                 <Drawer.Screen name="Components" component={Components} options={{
                     drawerItemStyle: { height: 0 }
                 }}/>
                 <Drawer.Screen name="Notifications" component={Notifications} options={{
-                    drawerItemStyle: { height: 0 }
+                    drawerItemStyle: { height: 0 },
+                    headerShown: true,
+                    headerTitle: 'Notifications'
                 }}/>
                 <Drawer.Screen name="NotificationsSettings" component={NotificationsSettings} options={{
-                    drawerItemStyle: { height: 0 }
+                    drawerItemStyle: { height: 0 },
+                    headerShown: true,
+                    headerTitle: 'Notifications Settings'
                 }}/>
                 <Drawer.Screen name="Privacy" component={Privacy} options={{
                     drawerItemStyle: { height: 0 }

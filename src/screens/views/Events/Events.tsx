@@ -136,7 +136,7 @@ const Events = ({ route, navigation }) => {
                                     if(res === "Organization") {
                                         navigation.navigate('Organization', { _id: route?.params?.id });
                                     } else {
-                                        navigation.navigate('Home');
+                                        navigation.goBack();
                                     }
                                 })
                                 .catch((err) => {

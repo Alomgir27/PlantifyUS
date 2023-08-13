@@ -276,6 +276,7 @@ const Comment = mongoose.model('Comment', commentSchema);
 Event.collection.createIndex({ location: '2dsphere' });
 User.collection.createIndex({ location: '2dsphere' });
 Organizations.collection.createIndex({ location: '2dsphere' });
+Event.collection.createIndex({ title: 'text', description: 'text' });
 
 
 

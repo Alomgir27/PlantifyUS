@@ -208,6 +208,8 @@ router.get('/getOne/:id', async (req, res) => {
         .populate({ path: 'volunteers', select: '_id name image' })
         .populate({ path: 'joinRequests', select: '_id name image' })
         .populate({ path: 'events', select: '_id title images' })
+        .populate({ path: 'moderators', select: '_id name image' })
+        .populate({ path: 'badges', select: '_id name image' })
         .then(organization => res.status(200).json({ success: true, organization, message: 'Organization fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organization', error: err }));
 });
@@ -215,6 +217,24 @@ router.get('/getOne/:id', async (req, res) => {
 
 
 
+
+//@route POST api/organizations/approveJoinRequest
+//@desc Add user to volunteers array of organization and remove user from joinRequests array
+//@access Public
+router.post('/approveJoinRequest', async (req, res) => {
+    const { userId, organizationId } = req.body;
+    console.log(req.body, 'req.body');
+
+    Organizations.findById(organizationId)
+        .then(organization => {
+            organization.joinRequests.pull(userId);
+            organization.volunteers.push(userId);
+            organization.save()
+                .then(organization => res.status(200).json({ success: true, organization, message: 'Organization updated successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
+        })
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to update organization', error: err }));
+});
 
         
 

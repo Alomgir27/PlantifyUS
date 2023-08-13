@@ -1,6 +1,6 @@
 import React , { useEffect, useState } from "react";
 import { COLORS } from "../../../constants/index";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import * as ICONS from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
@@ -9,6 +9,7 @@ import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
 import { Linking } from 'react-native';
 import { ActivityIndicator } from "react-native-paper";
+import { Text } from "../../../components/";
 
 
 
@@ -116,7 +117,7 @@ const TreeIdentify = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <ICONS.Ionicons name="arrow-back" size={24} color="black" />
+                    <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Identify Tree</Text>
             </View>
@@ -195,7 +196,6 @@ const TreeIdentify = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white
     },
     header: {
         flexDirection: 'row',
@@ -207,7 +207,6 @@ const styles = StyleSheet.create({
     headerTitle: {
         marginLeft: 10,
         fontSize: 20,
-        fontFamily: 'Roboto-Bold'
     },
     body: {
         flex: 1,
@@ -242,7 +241,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: COLORS.white,
-        fontFamily: 'Roboto-Bold'
     },
     loadingContainer: {
         flexDirection: 'row',
@@ -252,14 +250,12 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         marginLeft: 10,
-        fontFamily: 'Roboto-Bold'
     },
     errorContainer: {
         marginTop: 10
     },
     errorText: {
         color: COLORS.red,
-        fontFamily: 'Roboto-Bold'
     },
     treeContainer: {
         marginTop: 10,
@@ -288,27 +284,22 @@ const styles = StyleSheet.create({
     },
     externalLinkText: {
         color: COLORS.primary,
-        fontFamily: 'Roboto-Bold'
     },
     treeDetailsContainer: {
         marginTop: 10
     },
     treeName: {
-        fontFamily: 'Roboto-Bold',
         fontSize: 20
     },
     treeScientificName: {
-        fontFamily: 'Roboto-Bold',
         fontSize: 16,
         color: COLORS.gray
     },
     treeDescription: {
         marginTop: 10,
-        fontFamily: 'Roboto-Regular'
     },
     treeDetails: {
         marginTop: 10,
-        fontFamily: 'Roboto-Regular'
     }
 });
 

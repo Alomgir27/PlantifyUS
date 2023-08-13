@@ -1,6 +1,6 @@
 export {default as About} from './About';
 export {default as Agreement} from './Agreement';
-export {default as Chat} from './Chat';
+export {default as ChatRoom} from './ChatRoom';
 export {default as Components} from './Components';
 export {default as Home} from './Home';
 export {default as Notifications} from './Notifications';

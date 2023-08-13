@@ -28,8 +28,9 @@ import { COLORS } from "../constants/index";
 import { Block, Button, Text as Text2, Image as Image2 } from "../components/";
 import { useTheme } from "../hooks/";
 import { ActivityIndicator } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Home = ({ navigation}) => {
+const Home = ({ navigation}: any) => {
 
     const [loading, setLoading] = useState<Boolean>(false);
     const [notification, setNotification] = useState([]);
@@ -51,7 +52,6 @@ const Home = ({ navigation}) => {
     const dispatch = useDispatch();
 
     const {assets, sizes} = useTheme();
-    const IMAGE_SIZE = (sizes.width - (sizes.padding + sizes.sm) * 2) / 3;
     const IMAGE_VERTICAL_SIZE =
       (sizes.width - (sizes.padding + sizes.sm) * 2) / 2;
     
@@ -63,16 +63,20 @@ const Home = ({ navigation}) => {
             setMounted(false);
         }
     }, []);
+
+    useEffect(() => {
+        (async () => {
+            await AsyncStorage.removeItem('route');
+        })();
+    }
+    , []);
   
    
 
     const onRefresh = () => {
         setLoading(true);
         dispatch(clearData())
-        dispatch(fetchAllDefaultData());
-        setTimeout(() => {
-            setLoading(false);
-        }, 3000);
+        dispatch(fetchAllDefaultData(setLoading));
     }
 
 
@@ -940,11 +944,22 @@ const Home = ({ navigation}) => {
     }, [organizations])
 
 
+    if(loadingData && !loading) {
+        return (
+            <Block center>
+                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                    <Text2 p primary semibold style={{ marginTop: 10 }}>Loading...</Text2>
+                </View>
+            </Block>
+        )
+    }
+   
         
 
     return (
       <>
-        <ScrollView 
+        <Block scroll
             refreshControl={
                 <RefreshControl refreshing={loading} onRefresh={onRefresh} />
             }
@@ -1001,7 +1016,7 @@ const Home = ({ navigation}) => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.white, ...FONTS.H2, }}>New Plants</Text>
                             <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity
+                                <Button
                                     onPress={() => navigation.navigate("TreeIdentify")}
                                 >
                                     <Image
@@ -1012,7 +1027,7 @@ const Home = ({ navigation}) => {
                                             height: 20
                                         }}
                                     />
-                                </TouchableOpacity>
+                                </Button>
                             </View>
 
                         </View>
@@ -1024,31 +1039,26 @@ const Home = ({ navigation}) => {
                 </View>
             </View>
 
-            {loadingData && (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: SIZES.padding * 5 }}>
-                     <ActivityIndicator size="large" color={COLORS.primary} />
-                </View>
-            )}
+            
 
-          {!loadingData && (
-            <>
+         
             {/* New Events */}
             <View style={{ flex: 1 }}>
                 <View style={{
                     flex: 1,
                     borderBottomLeftRadius: 50,
                     borderBottomRightRadius: 50,
-                    // backgroundColor: COLORS.white
                 }}>
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Events</Text>
-
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate("Events")}
-                            >
-                                <Text2 p primary semibold>View All</Text2>
-                            </TouchableOpacity>
+                            <Button 
+                               onPress={() => navigation.navigate("Events")}
+                              >
+                                <Text2 p primary semibold>
+                                     View All
+                                </Text2>
+                            </Button>
                         </View>
 
                         <View style={{marginTop: SIZES.base }}>
@@ -1069,12 +1079,13 @@ const Home = ({ navigation}) => {
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Posts</Text>
-
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate("Posts")}
-                            >
-                                <Text2 p primary semibold>View All</Text2>
-                            </TouchableOpacity>
+                            <Button 
+                               onPress={() => navigation.navigate("Posts")}
+                              >
+                                <Text2 p primary semibold>
+                                     View All
+                                </Text2>
+                            </Button>
                         </View>
 
                         <View style={{ marginTop: SIZES.base }}>
@@ -1143,10 +1154,8 @@ const Home = ({ navigation}) => {
                     </View>
                 </View>
             </View>
-           </>
-           )}
 
-        </ScrollView>
+        </Block>
             {showRecommendUsers && (
                 <RecommendUsers navigation={navigation} setShowRecommendUsers={setShowRecommendUsers} />
             )}
@@ -1157,7 +1166,6 @@ const Home = ({ navigation}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: COLORS.lightGray,
         flexDirection: 'column'
     },
     shadow: {

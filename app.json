@@ -25,7 +25,8 @@
       "supportsTablet": true
     },
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      "expo-av"
     ]
   }
 }

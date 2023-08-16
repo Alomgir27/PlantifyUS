@@ -29,7 +29,7 @@ const { User } = require('../models');
 //@desc Login a user
 //@access Public
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, pushToken } = req.body;
     console.log(req.body);
 
     User.findOne({ email })
@@ -42,7 +42,11 @@ router.post('/login', async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Incorrect password' });
             }
 
-            return res.status(200).json({ success: true, user, message: 'User logged in successfully' });
+            user.pushToken = pushToken;
+            user.save()
+                .then(user => res.status(200).json({ success: true, user, message: 'User logged in successfully' }))
+                .catch(err => res.status(400).json({ success: false, message: 'Unable to login', error: err }));
+
         })
         .catch(err => res.status(400).json({ success: false, message: 'Unable to login', error: err }));
 });
@@ -90,6 +94,20 @@ router.get('/get/:id', async (req, res) => {
         .catch(err => res.status(400).json({ success: false, message: 'User could not be retrieved', error: err }));
 });
 
+// @route   GET api/users/getProfileUser/:id
+// @desc    Get a user
+// @access  Public
+router.get('/getProfileUser/:id', async (req, res) => {
+    const { id } = req.params;
+
+    User.findById(id)
+        .populate('friends')
+        .populate('eventsAttending')
+        .populate('posts')
+        .populate('badges')
+        .then(user => res.status(200).json({ success: true, user, message: 'User retrieved successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'User could not be retrieved', error: err }));
+});
 
 // @route   GET api/users
 // @desc    Get all users

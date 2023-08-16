@@ -86,11 +86,7 @@ export const fetchTrees = () => {
     return (dispatch, getState) => {
         if(getState().trees.loading)return;
         dispatch(loadingStateChange(true));
-        axios.get(`${API_URL}/plants`, {
-            params: {
-                skip: getState().trees.treesLoaded
-            }
-        })
+        axios.get(`${API_URL}/plants/initial`)
         .then((response) => {
             console.log(response.data.message, 'trees.js')
             dispatch({

@@ -43,6 +43,7 @@ const SearchScreen = ({ navigation }) => {
 
     const inputRef = useRef(null);
 
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             dispatch(fetchAllSearchData('', 5));
@@ -369,9 +370,9 @@ const SearchScreen = ({ navigation }) => {
                     <ICONS.Ionicons name="search" size={20} color={COLORS.gray} />
                      <TextInput
                         ref={inputRef}
-                        style={styles.searchInput}
+                        style={[styles.searchInput, { color: colors.text }] }
                         placeholder="Search"
-                        placeholderTextColor={COLORS.gray}
+                        placeholderTextColor={colors.input}
                         onChangeText={handleSearch}
                     />
                 </View>

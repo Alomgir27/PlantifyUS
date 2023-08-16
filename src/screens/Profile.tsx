@@ -1,18 +1,42 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect, useState } from 'react';
 import {Platform, Linking} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
-// import {useNavigation} from '@react-navigation/core';
 
 import {Block, Button, Image, Text} from '../components/';
 import {useData, useTheme, useTranslation} from '../hooks/';
-import { COLORS } from '../constants';
+import { API_URL } from '../constants';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const isAndroid = Platform.OS === 'android';
 
-const Profile = ({ navigation }) => {
-  const {user} = useData();
+
+const Profile = ({ navigation, route }) => {
+  
+
   const {t} = useTranslation();
   const {assets, colors, sizes} = useTheme();
+  const [user, setUser] = useState<any>(null);
+  const currentUser = useSelector((state) => state?.data?.currentUser);
+
+
+  useEffect(() => {
+    if(route?.params?.userId) {
+      (async () => {
+        await axios.get(`${API_URL}/users/getProfileUser/${route?.params?.userId}`)
+        .then((res) => {
+          setUser(res.data?.user);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+      )();
+    }else {
+      setUser(currentUser);
+    }
+  }, [route?.params?.userId]);
+
 
   const IMAGE_SIZE = (sizes.width - (sizes.padding + sizes.sm) * 2) / 3;
   const IMAGE_VERTICAL_SIZE =
@@ -51,7 +75,7 @@ const Profile = ({ navigation }) => {
             padding={sizes.sm}
             paddingBottom={sizes.l}
             radius={sizes.cardRadius}
-            source={assets.background}
+            source={{uri: user?.image}}
             >
             <Button
               row
@@ -62,11 +86,11 @@ const Profile = ({ navigation }) => {
                 radius={0}
                 width={10}
                 height={18}
-                color={colors.white}
+                color={colors.primary}
                 source={assets.arrow}
                 transform={[{rotate: '180deg'}]}
               />
-              <Text p white marginLeft={sizes.s}>
+              <Text p primary marginLeft={sizes.s}>
                 {t('profile.title')}
               </Text>
             </Button>
@@ -75,17 +99,17 @@ const Profile = ({ navigation }) => {
                 width={64}
                 height={64}
                 marginBottom={sizes.sm}
-                source={{uri: user?.avatar}}
+                source={{uri: user?.image}}
               />
-              <Text h5 center white>
+              <Text h5 center primary>
                 {user?.name}
               </Text>
-              <Text p center white>
-                {user?.department}
+              <Text p center primary>
+                {user?.bio}
               </Text>
               <Block row marginVertical={sizes.m}>
                 <Button
-                  white
+                  primary
                   outlined
                   shadow={false}
                   radius={sizes.m}
@@ -97,7 +121,7 @@ const Profile = ({ navigation }) => {
                     radius={sizes.m}
                     paddingHorizontal={sizes.m}
                     color="rgba(255,255,255,0.2)">
-                    <Text white bold transform="uppercase">
+                    <Text primary bold transform="uppercase">
                       {t('common.follow')}
                     </Text>
                   </Block>
@@ -107,24 +131,24 @@ const Profile = ({ navigation }) => {
                   radius={sizes.m}
                   marginHorizontal={sizes.sm}
                   color="rgba(255,255,255,0.2)"
-                  outlined={String(colors.white)}
+                  outlined={String(colors.primary)}
                   onPress={() => handleSocialLink('twitter')}>
                   <Ionicons
                     size={18}
                     name="logo-twitter"
-                    color={colors.white}
+                    color={colors.primary}
                   />
                 </Button>
                 <Button
                   shadow={false}
                   radius={sizes.m}
                   color="rgba(255,255,255,0.2)"
-                  outlined={String(colors.white)}
+                  outlined={String(colors.primary)}
                   onPress={() => handleSocialLink('dribbble')}>
                   <Ionicons
                     size={18}
                     name="logo-dribbble"
-                    color={colors.white}
+                    color={colors.primary}
                   />
                 </Button>
               </Block>
@@ -151,16 +175,12 @@ const Profile = ({ navigation }) => {
               paddingVertical={sizes.sm}
               renderToHardwareTextureAndroid>
               <Block align="center">
-                <Text h5>{user?.stats?.posts}</Text>
+                <Text h5>{user?.posts?.length}</Text>
                 <Text>{t('profile.posts')}</Text>
               </Block>
               <Block align="center">
-                <Text h5>{(user?.stats?.followers || 0) / 1000}k</Text>
-                <Text>{t('profile.followers')}</Text>
-              </Block>
-              <Block align="center">
-                <Text h5>{(user?.stats?.following || 0) / 1000}k</Text>
-                <Text>{t('profile.following')}</Text>
+                <Text h5>{(user?.friends?.length || 0) }</Text>
+                <Text>{t('profile.friends')}</Text>
               </Block>
             </Block>
           </Block>
@@ -170,8 +190,8 @@ const Profile = ({ navigation }) => {
             <Text h5 semibold marginBottom={sizes.s} marginTop={sizes.sm}>
               {t('profile.aboutMe')}
             </Text>
-            <Text p lineHeight={26}>
-              {user?.about}
+            <Text p lineHeight={26} color={colors.link}>
+              {user?.type}
             </Text>
           </Block>
 
@@ -179,7 +199,7 @@ const Profile = ({ navigation }) => {
           <Block paddingHorizontal={sizes.sm} marginTop={sizes.s}>
             <Block row align="center" justify="space-between">
               <Text h5 semibold>
-                {t('common.album')}
+               Post {t('profile.photos')}
               </Text>
               <Button>
                 <Text p primary semibold>

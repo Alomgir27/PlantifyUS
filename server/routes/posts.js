@@ -296,6 +296,32 @@ router.post('/fetchMore', async (req, res) => {
     }
 })
 
+//@route POST api/posts/getPosts
+//@desc Get posts by ids and userId must be present in favourites array
+//@access Public
+router.post('/getPosts', async (req, res) => {
+    const { ids, userId } = req.body;
+
+    Post.find({ favourites: userId, _id: { $nin: ids } })
+        .populate({
+            path: 'author',
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'event',
+            select: '_id title images status location createdAt author requirements',
+            populate: {
+                path: 'author',
+                select: '_id name image type'
+            }
+        })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .then(posts => res.status(200).json({ success: true, posts, message: 'Posts fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch posts', error: err }));
+})
+
+
 
 
 module.exports = router;

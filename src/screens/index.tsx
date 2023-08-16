@@ -13,7 +13,7 @@ export {default as Rental} from './Rental';
 export {default as Rentals} from './Rentals';
 export {default as Settings} from './Settings';
 export {default as Shopping} from './Shopping';
-export {default as PlantDetail} from './PlantDetail';
+export {default as PlantDetail} from './views/Plant/PlantDetail';
 export {default as SearchScreen} from './views/Search';
 export {default as Campings} from './Campings';
 export {default as Donation} from './Donation';
@@ -31,4 +31,6 @@ export {default as ImageDetails} from '../components/ImageDetails';
 export {default as Images} from '../components/Images';
 export {default as TreeIdentify} from './views/Identify/TreeIdentify';
 export {default as ViewOrganization} from './views/ViewOrganization';
+export {default as Plants} from './views/Plant/Plants';
+export {default as Favourite } from './views/Favourite';
 

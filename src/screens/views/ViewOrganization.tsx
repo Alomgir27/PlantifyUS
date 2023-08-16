@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useState, useEffect, useCallback } from 'react';
-import {FlatList, TouchableOpacity } from 'react-native';
+import {FlatList, TouchableOpacity, View } from 'react-native';
 
 
 import {useTheme, useData} from './../../hooks/';
@@ -12,6 +12,9 @@ import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RefreshControl } from 'react-native';
 import { Modal as Modal2 } from 'react-native-paper';
+import { Alert } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
+
 
 
 const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
@@ -34,13 +37,35 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
     const [showModalUser, setModalUser] = useState<boolean>(false);
     const [showAchievements, setShowAchievements] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<any>({});
+    const [showModalEvent, setModalEvent] = useState<boolean>(false);
+    const [event, setEvent] = useState<any>({});
+    const [text, setText] = useState<string>('');
+    const [selectedDate, setSelectedDate] = useState<any>({
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+        day: new Date().getDate(),
+        startHour: 0,
+        length: 1,
+    });
+
+   
+    
 
     const handleApprove = async (eventId: string) => {
-        await axios.post(`${API_URL}/events/approve`, { eventId, organizationId: id })
+        await axios.post(`${API_URL}/events/approve`, { eventId, organizationId: id , ...selectedDate, text, userId: user?._id})
         .then((res) => {
             console.log(res?.data);
+            setOrganization({...item, events: [...item?.events, res?.data?.event]});
             let newRequestedEvents = requestedEvents.filter((event: any) => event?._id !== eventId);
             setRequestedEvents(newRequestedEvents);
+            setModalEvent(false);
+            setSelectedDate({
+                year: new Date().getFullYear(),
+                month: new Date().getMonth() + 1,
+                day: new Date().getDate(),
+                length: 1,
+            });
+            setText('');
         })
         .catch((err) => {
             console.log(err);
@@ -145,67 +170,82 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
     }
     , [item?.name]);
 
-    const EventItem = ({item}: any) => {
+    const EventItem = ({nowItem}: any) => {
         return (
-        <Block column align="center" marginBottom={sizes.sm} key={item?._id}>
-            <Block card row align="center" marginBottom={sizes.sm} key={item?._id}>
-                {item?.images?.length > 0 && (
-                    <Image
-                        resizeMode="cover"
-                        source={{uri: item?.images[0]}}
-                        style={{
-                            height: IMAGE_VERTICAL_SIZE,
-                            width: IMAGE_VERTICAL_SIZE,
-                        }}
-                    />
-                )}
+         <Block>
+            <Block column align="center" marginBottom={sizes.sm} key={item?._id}>
+                <Block card row align="center" marginBottom={sizes.sm} key={item?._id}>
+                    {nowItem?.images?.length > 0 && (
+                        <Image
+                            resizeMode="cover"
+                            source={{uri: nowItem?.images[0]}}
+                            style={{
+                                height: IMAGE_VERTICAL_SIZE,
+                                width: IMAGE_VERTICAL_SIZE,
+                            }}
+                        />
+                    )}
 
-                
-                <Block padding={sizes.s} justify="space-between">
-                    <Text p numberOfLines={1} semibold marginBottom={sizes.s}>{item?.title}</Text>
-                    <Text p numberOfLines={2} marginBottom={sizes.s}>{item?.description}</Text>
-                   <TouchableOpacity onPress={() => {
-                        AsyncStorage.setItem('route', 'Organization')
-                        navigation.navigate('Events', { _id: item?._id, id })
-                     }}>
-                          
-                         <Block row align="center">
-                          <Text p semibold marginRight={sizes.s} color={colors.link}>
-                            See More
+                    
+                    <Block padding={sizes.s} justify="space-between">
+                        <Text p numberOfLines={1} semibold marginBottom={sizes.s}>{nowItem?.title}</Text>
+                        <Text p numberOfLines={2} marginBottom={sizes.s}>{nowItem?.description}</Text>
+                        <Text p size={10} marginBottom={sizes.s / 5} color={colors.text} numberOfLines={3}>
+                            {nowItem?.hostDetails?.message}
+                        </Text>
+                    <TouchableOpacity onPress={() => {
+                            navigation.navigate('Events', { _id: nowItem?._id, id })
+                        }}>
+                            
+                            <Block row align="center">
+                            <Text p semibold marginRight={sizes.s} color={colors.link}>
+                                See More
+                                </Text>
+                            <Image source={assets.arrow} color={colors.link} />
+                        </Block>
+                        </TouchableOpacity>
+                    </Block>
+                    {nowItem?.isVerified && <ICONS.Ionicons name="checkmark-circle" size={20} color={colors.primary} />}
+                </Block>
+                {(item?.moderators?.map((moderator: any) => moderator?._id).includes(user?._id) || item?.admin?._id === user?._id) && !nowItem?.isVerified && nowItem?.status === 'pending' && (
+                    <Block row align="center" justify="space-between" width={sizes.width - sizes.padding * 2}>
+                        <Button
+                            danger
+                            width={sizes.width / 3}
+                            onPress={() => handleReject(nowItem?._id)}
+                        >
+                            <Text bold white>
+                                Reject
                             </Text>
-                          <Image source={assets.arrow} color={colors.link} />
-                       </Block>
-                    </TouchableOpacity>
-                </Block>
-                {item?.isVerified && <ICONS.Ionicons name="checkmark-circle" size={20} color={colors.primary} />}
+                        </Button>
+                        <Button
+                            primary
+                            width={sizes.width / 3}
+                            onPress={() => Alert.alert('Are you sure you want to host this event?', 'Please check the event details before hosting it.',
+                            [
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => console.log('Cancel Pressed'),
+                                    style: 'cancel'
+                                },
+                                { text: 'Yes, I checked', onPress: () => {setEvent(nowItem); setModalEvent(true)} }
+                            ])}
+                        >
+                            <Text bold>
+                                Approved
+                            </Text>
+                        </Button>
+                    </Block>
+                )}
             </Block>
-            {item?.moderators?.includes(user?._id) && item?.admin?._id !== user?._id && !item?.isVerified && (
-                <Block row align="center" justify="space-between" width={sizes.width - sizes.padding * 2}>
-                    <Button
-                        primary
-                        width={sizes.width / 3}
-                        onPress={() => handleApprove(item?._id)}
-                    >
-                        <Text bold>
-                            Approve
-                        </Text>
-                    </Button>
-                    <Button
-                        danger
-                        width={sizes.width / 3}
-                        onPress={() => handleReject(item?._id)}
-                    >
-                        <Text bold white>
-                            Reject
-                        </Text>
-                    </Button>
-                </Block>
-            )}
-        </Block>
+          </Block>
         );
     };
 
-    console.log(item, 'item');
+  
+ 
+
+
   
     return (
     <Block>
@@ -303,7 +343,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
                                     View Profile
                                 </Text>
                             </Button>
-                            {!(item?.admin === user?._id || item?.moderators?.includes(user?._id)) ? (
+                            {!(item?.admin?._id === user?._id || item?.moderators?.map((moderator: any) => moderator?._id).includes(user?._id)) ? (
                               <Block row align="center" justify="space-between" width={sizes.padding * 8}>
                                 <Button onPress={() => approveJoinRequest(item?._id)}>
                                     <Text p primary semibold marginLeft={sizes.s}>
@@ -418,7 +458,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
             
             {requestedEvents?.length > 0 && (
                 requestedEvents?.slice(0, lengthEvents).map((event: any) => (
-                    <EventItem item={event} />
+                    <EventItem nowItem={event} key={event?._id} />
                 ))
             )}
         </Block>
@@ -433,7 +473,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
 
             {item?.events?.length > 0 && (
                 item?.events?.map((event: any) => (
-                    <EventItem item={event} />
+                    <EventItem nowItem={event} key={event?._id} />
                 ))
             )}
         </Block>
@@ -496,7 +536,191 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
                     </Block>
                 </Block>
         </Modal2>
+        <Modal2 visible={showModalEvent} 
+              onDismiss={() => setModalEvent(false)}
+              contentContainerStyle={{
+                  backgroundColor: isDark ? colors.card : colors.white,
+                  padding: sizes.padding,
+                  borderRadius: sizes.radius,
+                  width: sizes.width - sizes.padding * 2,
+                  alignSelf: 'center',
+
+              }}
+      
+          >
+            <Text p primary semibold marginBottom={sizes.padding}>
+                At least 24 hours before the event, you can approve or reject the event
+            </Text>
+                    <View  style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text p>
+                            day
+                        </Text>
+                        <TextInput
+                            style={{
+                                height: 40,
+                                width: 100,
+                                borderColor: colors.border,
+                                borderWidth: 1,
+                                borderRadius: sizes.radius,
+                                marginTop: sizes.padding,
+                                marginBottom: sizes.padding,
+                                paddingLeft: sizes.padding,
+
+                            }}
+                            onChangeText={(text) => setSelectedDate({...selectedDate, day: text})}
+                            placeholder="day"
+                            keyboardType="numeric"
+                            value={selectedDate?.day}
+                        />
+                    </View>
+                    <View  style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text p>
+                            month
+                        </Text>
+                        <TextInput
+                            style={{
+                                height: 40,
+                                width: 100,
+                                borderColor: colors.border,
+                                borderWidth: 1,
+                                borderRadius: sizes.radius,
+                                marginTop: sizes.padding,
+                                marginBottom: sizes.padding,
+                                paddingLeft: sizes.padding,
+
+                            }}
+                            onChangeText={(text) => setSelectedDate({...selectedDate, month: text})}
+                            placeholder="month"
+                            keyboardType="numeric"
+                            value={selectedDate?.month}
+                        />
+                    </View>
                     
+
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text p>
+                            year
+                        </Text>
+                        <TextInput
+                            style={{
+                                height: 40,
+                                width: 100,
+                                borderColor: colors.border,
+                                borderWidth: 1,
+                                borderRadius: sizes.radius,
+                                marginTop: sizes.padding,
+                                marginBottom: sizes.padding,
+                                marginLeft: sizes.padding,
+                                paddingLeft: sizes.padding,
+
+                            }}
+                            onChangeText={(text) => setSelectedDate({...selectedDate, year: text})}
+                            placeholder="year"
+                            keyboardType="numeric"
+                            value={selectedDate?.year}
+
+                        />
+                </View>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text p>
+                            Length of event
+                        </Text>
+                        <TextInput
+                            style={{
+                                height: 40,
+                                width: 100,
+                                borderColor: colors.border,
+                                borderWidth: 1,
+                                borderRadius: sizes.radius,
+                                marginTop: sizes.padding,
+                                marginBottom: sizes.padding,
+                                marginLeft: sizes.padding,
+                                paddingLeft: sizes.padding,
+                            }}
+                            onChangeText={(text) => setSelectedDate({...selectedDate, length: text})}
+                            value={selectedDate?.length}
+                            placeholder="hours"
+                            keyboardType="numeric"
+                        />
+                    </View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text p>
+                            Start Hour
+                        </Text>
+                        <TextInput
+                            style={{
+                                height: 40,
+                                width: 100,
+                                borderColor: colors.border,
+                                borderWidth: 1,
+                                borderRadius: sizes.radius,
+                                marginTop: sizes.padding,
+                                marginBottom: sizes.padding,
+                                marginLeft: sizes.padding,
+                                paddingLeft: sizes.padding,
+                            }}
+                            onChangeText={(text) => setSelectedDate({...selectedDate, startHour: text})}
+                            value={selectedDate?.startHour}
+                            placeholder="start hour"
+                            keyboardType="numeric"
+                        />
+                    </View>
+
+
+                {dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isBefore(dayjs()) && (
+                    <Text p danger>
+                        Please select a valid date
+                    </Text>
+                )}
+                {parseInt(selectedDate?.length) > 24 && (
+                    <Text p danger>
+                        Please select a valid length of event
+                        </Text>
+                    )}
+                {parseInt(selectedDate?.day) > 31 || parseInt(selectedDate?.month) > 12 && (
+                    <Text p danger>
+                        Please select a valid date
+                        </Text>
+                )}
+                {parseInt(selectedDate?.length) + parseInt(selectedDate?.startHour) > 24 && (
+                    <Text p danger>
+                        Please select a valid length of event
+                        </Text>
+                )}
+                <Text p>
+                    Write a message to the volunteers
+                </Text>
+
+              <TextInput
+                  multiline
+                  numberOfLines={4}
+                  style={{
+                      height: 100,
+                      width: '100%',
+                      borderColor: colors.border,
+                      borderWidth: 1,
+                      borderRadius: sizes.radius,
+                      padding: sizes.padding,
+                      marginTop: sizes.padding,
+                      marginBottom: sizes.padding,
+                  }}
+                  onChangeText={(text) => setText(text)}
+                  value={text}
+                  placeholder="Write a message to the volunteers"
+              />
+              <Button
+                  primary
+                  width={sizes.width / 3}
+                  disabled={dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isBefore(dayjs()) || !dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isValid() || parseInt(selectedDate?.length) > 24 || parseInt(selectedDate?.length) + parseInt(selectedDate?.startHour) > 24 || parseInt(selectedDate?.day) > 31 || parseInt(selectedDate?.month) > 12}
+                  onPress={() => {
+                    handleApprove(event?._id);
+                  }}
+              >
+                  <Text bold>
+                      Approved
+                  </Text>
+              </Button>
+              </Modal2>
 
      </Block>
     );
@@ -579,7 +803,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
             </Block>
         ),
       });
-    }, [navigation, isDark, colors, sizes, organization, user]);
+    }, [navigation, isDark, colors, sizes, organization, user, route?.params?._id]);
 
   
     return (

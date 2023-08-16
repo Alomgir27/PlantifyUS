@@ -32,14 +32,27 @@ const eventSchema = new Schema({
     }],
     organization: {
         type: Schema.Types.ObjectId,
-        ref: 'Organization'
+        ref: 'Organizations'
     },
     collectedFunds: Number,
     upvotes: [String],
     downvotes: [String],
     comments: [String],
     isVerified: Boolean,
-    type: String
+    type: String,
+    whoVerified: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    hostDetails: {
+        day: String,
+        month: String,
+        year: String,
+        length: String,
+        startTime: String,
+        text: String,
+        message: String,
+    },
 }, { timestamps: true });
 
 
@@ -55,7 +68,11 @@ const treeSchema = new Schema({
         water: String,
         temperature: String,
         fertilizer: String
-    }
+    },
+    uploadBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
 }, { timestamps: true });
 
 const donationSchema = new Schema({
@@ -104,7 +121,8 @@ const userSchema = new Schema({
         type: String,
         enum: ['user', 'moderator', 'admin'],
     },
-    uuid: String
+    uuid: String,
+    pushToken: String
 }, { timestamps: true });
 
 const organizationSchema = new Schema({

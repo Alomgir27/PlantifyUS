@@ -9,55 +9,40 @@ import {
     TouchableWithoutFeedback,
 } from 'react-native';
 
-import { ScrollView , RefreshControl} from 'react-native-gesture-handler';
-import { TextInput } from 'react-native-gesture-handler';
+import {  RefreshControl} from 'react-native-gesture-handler';
 
-import { images, icons, FONTS, SIZES } from '../constants/index';
+import { FONTS, SIZES } from '../../constants/index';
 
-import * as ICONS from "@expo/vector-icons";
 
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
 
 
 import moment from 'moment';
-
-import { fetchAllDefaultData, clearData } from '../modules/data';
-import RecommendUsers from '../components/RecommendUsers';
-
-import { COLORS } from "../constants/index";
-import { Block, Button, Text as Text2, Image as Image2 } from "../components/";
-import { useData, useTheme } from "../hooks/";
-import { ActivityIndicator } from "react-native-paper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const Home = ({ navigation}: any) => {
-    const { assets, colors, gradients, sizes } = useTheme();
-    const [loading, setLoading] = useState<Boolean>(false);
-
-    const [showRecommendUsers, setShowRecommendUsers] = useState(false);
-
-    const events = useSelector(state => state?.data?.events);
-    const trees = useSelector(state => state?.trees?.trees); 
-    const organizations = useSelector(state => state?.data?.organizations);
-    const posts = useSelector(state => state?.data?.posts);
-    const user = useSelector(state => state?.data?.currentUser);
-    const friends = useSelector(state => state?.data?.users);
-    const loadingData = useSelector(state => state?.data?.loading);
-
-    console.log("trees", trees);
+import axios from "axios";
+import { API_URL } from "../../constants/index";
 
 
+import { COLORS } from "../../constants/index";
+import { Block, Text as Text2 } from "../../components/";
+
+const Favourite = ({ navigation}: any) => {
+    const [refreshing, setRefreshing] = useState<Boolean>(false);
     const [mounted, setMounted] = useState<Boolean>(true);
+    const [events, setEvents] = useState<any>([]);
+    const [posts, setPosts] = useState<any>([]);
 
-    const dispatch = useDispatch();
+    const user = useSelector(state => state?.data?.currentUser);
 
-    const IMAGE_VERTICAL_SIZE =
-      (sizes.width - (sizes.padding + sizes.sm) * 2) / 2;
-    
+    useEffect(() => {
+        if(mounted && user?._id) {
+            fetchEvents();
+            fetchPosts();
+        }
+    }, [mounted, user?._id]);
+
 
       
-      useEffect(() => {
+     useEffect(() => {
         setMounted(true);
         return () => {
             setMounted(false);
@@ -69,134 +54,53 @@ const Home = ({ navigation}: any) => {
    
 
     const onRefresh = () => {
-        setLoading(true);
-        dispatch(clearData())
-        dispatch(fetchAllDefaultData(setLoading));
+        setRefreshing(true);
+        setEvents([]);
+        setPosts([]);
+        setTimeout(() => {
+            fetchEvents();
+            fetchPosts();
+            setRefreshing(false);
+        }, 3000);
+       
     }
 
+    const fetchEvents = async () => {
+        await axios.post(`${API_URL}/events/getEvents`, { 
+            userId: user?._id, 
+            ids: events?.map((event) => event?._id)
+        })
+        .then((res) => {
+            if(res?.data?.success) {
+                setEvents((prevEvents) => [...prevEvents, ...res?.data?.events]);
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        }
+        )
+        
+    }
+
+    const fetchPosts = async () => {
+        await axios.post(`${API_URL}/posts/getPosts`, {
+            userId: user?._id,
+            ids: posts?.map((post) => post?._id)
+        })
+        .then((res) => {
+            if(res?.data?.success) {
+                setPosts((prevPosts) => [...prevPosts, ...res?.data?.posts]);
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        }
+        )
+    }
 
 
 
    
-
-    React.useEffect(() => {
-    }, []);
-
-    // Render
-
-    function renderNewPlants(item: any, index: any) {
-        return (
-            <View style={{ alignItems: 'center', justifyContent: 'center', marginHorizontal: SIZES.base }}>
-               <TouchableOpacity
-                    onPress={() => navigation.navigate('Plants', { _id : item?._id})}
-                >
-                <Image
-                    source={{ uri: item?.images[0] }}
-                    resizeMode="cover"
-                    style={{
-                        width: SIZES.width * 0.23,
-                        height: '90%',
-                        borderRadius: 15
-                    }}
-                />
-
-                <View
-                    style={{
-                        position: 'absolute',
-                        bottom: '17%',
-                        right: 0,
-                        backgroundColor: COLORS.primary,
-                        paddingHorizontal: SIZES.base,
-                        borderTopLeftRadius: 10,
-                        borderBottomLeftRadius: 10,
-                    }}
-                >
-                    <Text p numberOfLines={1} style={{ color: COLORS.white, ...FONTS.body4 }}>{item?.name}</Text>
-                </View>
-                </TouchableOpacity>
-            </View>
-        )
-    }
-
-    const ListNewPlantsFooterComponent = () => {
-        if(trees.length > 3) {
-            return (
-                <Button row  middle shadow style={{ width: SIZES.width * 0.23, height: '90%', borderRadius: 15 }} onPress={() => navigation.navigate('Plants')}>
-                    <Image
-                        source={icons.chevron}
-                        resizeMode="contain"
-                        style={{
-                            marginLeft: SIZES.base,
-                            width: 30,
-                            height: 30,
-                        }}
-                    />
-                </Button>
-            )
-        } else {
-            return (
-                <View></View>
-            )
-        }
-    }
-
-    function renderFriendsComponent() {
-        if (friends.length === 0) {
-            return (
-                <View></View>
-            )
-        } else if (friends.length <= 3) {
-            return (
-                friends?.map((item: any, index: any) => (
-                    <View
-                        key={`friend-${index}`}
-                        style={index == 0 ? { flexDirection: 'row' } : { flexDirection: 'row', marginLeft: -20 }}
-                    >
-                        <Image
-                            source={{ uri: item?.image }}
-                            resizeMode="cover"
-                            style={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 25,
-                                borderWidth: 3,
-                                borderColor: COLORS.primary
-                            }}
-                        />
-                    </View>
-                ))
-            )
-        } else {
-            return (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {friends.map((item, index) => {
-                        if (index <= 2) {
-                            return (
-                                <View
-                                    key={`friend-${index}`}
-                                    style={index == 0 ? {} : { marginLeft: -20 }}
-                                >
-                                    <Image
-                                        source={item?.image}
-                                        resizeMode="cover"
-                                        style={{
-                                            width: 50,
-                                            height: 50,
-                                            borderRadius: 25,
-                                            borderWidth: 3,
-                                            borderColor: COLORS.primary
-                                        }}
-                                    />
-                                </View>
-                            )
-                        }
-                    })}
-
-                    <Text style={{ marginLeft: 5, color: COLORS.secondary, ...FONTS.body3 }}>+{friends.length - 3} More</Text>
-                </View>
-            )
-        }
-    }
 
     function renderEvent(item, index) {
         if(item?.images?.length === 1) {
@@ -754,103 +658,7 @@ const Home = ({ navigation}: any) => {
         )
     }
 
-    function ListFooterComponent({ routeName, length, navigation }) {
-        if(length > 3) {
-            return (
-                <TouchableOpacity style={{
-                    flex: 1,
-                    width: 150,
-                    height: 300,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginVertical: SIZES.base,
-                    borderRadius: 20,
-                    marginHorizontal: SIZES.base * 2,
-                    // backgroundColor: COLORS.white,
-                    // ...styles.shadow
-                }}
-                onPress={() => navigation.navigate(routeName)}
-                >
-                <View style={{
-                    backgroundColor: COLORS.gray,
-                    width: 100,
-                    height: 100,
-                    padding: 10,
-                    borderRadius: 50,
-                    marginRight: 20,
-                    marginLeft: 20,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginHorizontal: SIZES.base * 2,
-                    // ...styles.shadow
-                }}
-
-                >
-                    <Image
-                        source={icons.chevron}
-                        style={{
-                            width: 40,
-                            height: 40,
-                            tintColor: COLORS.white,
-                            alignSelf: 'center',
-                        }}
-                        />
-                </View>
-                </TouchableOpacity>
-            )
-        } else {
-            return (
-                <View style={{ marginBottom: 20 }}></View>
-            )
-        }
-    }
-
-    const renderHeader = useCallback(() => {
-        return (
-            <View style={{ paddingHorizontal: SIZES.padding }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <View style={{ flex: 1 }}>
-                        <Text2 h3 style={{ color: COLORS.white, ...FONTS.H2 }}>Hello! <ICONS.MaterialCommunityIcons name="leaf" size={30} color={colors.text} /></Text2>
-                        <Text2 p style={{ color: COLORS.white, ...FONTS.body3 }}>What would you like to find?</Text2>
-                    </View>
-                </View>
-            </View>
-        )
-    }, [user, colors]);
-
-    const renderSearch = useCallback(() => {
-        return (
-            <View style={{
-                flexDirection: 'row',
-                height: 50,
-                alignItems: 'center',
-                marginHorizontal: SIZES.padding,
-                paddingHorizontal: SIZES.radius,
-                borderRadius: 10,
-                backgroundColor: COLORS.lightGray
-            }}>
-                <Image
-                    source={icons.search}
-                    style={{
-                        width: 20,
-                        height: 20,
-                        tintColor: COLORS.gray
-                    }}
-                />
-                <TextInput
-                    style={{
-                        flex: 1,
-                        marginLeft: SIZES.radius,
-                        ...FONTS.body3
-                    }}
-                    placeholderTextColor={COLORS.gray}
-                    placeholder="what are you looking for?"
-                    onFocus={() => navigation.navigate("Search")}
-                />
-            </View>
-        )
-    }, [])
+  
 
     const renderEvents = useCallback(() => {
         return (
@@ -861,31 +669,14 @@ const Home = ({ navigation}: any) => {
                 renderItem={({ item, index }) => renderEvent(item, index)}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
-                spacing={10}
                 ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
-                ListFooterComponent={() => <ListFooterComponent routeName="Events" navigation={navigation} length={events.length} />}
                 onEndReachedThreshold={0.5} // Adjust the threshold as needed
-                
+                onEndReached={() => fetchEvents()}
             />
         )
     }, [events])
 
-    const renderPlants = useCallback(() => {
-        return (
-            <FlatList
-                style={{ height: 130 }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                data={trees}
-                keyExtractor={item => item._id.toString()}
-                renderItem={({ item, index }) => renderNewPlants(item, index)}
-                ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-                ListFooterComponent={() => <ListNewPlantsFooterComponent />}
-                onEndReachedThreshold={0.5} // Adjust the threshold as needed
 
-            />
-        )
-    }, [trees])
 
     const renderPosts = useCallback(() => {
         return (
@@ -896,156 +687,26 @@ const Home = ({ navigation}: any) => {
                 renderItem={({ item, index }) => renderPost(item, index)}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
-                spacing={10}
                 ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-                ListFooterComponent={() => <ListFooterComponent routeName="Posts" navigation={navigation} length={posts.length} />}
+                onEndReached={() => fetchEvents()}
                 onEndReachedThreshold={0.5} // Adjust the threshold as needed
             />
         )
 
     }, [posts])
+    
 
-    const renderFriends = useCallback(() => {
-        return (
-            <View style={{ flexDirection: 'row', marginVertical: SIZES.base, marginLeft: SIZES.padding }}>
-                {renderFriendsComponent()}
-            </View>
-        )
-    }
-    , [friends])
-
-    const organizationItem = useCallback(({ item, index }) => {
-        return (
-            <TouchableWithoutFeedback
-                onPress={() => navigation.navigate('Organization', { _id: item?._id})}
-            >
-            <Block column justify="space-between" wrap="wrap">
-                <Block center middle>
-                    <Image2
-                        resizeMode="cover"
-                        source={{ uri: item?.images[0] }}
-                        style={{
-                        width: IMAGE_VERTICAL_SIZE * 2,
-                        height: IMAGE_VERTICAL_SIZE * 1.5,
-                        }}
-                    />
-                </Block>
-                <Block>
-                    <Text style={{ ...FONTS.body3, color: COLORS.primary }}>
-                        {item?.name}{item?.isVerified && ( <ICONS.MaterialCommunityIcons name="check-circle" size={20} color={COLORS.primary} />)}
-                    </Text>
-                    <Text2 p numberOfLines={1}>{item?.bio?.length > 35 ? item?.bio?.slice(0, 35) + "..." : item?.bio}</Text2>
-                    <Text2 p primary semibold>
-                        {item?.volunteers?.length} members
-                    </Text2>
-                </Block>
-            </Block>
-            </TouchableWithoutFeedback>
-        )
-    }, [])
-
-    const renderOrganizations = useCallback(() => {
-        return (
-            <FlatList
-                style={{ flex: 1 }}
-                horizontal
-                data={organizations}
-                keyExtractor={item => item._id.toString()}
-                renderItem={organizationItem}
-                showsVerticalScrollIndicator={false}
-                ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-                contentContainerStyle={{ paddingHorizontal: sizes.padding }}
-            />
-        )
-    }, [organizations])
-
-
-    if(loadingData && !loading) {
-        return (
-            <Block center>
-                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <ActivityIndicator size="large" color={COLORS.primary} />
-                    <Text2 p primary semibold style={{ marginTop: 10 }}>Loading...</Text2>
-                </View>
-            </Block>
-        )
-    }
    
-        
+
 
     return (
-      <>
         <Block scroll
             refreshControl={
-                <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
            style={styles.container}
         >
-            {/* New Plants */}
-            <View style={{ flex: 1 }}>
-            
-                 {/* Header */}
-                 <View style={{ backgroundColor: COLORS.primary , paddingTop: 10 }}>
-                        {renderHeader()}
-                 </View>
-                {/* Search */}
-                 <View style={{ backgroundColor: COLORS.primary, paddingTop: 10 }}>
-                        {renderSearch()}
-                </View>
-
-
-                <View style={{
-                    flex: 1,
-                    borderBottomLeftRadius: 50,
-                    borderBottomRightRadius: 50,
-                    backgroundColor: COLORS.primary,
-                }}>
-                
-                    <View style={{ marginHorizontal: SIZES.padding, marginTop: 10  }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text2 h4  style={{ color: COLORS.white, ...FONTS.H2, }}>Plants</Text2>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Button
-                                    onPress={() => navigation.navigate("TreeIdentify")}
-                                >
-                                    <Image
-                                        source={icons.focus}
-                                        resizeMode="contain"
-                                        style={{
-                                            width: 20,
-                                            height: 20
-                                        }}
-                                    />
-                                </Button>
-                            </View>
-
-                        </View>
-                        
-                        <View style={{ marginTop: SIZES.base }}>
-                           {renderPlants()}
-                        </View>
-                    </View>
-                </View>
-            </View>
-
-              {/* vertical image */}
-              <View style={{ flex: 1, paddingHorizontal: SIZES.base * 2 }}>
-                <Block>
-                    <Block row align="center" justify="space-between" marginBottom={sizes.s} marginTop={sizes.m} wrap="wrap">
-                    <Text style={{ color: COLORS.secondary, ...FONTS.H2 }}>Organizations
-                    </Text>
-                    <Button onPress={() => navigation.navigate("Organizations")}>
-                        <Text2 p primary semibold>
-                        View All
-                        </Text2>
-                    </Button>
-                    </Block>
-                    {renderOrganizations()}
-                </Block>
-             </View>
-            
-
-         
+           
             {/* New Events */}
             <View style={{ flex: 1 }}>
                 <View style={{
@@ -1056,13 +717,6 @@ const Home = ({ navigation}: any) => {
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Events</Text>
-                            <Button 
-                               onPress={() => navigation.navigate("Events")}
-                              >
-                                <Text2 p primary semibold>
-                                     View All
-                                </Text2>
-                            </Button>
                         </View>
 
                         <View style={{marginTop: SIZES.base }}>
@@ -1083,13 +737,6 @@ const Home = ({ navigation}: any) => {
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Posts</Text>
-                            <Button 
-                               onPress={() => navigation.navigate("Posts")}
-                              >
-                                <Text2 p primary semibold>
-                                     View All
-                                </Text2>
-                            </Button>
                         </View>
 
                         <View style={{ marginTop: SIZES.base }}>
@@ -1098,58 +745,7 @@ const Home = ({ navigation}: any) => {
                     </View>
                 </View>
             </View>
-            
-
-            {/* Added Friend */}
-            <View style={{ paddingVertical: SIZES.padding }}>
-                <View style={{
-                    flex: 1,
-                    // backgroundColor: COLORS.lightGray
-                }}>
-                    <View style={{ marginTop: SIZES.radius, marginHorizontal: SIZES.padding }}>
-                        <Text style={{ color: COLORS.secondary, ...FONTS.h2, }}>Added Friends</Text>
-                        <Text style={{ color: COLORS.secondary, ...FONTS.body3, }}>{friends.length} Total</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            {/* Friends */}
-                            <View style={{ flex: 1.3, flexDirection: 'row', alignItems: 'center' }}>
-                                {renderFriends()}
-                            </View>
-
-                            {/* Add Friend */}
-                            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                <Text style={{ color: COLORS.secondary, ...FONTS.body3 }}>Add New</Text>
-                                <TouchableOpacity
-                                    style={{
-                                        marginLeft: SIZES.base,
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: 10,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        backgroundColor: COLORS.gray
-                                    }}
-                                    onPress={() => setShowRecommendUsers(true)}
-                                >
-                                    <Image
-                                        source={icons.plus}
-                                        resizeMode="contain"
-                                        style={{
-                                            width: 20,
-                                            height: 20
-                                        }}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-            </View>
-
         </Block>
-            {showRecommendUsers && (
-                <RecommendUsers navigation={navigation} setShowRecommendUsers={setShowRecommendUsers} />
-            )}
-        </>
     );
 };
 
@@ -1170,4 +766,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Home;
+export default Favourite;

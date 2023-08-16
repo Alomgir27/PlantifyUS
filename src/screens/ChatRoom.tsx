@@ -27,6 +27,7 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { ToastAndroid } from 'react-native';
 import SoundPlayer from './SoundPlayer';
+import { Vibration } from 'react-native';
 
 let recording = new Audio.Recording();
 
@@ -44,9 +45,7 @@ const ChatRoom = ({route, navigation}: any) => {
   const [isAudioRecording, setIsAudioRecording] = useState(false);
   const [nowTime, setNowTime] = useState<any>(null);
   const [loadingFileDownloader, setLoaingFileDownloader] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [currentMessage, setCurrentMessage] = useState<any>({});
-
+  const [loading, setLoading] = useState(false);
   
 
 
@@ -74,6 +73,8 @@ const ChatRoom = ({route, navigation}: any) => {
         files: [],
         fileType: '',
         location: {},
+        reacts: [],
+        edited: false,
       });
 
       }
@@ -303,6 +304,23 @@ useLayoutEffect(() => {
 }, [navigation, isDark, colors, sizes, organization]);
 
 
+const uriToBlob = (uri) => {
+  return new Promise((resolve, reject) => {
+     const xhr = new XMLHttpRequest()
+     xhr.onload = function () {
+       // return the blob
+       resolve(xhr.response)
+     }
+     xhr.onerror = function () {
+       reject(new Error('uriToBlob failed'))
+     }
+     xhr.responseType = 'blob'
+     xhr.open('GET', uri, true)
+ 
+     xhr.send(null)})
+}
+
+
   
 const handleSubmit = async (message: any, file: any, type: any,  user: any) => {
   const organizationRef = db.collection('organizations').doc(organization._id);
@@ -322,6 +340,8 @@ const handleSubmit = async (message: any, file: any, type: any,  user: any) => {
     sent: false,
     received: false,
     pending: true,
+    reacts: [],
+    // You can add any additional custom parameters you want.
     // quickReplies: {
     //   type: 'radio', // or 'checkbox',
     //   keepIt: true,
@@ -342,145 +362,155 @@ const handleSubmit = async (message: any, file: any, type: any,  user: any) => {
     // },
 
   }
+  // get the _id of the last message sent
+  let _id = organizationRef.collection('messages').doc().id;
+  options._id = _id;
+
   setMessage('');
   handleSend([options]);
   if(type === 'image') {
-    const response = await fetch(file);
-    const blob = await response.blob();
-    const uploadTask = storage.ref(`images/${blob._data.name}`).put(blob);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {},
-      (error) => {
-          console.log(error);
-      },
-      () => {
-          storage
-              .ref("images")
-              .child(blob._data.name)
-              .getDownloadURL()
-              .then((url) => {
-                  options.image = url;
-                  options.fileType = 'image';
-                  options.sent = true;
-                  options.received = true;
-                  options.pending = false;
-                  organizationRef.collection('messages').add(options)
-                  .then(() => {
-                    console.log('Message sent!');
-                    return;
-                  }
-                  )
-                  .catch((err) => {
-                    console.log(err);
-                  })
-              });
-      }
-  );
+    uriToBlob(file)
+    .then((blob) => {
+      const uploadTask = storage.ref(`images/${blob._data.name}`).put(blob);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {},
+        (error) => {
+            console.log(error);
+        },
+        () => {
+            storage
+                .ref("images")
+                .child(blob._data.name)
+                .getDownloadURL()
+                .then((url) => {
+                    options.image = url;
+                    options.fileType = 'image';
+                    options.sent = true;
+                    options.received = true;
+                    options.pending = false;
+                    organizationRef.collection('messages').doc(_id).set(options)
+                    .then(() => {
+                      console.log('Message sent!');
+                      return;
+                    }
+                    )
+                    .catch((err) => {
+                      console.log(err);
+                    })
+                });
+        }
+    );
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   }
   if(type === 'video') {
-    const response = await fetch(file);
-    const blob = await response.blob();
-    const uploadTask = storage.ref(`videos/${blob._data.name}`).put(blob);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {},
-      (error) => {
-          console.log(error);
-      },
-      () => {
-          storage
-              .ref("videos")
-              .child(blob._data.name)
-              .getDownloadURL()
-              .then((url) => {
-                  options.video = url;
-                  options.fileType = 'video';
-                  options.sent = true;
-                  options.received = true;
-                  options.pending = false;
-                  organizationRef.collection('messages').add(options)
-                  .then(() => {
-                    console.log('Message sent!');
-                    
-                    return;
-                  }
-                  )
-                  .catch((err) => {
-                    console.log(err);
-                  })
-              });
-      }
-  );
+    uriToBlob(file)
+    .then((blob) => {
+      const uploadTask = storage.ref(`videos/${blob._data.name}`).put(blob);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {},
+        (error) => {
+            console.log(error);
+        },
+        () => {
+            storage
+                .ref("videos")
+                .child(blob._data.name)
+                .getDownloadURL()
+                .then((url) => {
+                    options.video = url;
+                    options.fileType = 'video';
+                    options.sent = true;
+                    options.received = true;
+                    options.pending = false;
+                    organizationRef.collection('messages').doc(_id).set(options)
+                    .then(() => {
+                      console.log('Message sent!');
+                      return;
+                    }
+                    )
+                    .catch((err) => {
+                      console.log(err);
+                    })
+                });
+        }
+    );
+    })
   }
   if(type === 'file') {
-    const response = await fetch(file);
-    const blob = await response.blob();
-    const uploadTask = storage.ref(`files/${blob._data.name}`).put(blob);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {},
-      (error) => {
-          console.log(error);
-      },
-      () => {
-          storage
-              .ref("files")
-              .child(blob._data.name)
-              .getDownloadURL()
-              .then((url) => {
-                  options.fileType = 'file';
-                  options.file = url;
-                  options.sent = true;
-                  options.received = true;
-                  options.pending = false;
-                  organizationRef.collection('messages').add(options)
-                  .then(() => {
-                    console.log('Message sent!');
-                    return;
-                  }
-                  )
-                  .catch((err) => {
-                    console.log(err);
-                  })
-              });
-      }
-  );
+    uriToBlob(file)
+    .then((blob) => {
+       const uploadTask = storage.ref(`files/${blob._data.name}`).put(blob);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {},
+          (error) => {
+              console.log(error);
+          },
+          () => {
+              storage
+                  .ref("files")
+                  .child(blob._data.name)
+                  .getDownloadURL()
+                  .then((url) => {
+                      options.fileType = 'file';
+                      options.file = url;
+                      options.sent = true;
+                      options.received = true;
+                      options.pending = false;
+                      organizationRef.collection('messages').doc(_id).set(options)
+                      .then(() => {
+                        console.log('Message sent!');
+                        return;
+                      }
+                      )
+                      .catch((err) => {
+                        console.log(err);
+                      })
+                  });
+          }
+      );
+    })
   }
 
   if(type === 'audio') {
-    const response = await fetch(file);
-    const blob = await response.blob();
-    const uploadTask = storage.ref(`files/${blob._data.name}`).put(blob);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {},
-      (error) => {
-          console.log(error);
-      },
-      () => {
-          storage
-              .ref("files")
-              .child(blob._data.name)
-              .getDownloadURL()
-              .then((url) => {
-                  options.fileType = 'audio';
-                  options.audio = url;
-                  options.sent = true;
-                  options.received = true;
-                  options.pending = false;
-                  organizationRef.collection('messages').add(options)
-                  .then(() => {
-                    console.log('Message sent!');
-                    return;
-                  }
-                  )
-                  .catch((err) => {
-                    console.log(err);
-                  })
-              });
-      }
-  );
+    uriToBlob(file)
+    .then((blob) => {
+      const uploadTask = storage.ref(`files/${blob._data.name}`).put(blob);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {},
+          (error) => {
+              console.log(error);
+          },
+          () => {
+              storage
+                  .ref("files")
+                  .child(blob._data.name)
+                  .getDownloadURL()
+                  .then((url) => {
+                      options.fileType = 'audio';
+                      options.audio = url;
+                      options.sent = true;
+                      options.received = true;
+                      options.pending = false;
+                      organizationRef.collection('messages').doc(_id).set(options)
+                      .then(() => {
+                        console.log('Message sent!');
+                        return;
+                      }
+                      )
+                      .catch((err) => {
+                        console.log(err);
+                      })
+                  });
+          }
+      );
+    })
   }
 
   
@@ -489,7 +519,7 @@ const handleSubmit = async (message: any, file: any, type: any,  user: any) => {
     options.sent = true;
     options.received = true;
     options.pending = false;
-    organizationRef.collection('messages').add(options)
+    organizationRef.collection('messages').doc(_id).set(options)
     .then(() => {
       console.log('Message sent!');
     }
@@ -661,8 +691,20 @@ const handleSubmit = async (message: any, file: any, type: any,  user: any) => {
           renderMessageText={(props) => {
             const isMine = props?.currentMessage?.user?._id === user?._id;
             return (
-              <Block card flex={0} black={isMine}>
+              <Block card flex={0} black={isMine} white={!isMine}>
                 <Text white={isMine}>{props?.currentMessage?.text}</Text>
+                {props?.currentMessage?.reacts?.length > 0 && (
+                  <Block row align="center" justify="flex-end"   
+                  height={50}
+                  style={{ position: 'absolute', bottom: -27, left: -25, marginRight: sizes.sm }}
+                  >
+                    {/* add tree icon */}
+                    <ICON.Ionicons name="leaf" size={sizes.base * 2.5} color={colors.primary} />
+                    <Text size={10} primary marginHorizontal={sizes.s}>
+                      {props?.currentMessage?.reacts?.length}
+                    </Text>
+                  </Block>
+                )}  
               </Block>
             );
           }}
@@ -944,26 +986,70 @@ const handleSubmit = async (message: any, file: any, type: any,  user: any) => {
           );
         }
         }
-        onPress={(props) => {
-          setCurrentMessage(props?.currentMessage);
-          setShowModal(true);
+        onPress={(context, message) => {
+          if(loading) return;
+          setLoading(true);
+          Vibration.vibrate(100);
+          if(message?.reacts?.includes(user._id)) {
+            db.collection('organizations')
+            .doc(organization._id)
+            .collection('messages')
+            .doc(message?._id)
+            .get()
+            .then((doc) => {
+              if(doc.exists) {
+                db.collection('organizations')
+                .doc(organization._id)
+                .collection('messages')
+                .doc(message?._id)
+                .update({
+                  reacts: doc.data()?.reacts.filter((id: string) => id !== user._id)
+                })
+                .then(() => {
+                  console.log('React removed!');
+                }
+                )
+                .catch((err) => {
+                  console.log(err);
+                }
+                )
+              }
+            }
+            )
+
+          }else {
+            db.collection('organizations')
+            .doc(organization._id)
+            .collection('messages')
+            .doc(message?._id)
+            .get()
+            .then((doc) => {
+              if(doc.exists) {
+                db.collection('organizations')
+                .doc(organization._id)
+                .collection('messages')
+                .doc(message?._id)
+                .update({
+                  reacts: [...doc.data()?.reacts, user._id]
+                })
+                .then(() => {
+                  console.log('React added!');
+                }
+                )
+                .catch((err) => {
+                  console.log(err);
+                }
+                )
+              }
+            }
+            )
+          }
+          setLoading(false);
         }
         }
         />
       </Block>
-      {/* <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
-        <Block flex={0} align="center" justify="center" paddingVertical={sizes.sm}>
-          <Button onPress={() => {
-            setShowModal(false);
-            navigation.navigate('Profile', {userId: currentMessage?.user?._id});
-          }
-          }>
-            <Text size={12} black p>
-              view profile
-            </Text>
-          </Button>
-        </Block>
-      </Modal> */}
+  
 
 
 

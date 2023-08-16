@@ -19,11 +19,9 @@ import { Text } from "../components";
 import { Text as Text2 } from "react-native-elements";
 
 import { setLocation, setFilters, setCampings } from "../modules/campings";
-import * as mock from "../mock/campings";
 
 const { width, height } = Dimensions.get("screen");
 
-import * as Location from 'expo-location';
 
 class Campings extends React.Component {
   static navigationOptions = {
@@ -142,7 +140,7 @@ class Campings extends React.Component {
               latitude: marker.location.coordinates[1],
               longitude: marker.location.coordinates[0],
             }}
-              onPress={() => this.props.navigation.navigate("Event", { _id: marker?._id })}
+              // onPress={() => this.props.navigation.navigate("Events", { _id: marker?._id })}
               title={marker.title}
               description={marker.description}
               icon={<Icon.FontAwesome name="map-marker" size={24} color={COLORS.red} />}
@@ -302,10 +300,10 @@ class Campings extends React.Component {
             </View>
           </View>
           <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("Event", { _id: camping?._id })}
+            onPress={() => this.props.navigation.navigate("Events", { _id: camping?._id })}
             style={{ flex: 0.2, justifyContent: "center", alignItems: "center" }}
           >
-           <Icon.Ionicons name="ios-arrow-forward" color={COLORS.gray} size={24} />
+           <Icon.Ionicons name="ios-arrow-forward" color={COLORS.primary} size={24} />
           </TouchableOpacity>
         </View>
       );

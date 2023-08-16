@@ -4,9 +4,9 @@ import {
   StackHeaderTitleProps,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
-import {useNavigation} from '@react-navigation/core';
 import {DrawerActions} from '@react-navigation/native';
 import {StackHeaderOptions} from '@react-navigation/stack/lib/typescript/src/types';
+import {useNavigation} from '@react-navigation/native';
 
 import {useData} from './useData';
 import {useTranslation} from './useTranslation';
@@ -16,12 +16,16 @@ import Text from '../components/Text';
 import useTheme from '../hooks/useTheme';
 import Button from '../components/Button';
 import Block from '../components/Block';
+import { Ionicons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 
 export default () => {
   const {t} = useTranslation();
-  const {user, basket} = useData();
+  const {basket} = useData();
   const navigation = useNavigation();
   const {icons, colors, gradients, sizes} = useTheme();
+  const user = useSelector((state) => state?.data?.currentUser);
+
 
   const menu = {
     headerStyle: {elevation: 0},
@@ -57,14 +61,6 @@ export default () => {
             position="absolute"
             gradient={gradients?.primary}
           />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('Screens', {
-              screen: 'Shopping',
-            })
-          }>
-          <Image source={icons.basket} radius={0} color={colors.icon} />
           <Block
             flex={0}
             padding={0}
@@ -80,6 +76,20 @@ export default () => {
               {basket?.items?.length}
             </Text>
           </Block>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => user ? navigation.navigate('Screens', {screen: 'Profile', userId: user?._id }) : navigation.navigate('Screens', {screen: 'AuthLanding'})
+          }>
+            {user?.image ? (
+              <Image  
+                radius={6}
+                width={24}
+                height={24}
+                source={{uri: user?.image}}
+              />
+            ) : (
+              <Ionicons name="person-circle-outline" size={24} color={colors.icon} />
+            )}          
         </TouchableOpacity>
       </Block>
     ),
@@ -141,54 +151,9 @@ export default () => {
     },
     profile: {
       ...menu,
-      headerRight: () => (
-        <Block row flex={0} align="center" marginRight={sizes.padding}>
-          <TouchableOpacity
-            style={{marginRight: sizes.sm}}
-            onPress={() =>
-              navigation.navigate('Screens', {
-                screen: 'Notifications',
-              })
-            }>
-            <Image source={icons.bell} radius={0} color={colors.icon} />
-            <Block
-              flex={0}
-              right={0}
-              width={sizes.s}
-              height={sizes.s}
-              radius={sizes.xs}
-              position="absolute"
-              gradient={gradients?.primary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.dispatch(
-                DrawerActions.jumpTo('Screens', {screen: 'Profile'}),
-              )
-            }>
-            <Image
-              radius={6}
-              width={24}
-              height={24}
-              source={{uri: user.avatar}}
-            />
-          </TouchableOpacity>
-        </Block>
-      ),
-    },
-    chat: {
-      ...menu,
       headerLeft: () => (
         <Button onPress={() => navigation.goBack()}>
-          <Image
-            radius={0}
-            width={10}
-            height={18}
-            color={colors.icon}
-            source={icons.arrow}
-            transform={[{rotate: '180deg'}]}
-          />
+          <Image source={icons.arrow} radius={0} color={colors.icon} style={{transform: [{rotate: '180deg'}]}} />
         </Button>
       ),
       headerRight: () => (
@@ -214,34 +179,29 @@ export default () => {
           <TouchableOpacity
             onPress={() =>
               navigation.dispatch(
-                DrawerActions.jumpTo('Screens', {screen: 'Profile'}),
+                DrawerActions.jumpTo('Screens', {screen: 'Profile', userId: user?._id }),
               )
             }>
             <Image
               radius={6}
               width={24}
               height={24}
-              source={{uri: user.avatar}}
+              source={{uri: user?.image}}
             />
           </TouchableOpacity>
         </Block>
       ),
     },
-    rental: {
+    plants: {
       ...menu,
+      headerRight: () => null,
       headerLeft: () => (
         <Button onPress={() => navigation.goBack()}>
-          <Image
-            radius={0}
-            width={10}
-            height={18}
-            color={colors.icon}
-            source={icons.arrow}
-            transform={[{rotate: '180deg'}]}
-          />
+          <Image source={icons.arrow} radius={0} color={colors.icon} style={{transform: [{rotate: '180deg'}]}} />
         </Button>
       ),
     },
+    
   };
 
   return options;

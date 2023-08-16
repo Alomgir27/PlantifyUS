@@ -38,7 +38,7 @@ const BottomSheet = ({ navigation, sheetRef }) => {
         return Alert.alert("Please login to create event", "You can login from profile tab");
       }
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.5,
         allowsMultipleSelection: true,
       });
@@ -123,7 +123,7 @@ const BottomSheet = ({ navigation, sheetRef }) => {
             <View style={{alignItems: 'center'}}>
               {/* Tree plantation event creation */}
               <Text style={styles.panelTitle}>Upload Photo</Text>
-              <Text style={{color: COLORS.gray, fontSize: 12, marginBottom: 10}}>Multiple photos can be uploaded except for organization</Text>
+              <Text style={{color: COLORS.gray, fontSize: 12, marginBottom: 10}}>Multiple photos can be uploaded except for organization & tree</Text>
             </View>
             <TouchableOpacity style={styles.panelButton} onPress={takePhotoFromCamera}>
               <Text style={styles.panelButtonTitle}>Take Photo</Text>

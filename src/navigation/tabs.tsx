@@ -4,7 +4,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import Campings from "../screens/Campings";
 
-import { Home, SearchScreen } from "../screens";
+import { 
+    Home, 
+    SearchScreen,
+    Favourite
+ } from "../screens";
 
 import BottomSheet from "../components/BottomSheet";
 
@@ -157,7 +161,7 @@ const Tabs = ({ navigation}) => {
             />
             <Tab.Screen
                 name="Favourite"
-                component={Home}
+                component={Favourite}
             />
         </Tab.Navigator>
        <BottomSheet sheetRef={sheetRef} navigation={navigation} />

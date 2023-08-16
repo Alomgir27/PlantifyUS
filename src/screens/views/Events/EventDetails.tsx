@@ -11,11 +11,11 @@ import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 import * as ICONS from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get('window');
 
 import { Text as Text } from '../../../components/';
 import { Text as Text2 } from 'react-native-elements';
 import { IEvent } from "../../../constants/types";
+import moment from "moment";
 
 
 const EventDetails = ({ route , navigation}) => {
@@ -87,6 +87,14 @@ const EventDetails = ({ route , navigation}) => {
                         </View>
                         <View style={styles.eventBodyDescription}>
                             <Text style={styles.eventBodyDescriptionText}>{item?.description}</Text>
+                        </View>
+                        <View style={styles.eventBodyDetailsItem}>
+                            {item?.hostDetails?.message && (
+                                <Text p numberOfLines={2} paddingLeft={10} paddingBottom={10}>{item?.hostDetails?.message}</Text>
+                            )}
+                            {item?.hostDetails && (
+                                <Text p primary bold numberOfLines={2} paddingLeft={10} paddingBottom={10}>Host time: {new Date(parseInt(item?.hostDetails?.year), parseInt(item?.hostDetails?.month) - 1, parseInt(item?.hostDetails?.day), parseInt(item?.hostDetails?.startTime)) > new Date() ? moment(new Date(parseInt(item?.hostDetails?.year), parseInt(item?.hostDetails?.month) - 1, parseInt(item?.hostDetails?.day), parseInt(item?.hostDetails?.startTime))).fromNow() : "Event has ended"}</Text>
+                            )}
                         </View>
                         <View style={styles.eventBodyDetails}>
                             <View style={styles.eventBodyDetailsItem}>

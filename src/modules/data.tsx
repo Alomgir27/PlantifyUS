@@ -1,7 +1,6 @@
 import { API_URL } from "../constants/index"
 import axios from "axios"
-import { fetchTrees } from "./trees"
-import  AsyncStorage  from '@react-native-async-storage/async-storage';
+import { fetchTrees, handleResetTreesData } from "./trees"
 
 //Actions 
 const USER_STATE_CHANGE = 'USER_STATE_CHANGE'
@@ -321,6 +320,7 @@ export default  data = (state = INITIAL_STATE, action) => {
 export const clearData = () => {
     return ((dispatch) => {
         dispatch({ type: CLEAR_DATA })
+        dispatch(handleResetTreesData())
     })
 }
 
@@ -550,7 +550,6 @@ export const fetchTreesSearch = (search, limit) => {
         await axios.get(`${API_URL}/plants/search`, {
             params: {
                 search: search,
-                limit: limit
             }
         })
         .then((res) => {
@@ -942,6 +941,8 @@ export const fetchAllDefaultData = (callback: any) => {
     return (async (dispatch, getState) => {
         if(getState().data.loading) return;
         dispatch(handleLoading(true))
+        await dispatch(fetchTrees())
+        await dispatch(fetchOrganizations())
         await dispatch(fetchEvents())
         if(getState().data.currentUser) {
             await dispatch(fetchPosts(getState().data.currentUser._id))
@@ -950,8 +951,6 @@ export const fetchAllDefaultData = (callback: any) => {
         else {
             await dispatch(fetchPosts(null))
         }
-        await dispatch(fetchOrganizations())
-        await dispatch(fetchTrees())
         dispatch(handleLoading(false))
         if(callback) callback(false)
     })

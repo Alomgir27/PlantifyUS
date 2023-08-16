@@ -208,7 +208,7 @@ router.get('/getOne/:id', async (req, res) => {
         .populate('admin', '_id name image')
         .populate({ path: 'volunteers', select: '_id name image' })
         .populate({ path: 'joinRequests', select: '_id name image' })
-        .populate({ path: 'events', select: '_id title images' })
+        .populate({ path: 'events', select: '_id title images isVerified status hostDetails description whoVerified' })
         .populate({ path: 'moderators', select: '_id name image' })
         .populate({ path: 'badges', select: '_id name image' })
         .then(organization => res.status(200).json({ success: true, organization, message: 'Organization fetched successfully' }))
@@ -325,7 +325,7 @@ router.put('/test', async (req, res) => {
         .populate('admin', '_id name image')
         .populate({ path: 'volunteers', select: '_id name image' })
         .populate({ path: 'joinRequests', select: '_id name image' })
-        .populate({ path: 'events', select: '_id title images' })
+        .populate({ path: 'events', select: '_id title images hostDetails' })
         .then(organizations => {
             res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' });
         })

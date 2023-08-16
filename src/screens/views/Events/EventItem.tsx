@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     StyleSheet,
     View,
-    Text,
     TouchableOpacity,
     Image,
     Alert,
@@ -21,7 +20,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
-
+import { Text } from '../../../components';
 
 import * as ICONS from "@expo/vector-icons";
 
@@ -149,8 +148,8 @@ export class EventItem extends React.PureComponent {
                             style={styles.authorImg}
                         />
                     </View>
-                    <TouchableOpacity style={styles.authorInfo} onPress={() => navigation.navigate("Profile", { userId: item?.author })}>
-                        <Text style={styles.authorName}>{item?.author?.name} </Text>
+                    <TouchableOpacity style={styles.authorInfo} onPress={() => navigation.navigate("Profile", { userId: item?.author?._id })}>
+                        <Text bold primary style={styles.authorName}>{item?.author?.name} </Text>
                         <Text style={styles.time}>{moment(item?.createdAt).fromNow()}</Text>
                     </TouchableOpacity>
                     <View style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}>
@@ -202,7 +201,7 @@ export class EventItem extends React.PureComponent {
                         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                             {this.state.collapsed && (
-                                <Text numberOfLines={1} style={styles.cardTitle}>
+                                <Text numberOfLines={1} style={styles.cardTitle} primary bold>
                                     {item?.title}
                                 </Text>
                             )}
@@ -226,7 +225,7 @@ export class EventItem extends React.PureComponent {
                         )}
                         {!this.state.collapsed && (
                             <View>
-                                <Text style={styles.cardTitle}>{item?.title}</Text>
+                                <Text style={styles.cardTitle} primary bold>{item?.title}</Text>
                                 <Text numberOfLines={2} style={styles.cardDetails}>
                                     {item?.description}
                                 </Text>
@@ -308,6 +307,14 @@ export class EventItem extends React.PureComponent {
                     <TouchableOpacity style={styles.button}>
                         <Text style={styles.buttonText}>Donate</Text>
                     </TouchableOpacity>
+                </View>
+                <View style={styles.fundsInfo}>
+                    {item?.hostDetails?.message && (
+                        <Text p numberOfLines={2} paddingLeft={10} paddingBottom={10}>{item?.hostDetails?.message}</Text>
+                    )}
+                    {item?.hostDetails && (
+                        <Text p primary bold numberOfLines={2} paddingLeft={10} paddingBottom={10}>Host time: {new Date(parseInt(item?.hostDetails?.year), parseInt(item?.hostDetails?.month) - 1, parseInt(item?.hostDetails?.day), parseInt(item?.hostDetails?.startTime)) > new Date() ? moment(new Date(parseInt(item?.hostDetails?.year), parseInt(item?.hostDetails?.month) - 1, parseInt(item?.hostDetails?.day), parseInt(item?.hostDetails?.startTime))).fromNow() : "Event has ended"}</Text>
+                    )}
                 </View>
                 {/* upvotes downvotes and comments */}
                 <ScrollView  

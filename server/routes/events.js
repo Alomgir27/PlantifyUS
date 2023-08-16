@@ -50,14 +50,13 @@ const { Organizations } = require('../models');
 //@desc Create an event
 //@access Private
 router.post('/new', async (req, res) => {
-    const { title, description, location, organizer, attendees, images, requirements, landsDescription, author,  organization } = req.body;
+    const { title, description, location, attendees, images, requirements, landsDescription, author,  organization } = req.body;
     console.log(req.body);
 
     const newEvent = new Event({
         title,
         description,
         location,
-        organizer,
         attendees,
         images,
         requirements,
@@ -70,7 +69,8 @@ router.post('/new', async (req, res) => {
         downvotes: [],
         comments: [],
         isVerified: false,
-        type: 'event'
+        type: 'event',
+        hostDetails: {}
     });
 
     newEvent.save()
@@ -87,10 +87,14 @@ router.post('/new', async (req, res) => {
 //@desc Get all events if number of events is below 20 or fetch maximum 20 events and give priority to events with more upvotes
 //@access Public
 router.get('/initial', async (req, res) => {
-    Event.find()
+    Event.find({ isVerified: true })
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
         })
         .sort({ upvotes: -1 })
         .limit(5)
@@ -108,8 +112,16 @@ router.get('/search', async (req, res) => {
     const { search, limit } = req.query;
 
 
-    Event.find({ $or: [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }] })
+    Event.find({ $or: [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }], isVerified: true })
         .limit(parseInt(limit) || 5)
+        .populate({
+            path: 'author',
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
+        })
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })
@@ -122,6 +134,14 @@ router.put('/upvote', async (req, res) => {
     const { eventId, userId } = req.body;
 
     Event.findById(eventId)
+        .populate({ 
+            path: 'author',
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
+        })
         .then(event => {
             if (event.downvotes.includes(userId)) {
                 event.downvotes.pull(userId);
@@ -147,6 +167,14 @@ router.put('/downvote', async (req, res) => {
     const { eventId, userId } = req.body;
 
     Event.findById(eventId)
+        .populate({
+            path: 'author',
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
+        })
         .then(event => {
             if (event.upvotes.includes(userId)) {
                 event.upvotes.pull(userId);
@@ -174,7 +202,11 @@ router.get('/:id', async (req, res) => {
     Event.findById(id)
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
         })
         .then(event => res.status(200).json({ success: true, event, message: 'Event fetched successfully' }))   
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch event', error: err }));
@@ -190,10 +222,14 @@ router.post('/fetchMore', async (req, res) => {
 
     console.log(ids);
 
-    Event.find({ _id: { $nin: ids } })
+    Event.find({ _id: { $nin: ids }, isVerified: true })
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
         })
         .sort({ upvotes: -1 })
         .limit(10)
@@ -203,7 +239,7 @@ router.post('/fetchMore', async (req, res) => {
 
 
 
-//@route GET api/organizations/getRequestedEvents/${organization?._id}
+//@route GET api/events/getRequestedEvents/:id
 //@desc Get all events that the organization is a part of only check joinRequests array
 //@access Public
 router.get('/getRequestedEvents/:id', async (req, res) => {
@@ -215,6 +251,10 @@ router.get('/getRequestedEvents/:id', async (req, res) => {
             path: 'author',
             select: '_id name image type'
         })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
+        })
         .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 
@@ -225,7 +265,7 @@ router.get('/getRequestedEvents/:id', async (req, res) => {
 //@desc Approve an event
 //@access Private
 router.post('/approve', async (req, res) => {
-    const { eventId, organizationId } = req.body;
+    const { eventId, organizationId , year, month, day, startHour, length, userId, text } = req.body;
 
     Organizations.findById(organizationId)
         .then(organization => {
@@ -236,9 +276,27 @@ router.post('/approve', async (req, res) => {
             organization.save()
                 .then(organization => {
                     Event.findById(eventId)
+                        .populate({
+                            path: 'author',
+                            select: '_id name image type'
+                        })
+                        .populate({
+                            path: 'organization',
+                            select: '_id name images bio'
+                        })
                         .then(event => {
                             event.isVerified = true;
                             event.status = 'approved';
+                            event.whoVerified = userId;
+                            event.hostDetails = {
+                                day,
+                                month,
+                                year,
+                                length,
+                                startTime: startHour,
+                                message: 'Event hosted by ' + organization.name + ' on ' + day + '/' + month + '/' + year + ' at ' + startHour + ' for ' + length + ' hours',
+                                text
+                            }
                             event.save()
                                 .then(event => res.status(200).json({ success: true, event, message: 'Event approved successfully' }))
                                 .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
@@ -248,6 +306,45 @@ router.post('/approve', async (req, res) => {
                 .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
         })
         .catch(err => res.status(400).json({ success: false, message: 'Unable to approve event', error: err }));
+})
+
+const fetchEvents = async () => {
+    await axios.post(`${API_URL}/events/getEvents`, { 
+        userId: user?._id, 
+        ids: events?.map((event) => event?._id)
+    })
+    .then((res) => {
+        if(res?.data?.success) {
+            setEvents((prevEvents) => [...prevEvents, ...res?.data?.events]);
+        }
+    })
+    .catch((err) => {
+        console.log(err);
+    }
+    )
+    
+}
+
+//@route POST api/events/getEvents
+//@desc Get all events except the ones in the ids array and if userId is favourites array element 
+//@access Public
+router.post('/getEvents', async (req, res) => {
+    const { ids, userId } = req.body;
+    console.log(ids, userId);
+
+    Event.find({ favourites: userId, _id: { $nin: ids }, isVerified: true })
+        .populate({
+            path: 'author',
+            select: '_id name image type'
+        })
+        .populate({
+            path: 'organization',
+            select: '_id name images bio'
+        })
+        .sort({ upvotes: -1 })
+        .limit(10)
+        .then(events => res.status(200).json({ success: true, events, message: 'Events fetched successfully' }))
+        .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch events', error: err }));
 })
 
 

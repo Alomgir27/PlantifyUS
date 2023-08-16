@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import {
     StyleSheet,
     View,
@@ -6,8 +6,13 @@ import {
     Image
 } from 'react-native';
 
-import { icons, images, COLORS, SIZES, FONTS } from '../constants/index';
+import { icons, images, COLORS, SIZES, FONTS } from '../../../constants/index';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import { useTheme } from '../../../hooks/';
+import { API_URL } from '../../../constants/index';
+import axios from 'axios';
+
 
 const RequirementBar = ({ icon, barPercentage }) => {
     return (
@@ -85,7 +90,23 @@ const RequirementDetail = ({ icon, label, detail }) => {
     )
 }
 
-const PlantDetail = ({ navigation }) => {
+const PlantDetail = ({ navigation, route }) => {
+
+    const [tree, setTree] = useState(null);
+    const {assets, sizes} = useTheme();
+  
+    useEffect(() => {
+      if(route.params?._id) {
+        (async () => {
+          await axios.get(`${API_URL}/plants/${route.params._id}`)
+            .then(res => {
+              setTree(res?.data?.tree);
+            })
+            .catch(err => console.log(err));
+        }
+        )();
+      }
+    }, [route.params?._id]);
 
     // Render
 
@@ -102,8 +123,8 @@ const PlantDetail = ({ navigation }) => {
                 <View style={{ flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}>
                         <TouchableOpacity
-                            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.5)' }}
-                            onPress={() => { navigation.navigate("Home") }}
+                            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}
+                            onPress={() => navigation.goBack()}
                         >
                             <Image
                                 source={icons.back}
@@ -117,7 +138,7 @@ const PlantDetail = ({ navigation }) => {
                     </View>
                     <TouchableOpacity
                         style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}
-                        onPress={() => { console.log("Focus on pressed") }}
+                        onPress={() => navigation.navigate("TreeIdentify")}
                     >
                         <Image
                             source={icons.focus}
@@ -132,7 +153,7 @@ const PlantDetail = ({ navigation }) => {
 
                 <View style={{ flexDirection: 'row', marginTop: "10%" }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ color: COLORS.white, ...FONTS.largeTitle }}>Glory Mantas</Text>
+                        <Text style={{ color: COLORS.white, ...FONTS.largeTitle, fontSize: sizes.md }}>{tree?.name}</Text>
                     </View>
                     <View style={{ flex: 1 }}></View>
                 </View>
@@ -173,27 +194,27 @@ const PlantDetail = ({ navigation }) => {
                 <RequirementDetail
                     icon={icons.sun}
                     label="Sunlight"
-                    detail="15°C"
+                    detail={tree?.requirements?.sun + "°C"} 
                 />
                 <RequirementDetail
                     icon={icons.drop}
                     label="Water"
-                    detail="250 ML Daily"
+                    detail={tree?.requirements?.water + " ml / week"}
                 />
                 <RequirementDetail
                     icon={icons.temperature}
                     label="Room Temp"
-                    detail="25°C"
+                    detail={tree?.requirements?.temperature + "°C"}
                 />
                 <RequirementDetail
                     icon={icons.garden}
                     label="Soil"
-                    detail="3 Kg"
+                    detail={tree?.requirements?.soil + " Kg"}
                 />
                 <RequirementDetail
                     icon={icons.seed}
                     label="Fertilizer"
-                    detail="150 Mg"
+                    detail={tree?.requirements?.fertilizer + " Mg"}
                 />
             </View>
         )
@@ -202,20 +223,20 @@ const PlantDetail = ({ navigation }) => {
     function renderFooter() {
         return (
             <View style={{ flex: 1, flexDirection: 'row', paddingVertical: SIZES.padding }}>
-                <TouchableOpacity
+                <View
                     style={{
                         flex: 1,
                         flexDirection: 'row',
-                        paddingHorizontal: SIZES.padding,
+                        paddingHorizontal: SIZES.padding * 2,
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderTopRightRadius: 30,
                         borderBottomRightRadius: 30,
-                        backgroundColor: COLORS.primary
+                        backgroundColor: COLORS.primary,
+                        paddingVertical: SIZES.padding
                     }}
-                    onPress={() => { console.log("Take Action") }}
                 >
-                    <Text style={{ color: COLORS.white, ...FONTS.H2 }}>Take Action</Text>
+                    <Text style={{ color: COLORS.white, ...FONTS.H2 }}> Take care </Text>
 
                     <Image
                         source={icons.chevron}
@@ -226,7 +247,7 @@ const PlantDetail = ({ navigation }) => {
                             height: 20
                         }}
                     />
-                </TouchableOpacity>
+                </View>
 
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: SIZES.padding }}>
                     <Text style={{ flex: 1, color: COLORS.secondary, ...FONTS.h3 }}>Almost 2 weeks of growing time</Text>
@@ -250,7 +271,7 @@ const PlantDetail = ({ navigation }) => {
             {/* Banner Photo */}
             <View style={{ height: "35%" }}>
                 <Image
-                    source={images.bannerBg}
+                    source={{uri: tree?.images[0]}}
                     resizeMode="cover"
                     style={{
                         width: '100%',

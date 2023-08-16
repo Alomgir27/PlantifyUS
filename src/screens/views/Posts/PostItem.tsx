@@ -141,14 +141,14 @@ export class PostItem extends React.Component {
             <View style={styles.container}>
                 <View style={styles.postHeader}>
                     <View style={styles.postHeaderLeft}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Profile', {userId: item?.author})}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Profile', {userId: item?.author?._id})}>
                             <Image
                                 source={{uri: item?.author?.image }}
                                 style={styles.avatar}
                             />
                         </TouchableOpacity>
                         <View style={styles.postHeaderLeftText}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Profile', {userId: item?.author})}>
+                            <TouchableOpacity onPress={() => navigation.navigate('Profile', {userId: item?.author?._id})}>
                                 <Text2 style={[styles.name, { color: COLORS.primary}]}>{item?.author?.name}</Text2>
                             </TouchableOpacity>
                             <Text2 style={styles.date}>{moment(item?.createdAt).fromNow()}</Text2>

@@ -12,9 +12,7 @@ import {
   Button,
   Text,
   TextInput,
-  Snackbar,
   Banner,
-  Colors,
 } from "react-native-paper";
 import { auth, db,  storage } from "../config/firebase";
 import styles from "./styles";
@@ -27,7 +25,6 @@ import * as ImagePicker from 'expo-image-picker';
 
 import LottieView from "lottie-react-native";
 
-import { COLORS } from "../constants/index";
 
 import { fetchUser } from "../modules/data";
 
@@ -64,7 +61,7 @@ export default function Signup({ navigation }) {
         }
 
         let location = await Location.getCurrentPositionAsync({});
-        setLocation({ type: 'Point', coordinates: [location.coords.latitude, location.coords.longitude] });
+        setLocation({ type: 'Point', coordinates: [location.coords.longitude, location.coords.latitude] });
     })();
 }, []);
 
@@ -146,9 +143,11 @@ export default function Signup({ navigation }) {
               setLoading(false)
               navigation.navigate("Login");
             })
-            .catch((error) => {
+            .catch(async (error) => {
               console.log(error);
               setLabel(error.message);
+              await auth.currentUser.delete();
+
               setVisible(true);
               setLoading(false)
             });
@@ -156,7 +155,7 @@ export default function Signup({ navigation }) {
             await axios.post(`${baseURL}/users/register`, {
               name: Name,
               email: Email,
-              image: "https://firebasestorage.googleapis.com/v0/b/plantifyus.appspot.com/o/images%2Flogo.png?alt=media&token=73a05297-aa73-4e6b-b208-86842afe4973",
+              image: "https://firebasestorage.googleapis.com/v0/b/plantifyus.appspot.com/o/logo.png?alt=media&token=f0aadb2a-e1d0-480a-96f0-ca9e60221694",
               location: location,
               password: Password,
               eventsAttending: [],
@@ -174,16 +173,17 @@ export default function Signup({ navigation }) {
               }
               navigation.navigate("Login");
             })
-            .catch((error) => {
+            .catch(async (error) => {
               console.log(error);
               setLabel(error.message);
+              await auth.currentUser.delete();
               setLoading(false)
               setVisible(true);
             });
           }
          
         })
-        .catch((error) => {
+        .catch(async (error) => {
           console.log(error);
           setLabel(error.message);
           setLoading(false)

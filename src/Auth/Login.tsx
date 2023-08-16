@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { KeyboardAvoidingView, View, Alert, ScrollView } from "react-native";
 import { Button, Text, TextInput, Banner, Colors } from "react-native-paper";
 import { auth } from "../config/firebase";
@@ -16,21 +16,42 @@ import { fetchUser } from "../modules/data";
 import { useDispatch } from "react-redux";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import * as Notifications from "expo-notifications";
 import { ToastAndroid, Platform } from "react-native";
 
 export default function Login({ navigation }) {
 
-  const [label, setLabel] = React.useState("");
-  const [visible, setVisible] = React.useState(false);
+  const [label, setLabel] = useState("");
+  const [visible, setVisible] = useState(false);
 
-  const [securedpassword, setSecuredpassword] = React.useState(true);
-  const [Email, setEmail] = React.useState("");
-  const [Password, setPassword] = React.useState("");
-  const [color, setColor] = React.useState("#9d9d9d");
-  const [loading, setLoading] = React.useState(false);
+  const [securedpassword, setSecuredpassword] = useState(true);
+  const [Email, setEmail] = useState("");
+  const [Password, setPassword] = useState("");
+  const [color, setColor] = useState("#9d9d9d");
+  const [loading, setLoading] = useState(false);
+  const [expoPushToken, setExpoPushToken] = useState("");
 
   const dispatch = useDispatch();
+
+  
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Error",
+          "Failed to get push token for push notification!"
+        );
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      setExpoPushToken(token);
+      console.log(token);
+    })();
+  }, []);
+
+
 
 
 
@@ -42,6 +63,7 @@ export default function Login({ navigation }) {
         await axios.post(`${baseURL}/users/login`, {
           email: Email,
           password: Password,
+          pushToken: expoPushToken,
         })
         .then(async (res) => {
           dispatch(fetchUser(res?.data?.user?._id));

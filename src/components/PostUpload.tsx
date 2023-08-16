@@ -285,6 +285,14 @@ export default function PostUpload({ navigation, route }) {
                 return;
             }
         } else if(type === "newOrganization"){
+            if(images.length !== 1){
+                Alert.alert('Error', 'Please upload only one image', [
+                    {
+                        text: 'Ok',
+                    },
+                ])
+                return;
+            }
             if(newOrganizationForm.name === "" || newOrganizationForm.bio === ""){
                 Alert.alert('Error', 'Please fill in all the fields', [
                     {
@@ -353,32 +361,43 @@ export default function PostUpload({ navigation, route }) {
 
         setLoading(true);
 
-        let imagesURL = [];
-        images.forEach(async (image, index) => {
-            const name = image.uri.split("/").pop();
-            const response = await fetch(image.uri);
-            const blob = await response.blob();
-            const path = `images/${index} + ${name} + ${new Date().getTime()}`;
-            await storage.ref().child(path).put(blob)
-            .then(async (snapshot) => {
-                await snapshot.ref.getDownloadURL()
-                .then(async (downloadURL) => {
-                    console.log('File available at', downloadURL);
-                    imagesURL.push(downloadURL);
-                })
-                .catch((error) => {
-                    console.log(error);
+         const uriToBlob = (uri) => {
+            return new Promise((resolve, reject) => {
+               const xhr = new XMLHttpRequest()
+               xhr.onload = function () {
+                 // return the blob
+                 resolve(xhr.response)
+               }
+               xhr.onerror = function () {
+                 reject(new Error('uriToBlob failed'))
+               }
+               xhr.responseType = 'blob'
+               xhr.open('GET', uri, true)
+           
+               xhr.send(null)})
+        }
+
+        const imagesURL: string[] = [];
+        images.forEach((image, index) => {
+            uriToBlob(image.uri)
+            .then((blob) => {
+                const ref = storage.ref().child(`images/${Date.now()}`);
+                ref.put(blob)
+                .then((snapshot) => {
+                    snapshot.ref.getDownloadURL()
+                    .then((url) => {
+                        imagesURL.push(url);
+                        if(index === images?.length - 1){
+                            uploadData(imagesURL);
+                        }
+                    })
                 })
             })
-            .catch((error) => {
-                console.log(error);
-                setLoading(false);
-                if(Platform.OS === "android"){
-                    ToastAndroid.show("Error", ToastAndroid.SHORT);
-                }
-                return;
-            })
-            .finally(async () => {
+        })
+    }
+
+            
+    const uploadData = async (imagesURL: string[]) => {
                 if(type === "newEvent"){
                     await axios.post(`${API_URL}/events/new`, {
                         ...newEventForm,
@@ -460,7 +479,8 @@ export default function PostUpload({ navigation, route }) {
                 } else if(type === "newTree"){
                     await axios.post(`${API_URL}/plants/new`, {
                         ...newTreeForm,
-                        images: imagesURL
+                        images: imagesURL,
+                        userId: user?._id
                     })
                     .then((response) => {
                         console.log(JSON.stringify(response));
@@ -483,9 +503,7 @@ export default function PostUpload({ navigation, route }) {
                     })
                 }
             }
-            )
-        })
-    }
+
 
 
     const handleAddTag = () => {
@@ -597,6 +615,7 @@ export default function PostUpload({ navigation, route }) {
                         value={newEventForm.description}
                         onChangeText={(text) => setEventForm({ ...newEventForm, description: text })}
                         multiline={true}
+                        numberOfLines={4}
 
                     />
                 </View>
@@ -609,6 +628,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newEventForm.requirements.trees}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setEventForm({ ...newEventForm, requirements: { ...newEventForm.requirements, trees: text } })}
                             />
                         </View>
@@ -618,6 +638,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newEventForm.requirements.volunteers}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setEventForm({ ...newEventForm, requirements: { ...newEventForm.requirements, volunteers: text } })}
                             />
                         </View>
@@ -629,6 +650,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newEventForm.requirements.funds}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setEventForm({ ...newEventForm, requirements: { ...newEventForm.requirements, funds: text } })}
                             />
                         </View>
@@ -645,6 +667,8 @@ export default function PostUpload({ navigation, route }) {
                         textColor="#fff"
                         onChangeText={(text) => setEventForm({ ...newEventForm, landsDescription: text })}
                         multiline={true}
+                        numberOfLines={4}
+
                     />
                 </View>
                </View>
@@ -665,6 +689,8 @@ export default function PostUpload({ navigation, route }) {
                         textColor="#fff"
                         onChangeText={(text) => setNewPostForm({ ...newPostForm, text: text })}
                         multiline={true}
+                        numberOfLines={4}
+
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -762,6 +788,8 @@ export default function PostUpload({ navigation, route }) {
                         textColor="#fff"
                         onChangeText={(text) => setNewOrganizationForm({ ...newOrganizationForm, bio: text })}
                         multiline={true}
+                        numberOfLines={4}
+
                     />
                 </View>
             </View>
@@ -794,12 +822,13 @@ export default function PostUpload({ navigation, route }) {
                     <TextInput
                         style={{
                             ...styles.formInput,
-                            textAlignVertical: "top",
                         }}
                         value={newTreeForm.description}
                         textColor="#fff"
                         onChangeText={(text) => setNewTreeForm({ ...newTreeForm, description: text })}
                         multiline={true}
+                        numberOfLines={4}
+
                     />
                 </View>
                 <View style={styles.formItem}>
@@ -820,6 +849,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newTreeForm.requirements.sun}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, sun: text } })}
                             />
                         </View>
@@ -829,6 +859,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newTreeForm.requirements.soil}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, soil: text } })}
                             />
                         </View>
@@ -840,6 +871,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newTreeForm.requirements.water}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, water: text } })}
                             />
                         </View>
@@ -849,6 +881,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newTreeForm.requirements.temperature}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, temperature: text } })}
                             />
                         </View>
@@ -860,6 +893,7 @@ export default function PostUpload({ navigation, route }) {
                                 style={styles.formInput}
                                 value={newTreeForm.requirements.fertilizer}
                                 textColor="#fff"
+                                keyboardType="numeric"
                                 onChangeText={(text) => setNewTreeForm({ ...newTreeForm, requirements: { ...newTreeForm.requirements, fertilizer: text } })}
                             />
                         </View>
@@ -957,7 +991,17 @@ export default function PostUpload({ navigation, route }) {
                     </TouchableOpacity>
                     <TouchableOpacity 
                         style={[styles.typeButton, type === "newTree" ? styles.activeTypeButton : null]}
-                        onPress={() => setType("newTree")}
+                        onPress={() => {
+                            if(images.length > 1) {
+                                if(Platform.OS === "android") {
+                                    ToastAndroid.show("Only one image allowed for tree", ToastAndroid.SHORT);
+                                } else {
+                                    Alert.alert("Only one image allowed");
+                                }
+                            } else {
+                                setType("newTree");
+                            }
+                        }}
                     >
                         <Text style={[styles.typeButtonText, type === "newTree" ? styles.activeTypeButtonText : null]}>Add New Tree </Text>
                     </TouchableOpacity>
@@ -1102,7 +1146,7 @@ const styles = StyleSheet.create({
     },
     formInput: {
         width: "100%",
-        height: 40,
+        // height: 40,
         backgroundColor: "#212121",
         borderRadius: 5,
         paddingHorizontal: 10,

@@ -30,7 +30,6 @@ import { API_URL } from "../../../constants/index";
 import axios from "axios";
 
 import { IEvent } from '../../../constants/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import EventItem from './EventItem';
@@ -128,26 +127,7 @@ const Events = ({ route, navigation }) => {
                     }}
                 >
                     <TouchableOpacity
-                        onPress={() => {
-                            (async () => {
-                                await AsyncStorage.getItem('route')
-                                .then((res) => {
-                                    console.log(res);
-                                    if(res === "Organization") {
-                                        navigation.navigate('Organization', { _id: route?.params?.id });
-                                    } else {
-                                        navigation.goBack();
-                                    }
-                                })
-                                .catch((err) => {
-                                    console.log(err);
-                                })
-                                .finally(() => {
-                                    AsyncStorage.removeItem('route');
-                                    console.log('removed');
-                                })
-                            })();
-                        }}
+                        onPress={() => navigation.goBack()}
                     >
                        <ICONS.Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                     </TouchableOpacity>

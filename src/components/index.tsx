@@ -8,7 +8,6 @@ import Checkbox from './Checkbox';
 import Image from './Image';
 import OrganizationCard from './OrganizationCard';
 import Product from './Product';
-import Calendar from './Calendar';
 
 export {
   Block,
@@ -20,6 +19,5 @@ export {
   Image,
   OrganizationCard,
   Product,
-  Modal,
-  Calendar,
+  Modal
 };

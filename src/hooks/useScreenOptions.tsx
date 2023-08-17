@@ -201,6 +201,15 @@ export default () => {
         </Button>
       ),
     },
+    donation: {
+      ...menu,
+      headerRight: () => null,
+      headerLeft: () => (
+        <Button onPress={() => navigation.goBack()}>
+          <Image source={icons.arrow} radius={0} color={colors.icon} style={{transform: [{rotate: '180deg'}]}} />
+        </Button>
+      ),
+    },
     
   };
 

@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
     Comment.find({ _id: { $in: comments } })
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: 'name image type pushToken'
         })
         .skip((page - 1) * 10)
         .limit(10)
@@ -59,7 +59,7 @@ router.put('/upvote', async (req, res) => {
     Comment.findById(commentId)
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: 'name image type pushToken'
         })
         .then((comment) => {
             // Check if user has already downvoted the comment
@@ -93,7 +93,7 @@ router.put('/downvote', async (req, res) => {
     Comment.findById(commentId)
         .populate({
             path: 'author',
-            select: 'name image type'
+            select: 'name image type pushToken'
         })
         .then((comment) => {
             // Check if user has already upvoted the comment
@@ -161,14 +161,14 @@ router.post('/', async (req, res) => {
         Post.findById(id)
             .populate({
                 path: 'author',
-                select: 'name image type'
+                select: 'name image type pushToken'
             })
             .populate({
                 path: 'event',
                 select: 'title images status location createdAt author requirements',
                 populate: {
                     path: 'author',
-                    select: 'name image type'
+                    select: 'name image type pushToken'
                 }
             })
             .then((post) => {
@@ -263,14 +263,14 @@ router.delete('/', async (req, res) => {
         Post.findById(id)
             .populate({
                 path: 'author',
-                select: 'name image type'
+                select: 'name image type pushToken'
             })
             .populate({
                 path: 'event',
                 select: 'title images status location createdAt author requirements',
                 populate: {
                     path: 'author',
-                    select: 'name image type'
+                    select: 'name image type pushToken'
                 }
             })
             .then((post) => {

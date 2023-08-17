@@ -716,7 +716,7 @@ const Favourite = ({ navigation}: any) => {
                 }}>
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Events</Text>
+                            <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Favourite Events</Text>
                         </View>
 
                         <View style={{marginTop: SIZES.base }}>
@@ -736,7 +736,7 @@ const Favourite = ({ navigation}: any) => {
                 }}>
                     <View style={{ marginTop: SIZES.font, marginHorizontal: SIZES.padding }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Posts</Text>
+                            <Text style={{ color: COLORS.secondary, ...FONTS.H2, }}>Favourite Posts</Text>
                         </View>
 
                         <View style={{ marginTop: SIZES.base }}>

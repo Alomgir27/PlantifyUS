@@ -1,6 +1,5 @@
 import i18n from 'i18n-js';
 import {ImageSourcePropType} from 'react-native';
-import {CalendarBaseProps} from 'react-native-calendars';
 import {ITheme} from './theme';
 
 export * from './components';
@@ -224,23 +223,9 @@ export interface IBasket {
 
 export interface INotification {
   id?: number;
-  subject?: string;
+  _id?: string;
   message?: string;
   read?: boolean;
-  business?: boolean;
   createdAt?: number | Date;
-  type:
-    | 'document'
-    | 'documentation'
-    | 'payment'
-    | 'notification'
-    | 'profile'
-    | 'extras'
-    | 'office';
 }
 
-export interface ICalendar extends CalendarBaseProps {
-  dates?: any[];
-  calendar?: {start: number; end: number};
-  onClose?: (calendar?: {start?: number; end?: number}) => void;
-}

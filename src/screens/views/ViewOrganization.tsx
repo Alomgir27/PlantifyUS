@@ -9,11 +9,11 @@ import { API_URL } from '../../constants';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RefreshControl } from 'react-native';
 import { Modal as Modal2 } from 'react-native-paper';
 import { Alert } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import sendPushNotification from '../../modules/notfications';
 
 
 
@@ -27,6 +27,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
 
     const user = useSelector((state: any) => state.data.currentUser);
     const [id, setId] = useState<string>(item?._id);
+    const [loading, setLoading] = useState<boolean>(false);
     
     
     const [lengthMembers, setLengthMembers] = useState<number>(6);
@@ -52,9 +53,35 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
     
 
     const handleApprove = async (eventId: string) => {
+        setLoading(true);
         await axios.post(`${API_URL}/events/approve`, { eventId, organizationId: id , ...selectedDate, text, userId: user?._id})
         .then((res) => {
             console.log(res?.data);
+
+            const notification = {
+                title: 'Your event has been approved',
+                message: 'You can now see the event details',
+                type: 'event',
+                _id: res?.data?.event?._id,
+                image: res?.data?.event?.images[0],
+                userId: res?.data?.event?.author?._id,
+            };
+            sendPushNotification(res?.data?.event?.author?.pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+
+            item?.volunteers?.map((volunteer: any) => {
+                let pushToken = volunteer?.pushToken;
+                const notification = {
+                    title: 'New event has been hosted',
+                    message: res?.data?.event?.title + ' has been hosted by ' + item?.name,
+                    type: 'event',
+                    _id: res?.data?.event?._id,
+                    image: res?.data?.event?.images[0],
+                    userId: volunteer?._id,
+                };
+                sendPushNotification(pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+            })
+            
+
             setOrganization({...item, events: [...item?.events, res?.data?.event]});
             let newRequestedEvents = requestedEvents.filter((event: any) => event?._id !== eventId);
             setRequestedEvents(newRequestedEvents);
@@ -70,6 +97,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
         .catch((err) => {
             console.log(err);
         })
+        setLoading(false);
     };
 
     const handleReject = async (eventId: string) => {
@@ -88,7 +116,32 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
         await axios.post(`${API_URL}/organizations/approveJoinRequest`, { userId, organizationId: id })
         .then((res) => {
             console.log(res?.data);
+            let pushToken = item?.joinRequests?.filter((user: any) => user?._id === userId)[0]?.pushToken;
+            const notification = {
+                title: 'You have been accepted to join ' + item?.name,
+                message: 'You can now see the organization details',
+                type: 'organization',
+                _id: item?._id,
+                image: item?.images[0],
+                userId: userId,
+            };
+            sendPushNotification(pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+
+            let requestUser = item?.joinRequests?.filter((user: any) => user?._id === userId)[0];
             let newItems = item?.joinRequests?.filter((user: any) => user?._id !== userId);
+             //now notify all the volunteers 
+             newItems?.map((volunteer: any) => {
+                let pushToken = volunteer?.pushToken;
+                const notification = {
+                    title: 'New member joined ' + item?.name,
+                    message: requestUser?.name + ' has joined ' + item?.name,
+                    type: 'organization',
+                    _id: item?._id,
+                    image: item?.images[0],
+                    userId: volunteer?._id,
+                };
+                sendPushNotification(pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+            })
             setOrganization({...item, joinRequests: newItems});
         })
         .catch((err) => {
@@ -467,7 +520,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
         <Block>
             <Block row align="center" justify="space-between" marginBottom={sizes.s}>
                 <Text h5 semibold>
-                    Past Events {item?.events?.length > 0 && <Text primary>({item?.events?.length})</Text>}
+                    Hosted Events {item?.events?.length > 0 && <Text primary>({item?.events?.length})</Text>}
                 </Text>
             </Block>
 
@@ -711,7 +764,7 @@ const DetailOrganizations = ({item, navigation, setOrganization}: any) => {
               <Button
                   primary
                   width={sizes.width / 3}
-                  disabled={dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isBefore(dayjs()) || !dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isValid() || parseInt(selectedDate?.length) > 24 || parseInt(selectedDate?.length) + parseInt(selectedDate?.startHour) > 24 || parseInt(selectedDate?.day) > 31 || parseInt(selectedDate?.month) > 12}
+                  disabled={dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isBefore(dayjs()) || !dayjs(`${selectedDate?.year}-${selectedDate?.month}-${selectedDate?.day}`).isValid() || parseInt(selectedDate?.length) > 24 || parseInt(selectedDate?.length) + parseInt(selectedDate?.startHour) > 24 || parseInt(selectedDate?.day) > 31 || parseInt(selectedDate?.month) > 12 || parseInt(selectedDate?.length) < 1 || parseInt(selectedDate?.startHour) < 0 || loading}
                   onPress={() => {
                     handleApprove(event?._id);
                   }}

@@ -131,6 +131,13 @@ export const ASSETS: ThemeAssets = {
   x5: require('../assets/images/x5.png'),
   gle: require('../assets/images/gle.png'),
   tesla: require('../assets/images/tesla.png'),
+
+  //payments
+  paypal: require('../assets/images/paypal.png'),
+  payoneer: require('../assets/images/payoneer.png'),
+  bkash: require('../assets/images/bkash.png'),
+  rocket: require('../assets/images/rocket.png'),
+  nagad: require('../assets/images/nagad.png'),
 };
 
 export const FONTS: ThemeFonts = {

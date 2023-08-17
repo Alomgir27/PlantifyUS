@@ -32,6 +32,7 @@ app.use('/api/plants', require('./routes/plants'));
 app.use('/api/comments', require('./routes/comments'));
 app.use('/api/favourites', require('./routes/favourites'));
 app.use('/api/identify', require('./routes/identify'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 
 

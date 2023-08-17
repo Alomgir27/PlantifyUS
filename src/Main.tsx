@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from "react";
-import {  View, Text, Image, TouchableOpacity, StatusBar, StyleSheet } from "react-native";
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-
-
 import {
     PlantDetail,
     Campings,
@@ -39,28 +35,21 @@ import {
 import Tabs from "./navigation/tabs";
 import {createStackNavigator} from '@react-navigation/stack';
 
-
 // constants
-import { COLORS } from "./constants/index";
 import { fetchUser, fetchAllDefaultData, clearData } from "./modules/data";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { setMyLocation, setLocation } from "./modules/campings";
 import * as Location from 'expo-location';
-import * as ICONS from '@expo/vector-icons'
-import { Text as Text2 } from './components';
 
 import {useScreenOptions, useTranslation} from './hooks';
 
 const Stack = createStackNavigator();
 
-// const Drawer = createDrawerNavigator();
 export default function Main() {  
     const {t} = useTranslation();
     const screenOptions = useScreenOptions();
     const [loading, setLoading] = useState<boolean>(false);
-    const user = useSelector(state => state?.data?.currentUser)
-    const organizations = useSelector(state => state?.data?.organizations)
 
     const dispatch = useDispatch();
 
@@ -88,6 +77,7 @@ export default function Main() {
             dispatch(setLocation(location?.coords));
         })()
     }, [])
+
 
     useEffect(() => {
         if(loading){
@@ -118,7 +108,7 @@ export default function Main() {
             <Stack.Screen
                 name="Donation"
                 component={Donation}
-                options={{title: t('navigation.donation')}}
+                options={{title: t('navigation.donation'), ...screenOptions.donation}}
             />
             <Stack.Screen
                 name="PostUpload"
@@ -250,8 +240,6 @@ export default function Main() {
                 component={Plants}
                 options={{title: t('navigation.plants'), ...screenOptions.plants}}
             />
-           
-
        </Stack.Navigator>
                     
     );

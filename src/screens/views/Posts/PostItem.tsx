@@ -32,6 +32,8 @@ import moment from 'moment';
 import { API_URL } from "../../../constants/index";
 import { connect } from 'react-redux';
 import Comments from '../../../components/Comments';
+import sendPushNotification from '../../../modules/notfications';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -69,6 +71,17 @@ export class PostItem extends React.Component {
         }
         const { handlePress } : any = this.props;
         const { item } : any = this.props;
+        const notification = {
+            title: 'Upvote',
+            message: `${this.props.user?.name} upvoted your post`,
+            type: 'post',
+            _id: item?._id,
+            image: item?.images[0],
+            userId: item?.author?._id
+        }
+        if(item?.author?._id !== this.props.user?._id){
+          sendPushNotification(item?.author?.pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+        }
         handlePress('upvote', item?._id);        
     }
 

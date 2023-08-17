@@ -275,6 +275,12 @@ export interface ThemeAssets {
   x5: ImageSourcePropType;
   gle: ImageSourcePropType;
   tesla: ImageSourcePropType;
+
+  paypal: ImageSourcePropType;
+  payoneer: ImageSourcePropType;
+  bkash: ImageSourcePropType;
+  rocket: ImageSourcePropType;
+  nagad: ImageSourcePropType;
 }
 
 export interface ThemeFonts {

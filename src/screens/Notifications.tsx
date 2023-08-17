@@ -8,6 +8,8 @@ import {useData, useTheme, useTranslation} from '../hooks/';
 import {INotification} from '../constants/types';
 import {Block, Button, Image, Text} from '../components/';
 
+import { useSelector } from 'react-redux';
+
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
 dayjs.updateLocale('en', {
@@ -115,12 +117,13 @@ const Personal = ({subject, message, type, read, createdAt}: INotification) => {
   );
 };
 
-const Notifications = () => {
+const Notifications = ({navigation}) => {
   const {t} = useTranslation();
   const {notifications} = useData();
   const [tab, setTab] = useState('business');
   const pagerRef = React.createRef<PagerView>();
   const {icons, colors, sizes} = useTheme();
+  const user = useSelector(state => state.data.currentUser);
 
   const unread = notifications?.filter(
     (notification) => !notification?.read && notification.business,

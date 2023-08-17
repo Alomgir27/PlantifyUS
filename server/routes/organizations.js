@@ -106,7 +106,7 @@ router.post('/getAll', async (req, res) => {
     const { ids } = req.body;
     console.log(ids, 'ids get all');
     Organizations.find({ _id: { $nin: ids }, isVerified: true })
-        .populate('admin', '_id name image')
+        .populate('admin', '_id name image pushToken')
         .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .limit(5)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
@@ -121,7 +121,7 @@ router.get('/getMy/:id', async (req, res) => {
     const { id } = req.params;
     console.log(id, 'id');
     Organizations.find({ volunteers: id, isVerified: true })
-        .populate('admin', '_id name image')
+        .populate('admin', '_id name image pushToken')
         .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
@@ -134,7 +134,7 @@ router.post('/getPending', async (req, res) => {
     const { ids } = req.body;
     console.log(ids, 'ids get pending');
     Organizations.find({ _id: { $nin: ids }, isVerified: false })
-        .populate('admin', '_id name image')
+        .populate('admin', '_id name image pushToken')
         .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .limit(10)
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
@@ -149,7 +149,7 @@ router.get('/getRequested/:id', async (req, res) => {
     const { id } = req.params;
     console.log(id, 'id');
     Organizations.find({ joinRequests: id, isVerified: true })
-        .populate('admin', '_id name image')
+        .populate('admin', '_id name image pushToken')
         .populate({ path: 'volunteers', select: '_id name image', options: { limit: 2 } })
         .then(organizations => res.status(200).json({ success: true, organizations, message: 'Organizations fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organizations', error: err }));
@@ -205,11 +205,11 @@ router.get('/getOne/:id', async (req, res) => {
     const { id } = req.params;
     console.log(id, 'id');
     Organizations.findById(id)
-        .populate('admin', '_id name image')
-        .populate({ path: 'volunteers', select: '_id name image' })
-        .populate({ path: 'joinRequests', select: '_id name image' })
+        .populate('admin', '_id name image pushToken')
+        .populate({ path: 'volunteers', select: '_id name image pushToken' })
+        .populate({ path: 'joinRequests', select: '_id name image pushToken' })
         .populate({ path: 'events', select: '_id title images isVerified status hostDetails description whoVerified' })
-        .populate({ path: 'moderators', select: '_id name image' })
+        .populate({ path: 'moderators', select: '_id name image pushToken' })
         .populate({ path: 'badges', select: '_id name image' })
         .then(organization => res.status(200).json({ success: true, organization, message: 'Organization fetched successfully' }))
         .catch(err => res.status(400).json({ success: false, message: 'Unable to fetch organization', error: err }));
@@ -322,7 +322,7 @@ router.post('/removeVolunteer', async (req, res) => {
 
 router.put('/test', async (req, res) => {
     Organizations.find()
-        .populate('admin', '_id name image')
+        .populate('admin', '_id name image pushToken')
         .populate({ path: 'volunteers', select: '_id name image' })
         .populate({ path: 'joinRequests', select: '_id name image' })
         .populate({ path: 'events', select: '_id title images hostDetails' })

@@ -24,54 +24,23 @@ const Extra = ({
 
   return (
     <Block card align="center" padding={sizes.sm} marginTop={sizes.base * 8}>
-      <Image source={image} height={100} marginTop={-50} />
-      <Text p semibold marginTop={sizes.sm} marginBottom={sizes.xs}>
+      <Image 
+        source={image} 
+        height={100} 
+        marginTop={-50} 
+        marginBottom={sizes.sm}
+        width={100}
+        />
+      <Text p bold marginTop={sizes.sm} marginBottom={sizes.xs}>
         {name}
       </Text>
-      <Text
-        p
-        bold
-        transform="uppercase"
-        success={available}
-        danger={!available}>
-        {t(`extras.${available ? 'available' : 'unavailable'}`)}
-      </Text>
-      <Block row justify="space-evenly" marginTop={sizes.sm}>
+      
+      <Block row justify="center" marginTop={sizes.sm}>
         <Button
-          flex={0.5}
-          gradient={gradients.secondary}
-          onPress={() => onTimeSelect?.(id)}>
-          <Block
-            row
-            align="center"
-            justify="space-between"
-            paddingHorizontal={sizes.sm}>
-            <Text bold white transform="uppercase" marginRight={sizes.sm}>
-              {time}
-            </Text>
-            <Image
-              source={assets.arrow}
-              color={colors.white}
-              transform={[{rotate: '90deg'}]}
-            />
-          </Block>
-        </Button>
-        <Button
-          flex={1}
-          onPress={() => onSave?.()}
-          marginHorizontal={sizes.s}
-          gradient={saved ? gradients.success : gradients.secondary}>
-          <Text bold white transform="uppercase" marginHorizontal={sizes.s}>
-            {t(saved ? 'extras.saved' : 'extras.save')}
-          </Text>
-        </Button>
-        <Button
-          flex={0.5}
-          disabled={!available}
           onPress={() => onBook?.()}
           gradient={booked ? gradients.success : gradients.primary}>
           <Text bold white transform="uppercase" marginHorizontal={sizes.sm}>
-            {t(booked ? 'extras.booked' : 'extras.book')}
+            Proceeds to Checkout
           </Text>
         </Button>
       </Block>
@@ -79,7 +48,7 @@ const Extra = ({
   );
 };
 
-const Extras = () => {
+const Donations = ({ navigation }) => {
   const {t} = useTranslation();
   const {gradients, sizes} = useTheme();
   const [extras, setExtras] = useState(EXTRAS);
@@ -126,17 +95,24 @@ const Extras = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingVertical: sizes.md}}>
         <Text h3 gradient={gradients.primary} end={[0.7, 0]}>
-          {t('extras.title1')}
+          Your Donations are 
         </Text>
         <Text h3 gradient={gradients.primary} end={[0.7, 0]}>
-          {t('extras.title2')}
+          appreciated and will 
+        </Text>
+        <Text h3 gradient={gradients.primary} end={[0.7, 0]}>
+          be used to help the 
+        </Text>
+        <Text h3 gradient={gradients.primary} end={[0.7, 0]}>
+          community.
+        </Text>
+        <Text h4 bold marginTop={sizes.sm}>
+          Thank you for your support.
         </Text>
         <Text p marginVertical={sizes.sm}>
-          {t('extras.description')}
+          We are a 501(c)(3) non-profit organization. Your donations will help us to continue to provide services to the community.
         </Text>
-        <Text p semibold>
-          {t('extras.schedule')}
-        </Text>
+        
 
         {/* using map for items due to nested scrolls on same direction (vertical) */}
         {extras?.map((extra) => (
@@ -153,7 +129,7 @@ const Extras = () => {
       {/* contact us */}
       <Button gradient={gradients.primary} marginTop={sizes.s}>
         <Text bold white transform="uppercase" marginHorizontal={sizes.sm}>
-          {t('extras.contactUs')}
+          {t('extras.contactUs') + ' to get more information'}
         </Text>
       </Button>
 
@@ -186,4 +162,4 @@ const Extras = () => {
   );
 };
 
-export default Extras;
+export default Donations;

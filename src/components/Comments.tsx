@@ -56,6 +56,7 @@ import {
 import { Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Platform , ToastAndroid } from "react-native";
+import sendPushNotification from "../modules/notfications";
 
 const { width, height } = Dimensions.get("window");
 
@@ -130,6 +131,18 @@ const Comments = ({  item, isVisible, handleToggleComments, type, callBack } : a
     const handleCommentReplySubmit = () => {
         if (comment) {
             dispatch(handleCommentSubmit('replyTo', currentComment?._id, comment, setCurrentComment));
+            const notification = {
+                title: "Reply",
+                message: `${currentUser?.name} replied to your comment`,
+                type: type,
+                _id: item?._id,
+                image: item?.image,
+                userId: currentComment?.author?._id
+            }
+            if(currentComment?.author?._id !== currentUser?._id){
+               sendPushNotification(currentComment?.author?.pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+            }
+
             setComment("");
             inputRef.current?.clear();
             Keyboard.dismiss();
@@ -170,6 +183,17 @@ const Comments = ({  item, isVisible, handleToggleComments, type, callBack } : a
                 return;
             } else {
                 dispatch(handleCommentSubmit(type, item?._id, comment));
+                const notification = {
+                    title: "Comment",
+                    message: `${currentUser?.name} commented on your post`,
+                    type: type,
+                    _id: item?._id,
+                    image: item?.image,
+                    userId: item?.author?._id
+                }
+                if(item?.author?._id !== currentUser?._id){
+                    sendPushNotification(item?.author?.pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+                }
                 setComment("");
                 inputRef.current?.clear();
                 Keyboard.dismiss();

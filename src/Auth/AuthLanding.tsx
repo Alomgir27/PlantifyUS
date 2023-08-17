@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View,  StyleSheet, Image } from 'react-native';
 import Swiper from 'react-native-swiper';
+import { Text } from './../components';
 
 import { COLORS } from '../constants/index';
 
@@ -13,7 +14,7 @@ const AuthLandingPage = ({ navigation }) => {
             source={require('../../assets/logo.png')}
             style={styles.slideImage}
           />
-          <Text style={styles.slideText}>Welcome to our app!</Text>
+          <Text h4 style={styles.slideText}>Welcome to our app!</Text>
   
           <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
             We are a community of plant lovers
@@ -24,7 +25,7 @@ const AuthLandingPage = ({ navigation }) => {
             source={require('../../assets/images/slide2.png')}
             style={styles.slideImage}
           />
-           <Text style={styles.slideText}>Did you know?</Text>
+           <Text h4 style={styles.slideText}>Did you know?</Text>
             <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
               Plants can help you sleep better and improve your mood
             </Text>
@@ -34,7 +35,7 @@ const AuthLandingPage = ({ navigation }) => {
             source={require('../../assets/images/slide3.png')}
             style={styles.slideImage}
           />
-          <Text style={styles.slideText}>Join our community!</Text>
+          <Text h4 style={styles.slideText}>Join our community!</Text>
           {/* sologan */}
           <Text style={{ textAlign: 'center', color: COLORS.gray, margin: 5 }}>
             Share your plants with others and get inspired

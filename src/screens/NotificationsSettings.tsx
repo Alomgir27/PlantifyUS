@@ -56,10 +56,6 @@ const Notifications = () => {
           <Text>{t('settings.notifications.comments')}</Text>
           <Switch checked />
         </Block>
-        <Block row align="center" justify="space-between">
-          <Text>{t('settings.notifications.offers')}</Text>
-          <Switch checked />
-        </Block>
       </Block>
     </Block>
   );

@@ -90,7 +90,7 @@ router.get('/initial', async (req, res) => {
     Event.find({ isVerified: true })
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -116,7 +116,7 @@ router.get('/search', async (req, res) => {
         .limit(parseInt(limit) || 5)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -136,7 +136,7 @@ router.put('/upvote', async (req, res) => {
     Event.findById(eventId)
         .populate({ 
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -169,7 +169,7 @@ router.put('/downvote', async (req, res) => {
     Event.findById(eventId)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -202,7 +202,7 @@ router.get('/:id', async (req, res) => {
     Event.findById(id)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -225,7 +225,7 @@ router.post('/fetchMore', async (req, res) => {
     Event.find({ _id: { $nin: ids }, isVerified: true })
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -249,7 +249,7 @@ router.get('/getRequestedEvents/:id', async (req, res) => {
     Event.find({ organization: id, isVerified: false })
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',
@@ -278,7 +278,7 @@ router.post('/approve', async (req, res) => {
                     Event.findById(eventId)
                         .populate({
                             path: 'author',
-                            select: '_id name image type'
+                            select: '_id name image type pushToken'
                         })
                         .populate({
                             path: 'organization',
@@ -335,7 +335,7 @@ router.post('/getEvents', async (req, res) => {
     Event.find({ favourites: userId, _id: { $nin: ids }, isVerified: true })
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'organization',

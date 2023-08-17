@@ -73,14 +73,14 @@ router.get('/initial', async (req, res) => {
                     .limit(limit)
                     .populate({
                         path: 'author',
-                        select: '_id name image type'
+                        select: '_id name image type pushToken'
                     })
                     .populate({
                         path: 'event',
                         select: '_id title images status location createdAt author requirements',
                         populate: {
                             path: 'author',
-                            select: '_id name image type'
+                            select: '_id name image type pushToken'
                         }
                     })
                     .sort({ createdAt: -1 })
@@ -93,14 +93,14 @@ router.get('/initial', async (req, res) => {
             .limit(limit)
             .populate({
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             })
             .populate({
                 path: 'event',
                 select: '_id title images status location createdAt author requirements',
                 populate: {
                     path: 'author',
-                    select: '_id name image type'
+                    select: '_id name image type pushToken'
                 }
             })
             .sort({ createdAt: -1 })
@@ -120,14 +120,14 @@ router.get('/search', async (req, res) => {
         .limit(parseInt(limit) || 5)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'event',
             select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             }
         })
         .sort({ createdAt: -1 })
@@ -146,14 +146,14 @@ router.put('/upvote', async (req, res) => {
     Post.findById(postId)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'event',
             select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             }
         })
         .then(post => {
@@ -188,14 +188,14 @@ router.put('/downvote', async (req, res) => {
     Post.findById(postId)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'event',
             select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             }
         })
         .then(post => {
@@ -229,14 +229,14 @@ router.get('/:id', async (req, res) => {
     Post.findById(id)
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'event',
             select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             }
         })
         .then(post => res.status(200).json({ success: true, post, message: 'Post fetched successfully' }))
@@ -259,14 +259,14 @@ router.post('/fetchMore', async (req, res) => {
             Post.find({ $and: [{ _id: { $nin: ids } }, { $or: [{ author: { $in: user.friends } }, { author: user._id }] }] })
                 .populate({
                     path: 'author',
-                    select: '_id name image type'
+                    select: '_id name image type pushToken'
                 })
                 .populate({
                     path: 'event',
                     select: '_id title images status location createdAt author requirements',
                     populate: {
                         path: 'author',
-                        select: '_id name image type'
+                        select: '_id name image type pushToken'
                     }
                 })
                 .sort({ createdAt: -1 })
@@ -279,14 +279,14 @@ router.post('/fetchMore', async (req, res) => {
         Post.find({ _id: { $nin: ids } })
             .populate({
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             })
             .populate({
                 path: 'event',
                 select: '_id title images status location createdAt author requirements',
                 populate: {
                     path: 'author',
-                    select: '_id name image type'
+                    select: '_id name image type pushToken'
                 }
             })
             .sort({ createdAt: -1 })
@@ -305,14 +305,14 @@ router.post('/getPosts', async (req, res) => {
     Post.find({ favourites: userId, _id: { $nin: ids } })
         .populate({
             path: 'author',
-            select: '_id name image type'
+            select: '_id name image type pushToken'
         })
         .populate({
             path: 'event',
             select: '_id title images status location createdAt author requirements',
             populate: {
                 path: 'author',
-                select: '_id name image type'
+                select: '_id name image type pushToken'
             }
         })
         .sort({ createdAt: -1 })

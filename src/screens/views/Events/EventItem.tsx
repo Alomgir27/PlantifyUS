@@ -14,28 +14,24 @@ import {
 
 import { 
     FlatList , 
-    RefreshControl
 } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { images, icons, COLORS, FONTS, SIZES } from '../../../constants/index';
+import { images, icons, COLORS, FONTS, SIZES} from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
 import { Text } from '../../../components';
 
 import * as ICONS from "@expo/vector-icons";
 
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
 
 import moment from 'moment';
-
-
-import { API_URL } from "../../../constants/index";
 import { connect } from 'react-redux';
+
 import Comments from '../../../components/Comments';
+import { Button } from './../../../components/index';
 
 
-
+import sendPushNotification from '../../../modules/notfications';
 
 
 export class EventItem extends React.PureComponent {
@@ -59,6 +55,7 @@ export class EventItem extends React.PureComponent {
 
     }
 
+
     componentDidMount() {
         this.setState({ user: this.props.user });
     }
@@ -72,6 +69,17 @@ export class EventItem extends React.PureComponent {
             return Alert.alert('You need to login first', 'Please login to upvote');
         }
         const { handlePress } = this.props;
+        const notification = {
+            title: 'Upvote',
+            message: `${this.state.user?.name} upvoted your event`,
+            type: 'event',
+            _id: id,
+            image: this.props.item?.images[0],
+            userId: this.props.item?.author?._id,
+        }
+        if(this.props.item?.author?._id !== this.state.user?._id){
+          sendPushNotification(this.props.item?.author?.pushToken, notification.title, notification.message, notification.type, notification._id, notification.image, notification.userId);
+        }
         handlePress('upvote', id);
     }
 
@@ -218,7 +226,7 @@ export class EventItem extends React.PureComponent {
                         </TouchableOpacity>
                        {this.state.collapsed && (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text numberOfLines={1} style={{ ...FONTS.body4, color: COLORS.secondary }}>
+                            <Text black numberOfLines={1} style={{ ...FONTS.body4, color: COLORS.secondary }}>
                                 {item?.description}
                             </Text>
                         </View>
@@ -226,16 +234,16 @@ export class EventItem extends React.PureComponent {
                         {!this.state.collapsed && (
                             <View>
                                 <Text style={styles.cardTitle} primary bold>{item?.title}</Text>
-                                <Text numberOfLines={2} style={styles.cardDetails}>
+                                <Text black numberOfLines={2} style={styles.cardDetails}>
                                     {item?.description}
                                 </Text>
-                                <Text style={styles.cardDetails}>
+                                <Text black style={styles.cardDetails}>
                                     {item?.landsDescription}
                                 </Text>
-                                <Text style={styles.cardDetails}>
+                                <Text black style={styles.cardDetails}>
                                     {item?.requirements?.trees} trees
                                 </Text>
-                                <Text style={styles.cardDetails}>
+                                <Text black style={styles.cardDetails}>
                                     {item?.requirements?.volunteers} volunteers
                                 </Text>
                             </View>
@@ -304,9 +312,15 @@ export class EventItem extends React.PureComponent {
                             {item?.collectedFunds / item?.requirements?.funds * 100} %
                         </Text>
                     </View>
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>Donate</Text>
-                    </TouchableOpacity>
+                   
+                    <Button
+                        onPress={() => navigation.navigate("Donation", { _id: item?._id })}
+                        gradient={parseInt(item?.collectedFunds) / parseInt(item?.requirements?.funds) * 100 === 100 ? ['#3A416F', '#141727'] : ["#00996D", "#606d87"]}
+                    >
+                        <Text bold white transform="uppercase" marginHorizontal={10}>
+                            Donate Now
+                        </Text>
+                    </Button>
                 </View>
                 <View style={styles.fundsInfo}>
                     {item?.hostDetails?.message && (

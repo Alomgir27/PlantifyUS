@@ -236,7 +236,7 @@ const notificationSchema = new Schema({
     },
     organization: {
         type: Schema.Types.ObjectId,
-        ref: 'Organization'
+        ref: 'Organizations'
     },
     post: {
         type: Schema.Types.ObjectId,

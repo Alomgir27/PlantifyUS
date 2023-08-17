@@ -256,7 +256,8 @@
     "read": "Notifications lues",
     "unread": "Notifications non lues",
     "personal": "Personnel",
-    "business": "Affaires"
+    "business": "Affaires",
+    "organizations": "Organisations"
   },
   "shop": {
     "subtotal": {

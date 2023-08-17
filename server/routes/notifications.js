@@ -80,7 +80,8 @@ router.post('/', async (req, res) => {
         user: userId,
         organization: type === 'organization' ? _id : null,
         event: type === 'event' ? _id : null,
-        post: type === 'post' ? _id : null
+        post: type === 'post' ? _id : null,
+        read: false
     });
 
     notification.save()
@@ -93,42 +94,75 @@ router.post('/', async (req, res) => {
 });
 
 
+//@route GET api/notifications/:id
+//@desc Get all notifications for a user
+//@access Private
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    console.log(id);
+
+    Notification.find({ user: id })
+    .populate('user')
+    .sort({ createdAt: -1 })
+    .then(notifications => {
+        res.status(200).json({ success: true, notifications });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    })
+});
+
+
+
+//@route POST api/notifications/fetchMore
+//@desc Get more notifications for a user
+//@access Private
+router.post('/fetchMore', async (req, res) => {
+    const { userId, ids } = req.body;
+
+    Notification.find({ user: userId, _id: { $nin: ids } })
+    .populate('user')
+    .sort({ createdAt: -1 })
+    .then(notifications => {
+        res.status(200).json({ success: true, notifications });
+    })
+    .catch(err => {
+        res.status(500).json({ success: false, message: err.message });
+    })
+});
 
 
 
 
+//@route POST api/notifications/markAsRead
+//@desc Mark notifications as read
+//@access Private
+router.post('/markAsRead', async (req, res) => {
+    const { ids } = req.body;
 
+    Notification.updateMany({ _id: { $in: ids } }, { read: true })
+    .then(notifications => {
+        res.status(200).json({ success: true, notifications });
+    })
+    .catch(err => {
+        res.status(500).json({ success: false, message: err.message });
+    })
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+router.post('/test', async (req, res) => {
+    Notification.find()
+    .then(notifications => {
+        notifications.forEach(notification => {
+            notification.read = false;
+            notification.save();
+        })
+        res.status(200).json({ success: true, notifications });
+    })
+    .catch(err => {
+        res.status(500).json({ success: false, message: err.message });
+    })
+});
 
 module.exports = router;

@@ -216,7 +216,8 @@
     "read": "Read Notifications",
     "unread": "Unread Notifications",
     "personal": "Personal",
-    "business": "Business"
+    "business": "Business",
+    "organizations": "Organizations"
   },
   "shop": {
     "subtotal": {

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     StyleSheet,
@@ -19,7 +20,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import { images, icons, COLORS, FONTS, SIZES} from '../../../constants/index';
 import MapView, { Marker } from 'react-native-maps';
-import { Text } from '../../../components';
+import { Block, Text } from '../../../components';
 
 import * as ICONS from "@expo/vector-icons";
 
@@ -29,6 +30,8 @@ import { connect } from 'react-redux';
 
 import Comments from '../../../components/Comments';
 import { Button } from './../../../components/index';
+import { useTheme } from '../../../hooks';
+import { API_URL } from '../../../constants/index';
 
 
 import sendPushNotification from '../../../modules/notfications';
@@ -41,9 +44,9 @@ export class EventItem extends React.PureComponent {
             collapsed: true,
             user: null,
             isVisible: false,
-            shareText: 'https://www.google.com/',
-            shareUrl: 'https://www.google.com/',
-            shareTitle: 'Google',
+            shareText: `${this.props.item.title}`,
+            shareUrl: `events/${this.props.item._id}`,
+            shareTitle: `${this.props.item.title}`
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.handleUpVote = this.handleUpVote.bind(this);
@@ -143,10 +146,13 @@ export class EventItem extends React.PureComponent {
 
     render() {
         const { item, navigation } = this.props;
+        const { colors } = this.props;
         return (
         <>
             <View
-                style={styles.card}
+                style={[styles.card, { backgroundColor: colors.card }]}
+                key={item?._id}
+
             >
                 <View style={styles.author}>
                     <View style={styles.authorImgWrapper}>
@@ -412,18 +418,16 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     card: {
-        marginHorizontal: 10,
-        marginVertical: 10,
-        // backgroundColor: COLORS.white,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        // elevation: 5,
+        flex: 1,
+        margin: 10,
+        borderRadius: 8,
+        shadowColor: COLORS.lightGray,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 3,
+        elevation: 5,
+        
+      
     },
     cardImgWrapper: {
         flex: 1,
@@ -594,8 +598,11 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = (state) => {
+     const { colors } = useTheme();
+
     return {
         user: state.data.currentUser,
+        colors
     }
 }
 

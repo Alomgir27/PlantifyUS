@@ -2,14 +2,15 @@ import axios from "axios";
 import { API_URL } from "../constants/index";
 
 
-export const TREES_DATA_STATE_CHANGE = 'TREES_DATA_STATE_CHANGE';
-export const TREES_DATA_ADD = 'TREES_DATA_ADD';
-export const TREES_DATA_FETCH_SUCCESS = 'TREES_DATA_FETCH_SUCCESS';
-export const TREES_DATA_UPDATE = 'TREES_DATA_UPDATE';
-export const TREES_DATA_DELETE = 'TREES_DATA_DELETE';
-export const TREES_DATA_RESET = 'TREES_DATA_RESET';
-export const LOADING_STATE_CHANGE = 'LOADING_STATE_CHANGE';
-
+import {
+    TREES_DATA_STATE_CHANGE,
+    TREES_DATA_ADD,
+    TREES_DATA_FETCH_SUCCESS,
+    TREES_DATA_UPDATE,
+    TREES_DATA_DELETE,
+    TREES_DATA_RESET,
+    LOADING_STATE_CHANGE
+} from "./constants";
 
 
 

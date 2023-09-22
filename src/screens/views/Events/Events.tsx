@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     StyleSheet,
@@ -197,6 +198,11 @@ const Events = ({ route, navigation }) => {
                             onRefresh={onRefresh}
                         />
                     }
+                    ItemSeparatorComponent={() => {
+                        return (
+                            <View style={{ height: 10 }}></View>
+                        )
+                    }}
                     onEndReached={fetchMore}
                     onEndReachedThreshold={0.5}
                     ListFooterComponent={() => {

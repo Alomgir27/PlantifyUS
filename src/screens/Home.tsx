@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
     StyleSheet,
@@ -46,7 +48,6 @@ const Home = ({ navigation}: any) => {
 
 
 
-    const [mounted, setMounted] = useState<Boolean>(true);
 
     const dispatch = useDispatch();
 
@@ -54,17 +55,6 @@ const Home = ({ navigation}: any) => {
       (sizes.width - (sizes.padding + sizes.sm) * 2) / 2;
     
 
-      
-      useEffect(() => {
-        setMounted(true);
-        return () => {
-            setMounted(false);
-        }
-    }, []);
-
- 
-  
-   
 
     const onRefresh = () => {
         setLoading(true);

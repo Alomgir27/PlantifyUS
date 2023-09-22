@@ -156,3 +156,5 @@ Happy planting! 🌿
 ---
 
 This report briefly highlights the key aspects of the PlantifyUs Android application project, including its features, technologies used, installation, database design, and conclusion. You can include additional details and customize the report further to meet the specific requirements of your project submission.
+
+For more information about the PlantifyUs project, visit the [PlantifyUs website](https://www.plantifyus.com).

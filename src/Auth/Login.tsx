@@ -59,7 +59,12 @@ export default function Login({ navigation }) {
     setLoading(true)
     auth.signInWithEmailAndPassword(Email, Password)
       .then(async (result) => {
-        console.log(result);
+        if(result?.user?.emailVerified === false){
+          setLoading(false);
+          setLabel("Please verify your email address first");
+          setVisible(true);
+          return;
+        }
         await axios.post(`${baseURL}/users/login`, {
           email: Email,
           password: Password,
@@ -140,6 +145,7 @@ export default function Login({ navigation }) {
             margin: 10,
             borderRadius: 9,
             marginBottom: 20,
+            
           }}
         >
           <Text style={{ fontSize: 15, color: "#000" }}>{label}</Text>
@@ -147,7 +153,7 @@ export default function Login({ navigation }) {
 
 
       <KeyboardAvoidingView
-        style={{ flex: 1, justifyContent: "center", padding: 20, bottom: 50 }}
+        style={{ flex: 1, justifyContent: "center", padding: 20, bottom: 50, marginTop: 20 }}
       >
         <TextInput
           label="Email"
@@ -160,10 +166,10 @@ export default function Login({ navigation }) {
         />
 
         <TextInput
-          Password
           label="Password"
           style={styles.input}
           value={Password}
+          type="password"
           onChangeText={(text) => setPassword(text)}
           mode="outlined"
           secureTextEntry={securedpassword}

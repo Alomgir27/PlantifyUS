@@ -24,12 +24,14 @@ import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 
 import LottieView from "lottie-react-native";
-
+import { uriToBlob } from "../components/uriToBlob";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { fetchUser } from "../modules/data";
 
 import { useDispatch } from "react-redux";
 import { ToastAndroid, Platform } from "react-native";
+
 
 export default function Signup({ navigation }) {
 
@@ -116,71 +118,52 @@ export default function Signup({ navigation }) {
       }, 2000);
     }
      else {
+      const obj = {
+        name: Name,
+        email: Email,
+        password: Password,
+        location: location,
+        eventsAttending: [],
+        friends: [],
+        posts: [],
+        bio: "",
+        uuid: "",
+        image: "https://firebasestorage.googleapis.com/v0/b/plantifyus.appspot.com/o/logo.png?alt=media&token=f0aadb2a-e1d0-480a-96f0-ca9e60221694"
+      }
+     
       setLoading(true)
       await auth.createUserWithEmailAndPassword(Email, Password)
         .then(async (result) => {
           if(image !== null){
-            const response = await fetch(image);
-            const blob = await response.blob();
-            const childPath = `images/${auth.currentUser.uid}/${Math.random().toString(36)}`;
+            const blob = await uriToBlob(image);
+            const childPath = `images/${auth?.currentUser?.uid}/${Math.random().toString(36)}`;
             await storage.ref().child(childPath).put(blob)
             const url = await storage.ref().child(childPath).getDownloadURL();
-            await axios.post(`${baseURL}/users/register`, {
-              name: Name,
-              email: Email,
-              image: url,
-              location: location,
-              password: Password,
-              eventsAttending: [],
-              friends: [],
-              posts: [],
-              bio: "",
-              uuid: auth.currentUser.uid
-            })
-            .then((response) => {
-              console.log(response);
-              dispatch(fetchUser(response?.data?.user?._id));
-              setLoading(false)
-              navigation.navigate("Login");
-            })
-            .catch(async (error) => {
-              console.log(error);
-              setLabel(error.message);
-              await auth.currentUser.delete();
-
-              setVisible(true);
-              setLoading(false)
-            });
-          }else{
-            await axios.post(`${baseURL}/users/register`, {
-              name: Name,
-              email: Email,
-              image: "https://firebasestorage.googleapis.com/v0/b/plantifyus.appspot.com/o/logo.png?alt=media&token=f0aadb2a-e1d0-480a-96f0-ca9e60221694",
-              location: location,
-              password: Password,
-              eventsAttending: [],
-              friends: [],
-              posts: [],
-              bio: "",
-              uuid: auth.currentUser.uid
-            })
-            .then((response) => {
-              console.log(response);
-              dispatch(fetchUser(response?.data?.user?._id));
-              setLoading(false)
-              if(Platform.OS === "android"){
-                ToastAndroid.show("Account Created Successfully", ToastAndroid.SHORT);
-              }
-              navigation.navigate("Login");
-            })
-            .catch(async (error) => {
-              console.log(error);
-              setLabel(error.message);
-              await auth.currentUser.delete();
-              setLoading(false)
-              setVisible(true);
-            });
+            obj.image = url;
           }
+          // verfication email
+          await result.user.sendEmailVerification();
+          await axios.post(`${baseURL}/users/register`, obj)
+          .then(async (res) => {
+            console.log(res);
+            await AsyncStorage.setItem("user", JSON.stringify(res?.data?.user));
+            setLoading(false);
+            setEmail("");
+            setPassword("");
+            if(Platform.OS === "android"){
+              ToastAndroid.show("Verification email has been sent to your email address", ToastAndroid.SHORT);
+            }
+            navigation.navigate("Login"),
+            setVisible(false);
+            setLabel("");
+          })
+          .catch(async (err) => {
+            setLoading(false);
+            console.log(err);
+            Alert.alert("Error", err.message);
+            await auth?.currentUser?.delete();
+            
+          })
          
         })
         .catch(async (error) => {
@@ -244,10 +227,7 @@ export default function Signup({ navigation }) {
 
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity onPress={pickImage}>
-          <Image 
-            source={{ uri: image  ? image : "https://firebasestorage.googleapis.com/v0/b/plantifyus.appspot.com/o/images%2Flogo.png?alt=media&token=73a05297-aa73-4e6b-b208-86842afe4973" }}
-            style={{ width: 200, height: 200, resizeMode: "contain", borderRadius: 100, marginBottom: 20 }}
-          />
+          {image ? <Image source={{ uri: image }} style={{ width: 200, height: 200, borderRadius: 100 }} /> : <Image source={require("../../assets/logo.png")} style={{ width: 200, height: 200, borderRadius: 100 }} /> }
         </TouchableOpacity>
       </View>
 

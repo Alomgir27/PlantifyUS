@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState, useEffect } from "react";
 import {
     PlantDetail,
@@ -53,16 +54,6 @@ export default function Main() {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        (async () => {
-            const user = await AsyncStorage.getItem('user');
-            let _id: any = null;
-            if(user) {
-                _id = JSON.parse(user)?._id
-            }
-            dispatch(fetchUser(_id, setLoading))
-        })();
-    }, [])
 
     useEffect(() => {
         (async () => {
@@ -78,10 +69,23 @@ export default function Main() {
         })()
     }, [])
 
+    useEffect(() => {
+        (async () => {
+            const user = await AsyncStorage.getItem('user');
+            let _id: any = null;
+            if(user) {
+                _id = JSON.parse(user)?._id
+            }
+            dispatch(fetchUser(_id, setLoading))
+        })();
+        return () => {
+            dispatch(clearData())
+        }
+    }, [])
+
 
     useEffect(() => {
         if(loading){
-            dispatch(clearData())
             dispatch(fetchAllDefaultData());
             setLoading(false);
         }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image, SafeAreaView,  ScrollView, Alert   } from "react-native";
 import { Button } from "react-native-paper";
+import { uriToBlob } from "./uriToBlob";
 
 import Swiper from 'react-native-swiper';
 import * as Icon from "@expo/vector-icons";
@@ -17,6 +18,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import axios from "axios";
 import { ToastAndroid, Platform } from "react-native";
+
 
 
 
@@ -361,21 +363,7 @@ export default function PostUpload({ navigation, route }) {
 
         setLoading(true);
 
-         const uriToBlob = (uri) => {
-            return new Promise((resolve, reject) => {
-               const xhr = new XMLHttpRequest()
-               xhr.onload = function () {
-                 // return the blob
-                 resolve(xhr.response)
-               }
-               xhr.onerror = function () {
-                 reject(new Error('uriToBlob failed'))
-               }
-               xhr.responseType = 'blob'
-               xhr.open('GET', uri, true)
-           
-               xhr.send(null)})
-        }
+     
 
         const imagesURL: string[] = [];
         images.forEach((image, index) => {

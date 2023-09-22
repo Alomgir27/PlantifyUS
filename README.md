@@ -135,6 +135,18 @@ PlantifyUs is built using a combination of technologies and libraries:
      yarn android
      ```
 
+Note: Ensure that you have the correctly configured with the backend server. You can find the backend configuration API URL in the `index.js` file.
+which is located in the `src/constants/index.js` directory. You can also find the backend configuration API URL in the `index.js` file.
+   
+   replace the `API_URL` with your own backend API URL.
+   ```sh
+       const API_URL = "http://your-backend-api-url/api";
+       const API_URL = "http://192.168.0.112:5000/api"; // example
+   ```
+
+Note: Ensure that you have the latest version of Node.js installed on your system. You can download Node.js from the [official website](https://nodejs.org/en/download/).
+
+
 ## Database Design
 
 PlantifyUs's database design is based on an SQL-like schema, featuring tables such as Users, Organizations, Events, Trees, Donations, Posts, Favourites, Notifications, Badges, Progress, and Comments. These tables define various relationships, including one-to-many and many-to-many relationships through junction tables.

@@ -7,7 +7,9 @@
     "start": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "start:both": "concurrently \"yarn start\" \"cd ./server && yarn start\""
+
   },
   "dependencies": {
     "@babel/cli": "^7.21.0",

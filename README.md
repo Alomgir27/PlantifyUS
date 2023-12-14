@@ -171,6 +171,10 @@ This report briefly highlights the key aspects of the PlantifyUs Android applica
 
 For more information about the PlantifyUs project, visit the [PlantifyUs website](https://www.plantifyus.com).
 
-YouTube Link: [See Demo On YouTube](https://www.youtube.com/watch?v=AXVCvDrNtbo&ab_channel=ALOMGIR)
 
+[![See Demo On YouTube](https://i.ytimg.com/vi/AXVCvDrNtbo/hqdefault.jpg)](https://www.youtube.com/watch?v=AXVCvDrNtbo&ab_channel=ALOMGIR)
+
+
+
+---
 ![image](drawSQL-plantifyus-export-2023-08-24.png)

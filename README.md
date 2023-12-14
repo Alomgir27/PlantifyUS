@@ -4,7 +4,7 @@
 
 PlantifyUs is an Android application designed to cater to the needs of plant enthusiasts who wish to explore, learn, and share information about various plant species. This application serves as a platform for connecting plant lovers, facilitating the discovery of plant information, and promoting a sense of community among users. PlantifyUs aims to provide an intuitive and user-friendly interface for users to discover, interact with, and contribute to a comprehensive plant database.
 
-## Features
+## Features 
 
 ### 1. Plant Discovery and Information
 Users can explore an extensive collection of plant species, including detailed information such as names, categories, characteristics, and benefits. The app's search functionality enables users to find specific plants based on their names, categories, or unique characteristics.

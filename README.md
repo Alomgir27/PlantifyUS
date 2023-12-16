@@ -2,6 +2,8 @@
 ![image](drawSQL-plantifyus-export-2023-08-24.png)
 
 ---
+To see it on YouTube click below
+
 [![See Demo On YouTube](https://i.ytimg.com/vi/AXVCvDrNtbo/hqdefault.jpg)](https://www.youtube.com/watch?v=AXVCvDrNtbo&ab_channel=ALOMGIR)
 
 

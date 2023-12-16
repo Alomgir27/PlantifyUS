@@ -1,3 +1,10 @@
+---
+![image](drawSQL-plantifyus-export-2023-08-24.png)
+
+---
+[![See Demo On YouTube](https://i.ytimg.com/vi/AXVCvDrNtbo/hqdefault.jpg)](https://www.youtube.com/watch?v=AXVCvDrNtbo&ab_channel=ALOMGIR)
+
+
 # PlantifyUs Project Report
 
 ## Introduction
@@ -170,11 +177,3 @@ Happy planting! 🌿
 This report briefly highlights the key aspects of the PlantifyUs Android application project, including its features, technologies used, installation, database design, and conclusion. You can include additional details and customize the report further to meet the specific requirements of your project submission.
 
 For more information about the PlantifyUs project, visit the [PlantifyUs website](https://www.plantifyus.com).
-
-
-[![See Demo On YouTube](https://i.ytimg.com/vi/AXVCvDrNtbo/hqdefault.jpg)](https://www.youtube.com/watch?v=AXVCvDrNtbo&ab_channel=ALOMGIR)
-
-
-
----
-![image](drawSQL-plantifyus-export-2023-08-24.png)
